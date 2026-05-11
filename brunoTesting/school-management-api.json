@@ -1,0 +1,2271 @@
+{
+  "type": "http-collection",
+  "version": 1,
+  "name": "School Management API",
+  "children": [
+    {
+      "type": "http-folder",
+      "name": "Attendance",
+      "children": [
+        {
+          "type": "http-request",
+          "name": "POST /api/attendance/mark",
+          "method": "POST",
+          "url": "{{baseUrl}}/api/attendance/mark",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": {
+              "studentId": "123",
+              "status": "present"
+            },
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "TEACHER"
+            ],
+            "created": "2025-06-23T09:20:58.485075Z",
+            "modified": "2025-06-23T09:20:58.485082Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "POST /api/attendance/mark-bulk",
+          "method": "POST",
+          "url": "{{baseUrl}}/api/attendance/mark-bulk",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": {
+              "studentId": "123",
+              "status": "present"
+            },
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "TEACHER"
+            ],
+            "created": "2025-06-23T09:20:58.485091Z",
+            "modified": "2025-06-23T09:20:58.485093Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "GET /api/attendance/check/:classId",
+          "method": "GET",
+          "url": "{{baseUrl}}/api/attendance/check/:classId",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": null,
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "SCHOOL",
+              "TEACHER"
+            ],
+            "created": "2025-06-23T09:20:58.485097Z",
+            "modified": "2025-06-23T09:20:58.485098Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "GET /api/attendance/:id",
+          "method": "GET",
+          "url": "{{baseUrl}}/api/attendance/:id",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": null,
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "SCHOOL",
+              "TEACHER",
+              "STUDENT"
+            ],
+            "created": "2025-06-23T09:20:58.485102Z",
+            "modified": "2025-06-23T09:20:58.485103Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "POST /api/attendance/bulk",
+          "method": "POST",
+          "url": "{{baseUrl}}/api/attendance/bulk",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": {
+              "studentIds": [
+                "123",
+                "124"
+              ]
+            },
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "SCHOOL",
+              "TEACHER"
+            ],
+            "created": "2025-06-23T09:20:58.485112Z",
+            "modified": "2025-06-23T09:20:58.485113Z"
+          }
+        }
+      ]
+    },
+    {
+      "type": "http-folder",
+      "name": "Class",
+      "children": [
+        {
+          "type": "http-request",
+          "name": "POST /api/class/create",
+          "method": "POST",
+          "url": "{{baseUrl}}/api/class/create",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": {
+              "title": "New Item",
+              "description": "Sample description"
+            },
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "SCHOOL"
+            ],
+            "created": "2025-06-23T09:20:58.485122Z",
+            "modified": "2025-06-23T09:20:58.485124Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "GET /api/class/all",
+          "method": "GET",
+          "url": "{{baseUrl}}/api/class/all",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": null,
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "SCHOOL",
+              "TEACHER",
+              "STUDENT"
+            ],
+            "created": "2025-06-23T09:20:58.485128Z",
+            "modified": "2025-06-23T09:20:58.485130Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "GET /api/class/attendee",
+          "method": "GET",
+          "url": "{{baseUrl}}/api/class/attendee",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": null,
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "TEACHER"
+            ],
+            "created": "2025-06-23T09:20:58.485136Z",
+            "modified": "2025-06-23T09:20:58.485138Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "GET /api/class/:id",
+          "method": "GET",
+          "url": "{{baseUrl}}/api/class/:id",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": null,
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "SCHOOL"
+            ],
+            "created": "2025-06-23T09:20:58.485141Z",
+            "modified": "2025-06-23T09:20:58.485143Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "PUT /api/class/update/:id",
+          "method": "PUT",
+          "url": "{{baseUrl}}/api/class/update/:id",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": {
+              "title": "Updated Title"
+            },
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "SCHOOL"
+            ],
+            "created": "2025-06-23T09:20:58.485151Z",
+            "modified": "2025-06-23T09:20:58.485152Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "DELETE /api/class/delete/:id",
+          "method": "DELETE",
+          "url": "{{baseUrl}}/api/class/delete/:id",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": null,
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "SCHOOL"
+            ],
+            "created": "2025-06-23T09:20:58.485157Z",
+            "modified": "2025-06-23T09:20:58.485158Z"
+          }
+        }
+      ]
+    },
+    {
+      "type": "http-folder",
+      "name": "Examination",
+      "children": [
+        {
+          "type": "http-request",
+          "name": "POST /api/examination/create",
+          "method": "POST",
+          "url": "{{baseUrl}}/api/examination/create",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": {
+              "title": "New Item",
+              "description": "Sample description"
+            },
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "TEACHER",
+              "SCHOOL"
+            ],
+            "created": "2025-06-23T09:20:58.485166Z",
+            "modified": "2025-06-23T09:20:58.485168Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "GET /api/examination/all",
+          "method": "GET",
+          "url": "{{baseUrl}}/api/examination/all",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": null,
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "SCHOOL",
+              "TEACHER",
+              "STUDENT"
+            ],
+            "created": "2025-06-23T09:20:58.485172Z",
+            "modified": "2025-06-23T09:20:58.485173Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "GET /api/examination/class/:id",
+          "method": "GET",
+          "url": "{{baseUrl}}/api/examination/class/:id",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": null,
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "SCHOOL",
+              "TEACHER",
+              "STUDENT"
+            ],
+            "created": "2025-06-23T09:20:58.485176Z",
+            "modified": "2025-06-23T09:20:58.485178Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "PUT /api/examination/update/:id",
+          "method": "PUT",
+          "url": "{{baseUrl}}/api/examination/update/:id",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": {
+              "title": "Updated Title"
+            },
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "SCHOOL",
+              "TEACHER"
+            ],
+            "created": "2025-06-23T09:20:58.485183Z",
+            "modified": "2025-06-23T09:20:58.485185Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "DELETE /api/examination/delete/:id",
+          "method": "DELETE",
+          "url": "{{baseUrl}}/api/examination/delete/:id",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": null,
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "SCHOOL",
+              "TEACHER"
+            ],
+            "created": "2025-06-23T09:20:58.485188Z",
+            "modified": "2025-06-23T09:20:58.485189Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "POST /api/examination/calculate-duration",
+          "method": "POST",
+          "url": "{{baseUrl}}/api/examination/calculate-duration",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": {
+              "startTime": "10:00",
+              "endTime": "12:00"
+            },
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "SCHOOL",
+              "TEACHER"
+            ],
+            "created": "2025-06-23T09:20:58.485196Z",
+            "modified": "2025-06-23T09:20:58.485198Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "GET /api/examination/exam-types",
+          "method": "GET",
+          "url": "{{baseUrl}}/api/examination/exam-types",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": null,
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "SCHOOL",
+              "TEACHER",
+              "STUDENT"
+            ],
+            "created": "2025-06-23T09:20:58.485201Z",
+            "modified": "2025-06-23T09:20:58.485203Z"
+          }
+        }
+      ]
+    },
+    {
+      "type": "http-folder",
+      "name": "Notice",
+      "children": [
+        {
+          "type": "http-request",
+          "name": "GET /api/notice/all",
+          "method": "GET",
+          "url": "{{baseUrl}}/api/notice/all",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": null,
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "SCHOOL",
+              "TEACHER",
+              "STUDENT"
+            ],
+            "created": "2025-06-23T09:20:58.485207Z",
+            "modified": "2025-06-23T09:20:58.485208Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "GET /api/notice/important",
+          "method": "GET",
+          "url": "{{baseUrl}}/api/notice/important",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": null,
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "SCHOOL",
+              "TEACHER",
+              "STUDENT"
+            ],
+            "created": "2025-06-23T09:20:58.485211Z",
+            "modified": "2025-06-23T09:20:58.485213Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "GET /api/notice/active",
+          "method": "GET",
+          "url": "{{baseUrl}}/api/notice/active",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": null,
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "SCHOOL",
+              "TEACHER",
+              "STUDENT"
+            ],
+            "created": "2025-06-23T09:20:58.485216Z",
+            "modified": "2025-06-23T09:20:58.485218Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "GET /api/notice/audience/:audience",
+          "method": "GET",
+          "url": "{{baseUrl}}/api/notice/audience/:audience",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": null,
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "SCHOOL",
+              "TEACHER",
+              "STUDENT"
+            ],
+            "created": "2025-06-23T09:20:58.485221Z",
+            "modified": "2025-06-23T09:20:58.485223Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "GET /api/notice/:id",
+          "method": "GET",
+          "url": "{{baseUrl}}/api/notice/:id",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": null,
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "SCHOOL",
+              "TEACHER",
+              "STUDENT"
+            ],
+            "created": "2025-06-23T09:20:58.485226Z",
+            "modified": "2025-06-23T09:20:58.485228Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "POST /api/notice/create",
+          "method": "POST",
+          "url": "{{baseUrl}}/api/notice/create",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": {
+              "title": "New Item",
+              "description": "Sample description"
+            },
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "SCHOOL",
+              "TEACHER"
+            ],
+            "created": "2025-06-23T09:20:58.485237Z",
+            "modified": "2025-06-23T09:20:58.485240Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "PUT /api/notice/:id",
+          "method": "PUT",
+          "url": "{{baseUrl}}/api/notice/:id",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": {
+              "sample": "data"
+            },
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "SCHOOL",
+              "TEACHER"
+            ],
+            "created": "2025-06-23T09:20:58.485250Z",
+            "modified": "2025-06-23T09:20:58.485253Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "DELETE /api/notice/:id",
+          "method": "DELETE",
+          "url": "{{baseUrl}}/api/notice/:id",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": null,
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "SCHOOL",
+              "TEACHER"
+            ],
+            "created": "2025-06-23T09:20:58.485258Z",
+            "modified": "2025-06-23T09:20:58.485261Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "POST /api/notice/batch-delete",
+          "method": "POST",
+          "url": "{{baseUrl}}/api/notice/batch-delete",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": {
+              "ids": [
+                "id1",
+                "id2"
+              ]
+            },
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "SCHOOL",
+              "TEACHER"
+            ],
+            "created": "2025-06-23T09:20:58.485273Z",
+            "modified": "2025-06-23T09:20:58.485276Z"
+          }
+        }
+      ]
+    },
+    {
+      "type": "http-folder",
+      "name": "Schedule",
+      "children": [
+        {
+          "type": "http-request",
+          "name": "POST /api/schedule/create",
+          "method": "POST",
+          "url": "{{baseUrl}}/api/schedule/create",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": {
+              "title": "New Item",
+              "description": "Sample description"
+            },
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "SCHOOL",
+              "TEACHER"
+            ],
+            "created": "2025-06-23T09:20:58.485284Z",
+            "modified": "2025-06-23T09:20:58.485285Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "GET /api/schedule/fetch-with-class/:id",
+          "method": "GET",
+          "url": "{{baseUrl}}/api/schedule/fetch-with-class/:id",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": null,
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "SCHOOL",
+              "TEACHER",
+              "STUDENT"
+            ],
+            "created": "2025-06-23T09:20:58.485289Z",
+            "modified": "2025-06-23T09:20:58.485290Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "GET /api/schedule/fetch/:id",
+          "method": "GET",
+          "url": "{{baseUrl}}/api/schedule/fetch/:id",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": null,
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "SCHOOL",
+              "TEACHER",
+              "STUDENT"
+            ],
+            "created": "2025-06-23T09:20:58.485293Z",
+            "modified": "2025-06-23T09:20:58.485294Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "PUT /api/schedule/update/:id",
+          "method": "PUT",
+          "url": "{{baseUrl}}/api/schedule/update/:id",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": {
+              "title": "Updated Title"
+            },
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "SCHOOL",
+              "TEACHER"
+            ],
+            "created": "2025-06-23T09:20:58.485301Z",
+            "modified": "2025-06-23T09:20:58.485303Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "DELETE /api/schedule/delete/:id",
+          "method": "DELETE",
+          "url": "{{baseUrl}}/api/schedule/delete/:id",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": null,
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "SCHOOL",
+              "TEACHER"
+            ],
+            "created": "2025-06-23T09:20:58.485306Z",
+            "modified": "2025-06-23T09:20:58.485307Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "GET /api/schedule/teacher/subjects/:teacherId",
+          "method": "GET",
+          "url": "{{baseUrl}}/api/schedule/teacher/subjects/:teacherId",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": null,
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "SCHOOL"
+            ],
+            "created": "2025-06-23T09:20:58.485311Z",
+            "modified": "2025-06-23T09:20:58.485312Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "POST /api/schedule/cleanup",
+          "method": "POST",
+          "url": "{{baseUrl}}/api/schedule/cleanup",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": {},
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "SCHOOL"
+            ],
+            "created": "2025-06-23T09:20:58.485319Z",
+            "modified": "2025-06-23T09:20:58.485320Z"
+          }
+        }
+      ]
+    },
+    {
+      "type": "http-folder",
+      "name": "School",
+      "children": [
+        {
+          "type": "http-request",
+          "name": "POST /api/school/register",
+          "method": "POST",
+          "url": "{{baseUrl}}/api/school/register",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": {
+              "name": "Sample Name",
+              "email": "user@example.com",
+              "password": "Password123"
+            },
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [],
+            "created": "2025-06-23T09:20:58.485326Z",
+            "modified": "2025-06-23T09:20:58.485328Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "POST /api/school/login",
+          "method": "POST",
+          "url": "{{baseUrl}}/api/school/login",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": {
+              "email": "user@example.com",
+              "password": "Password123"
+            },
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [],
+            "created": "2025-06-23T09:20:58.485333Z",
+            "modified": "2025-06-23T09:20:58.485334Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "POST /api/school/register/google",
+          "method": "POST",
+          "url": "{{baseUrl}}/api/school/register/google",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": {
+              "name": "Sample Name",
+              "email": "user@example.com",
+              "password": "Password123"
+            },
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [],
+            "created": "2025-06-23T09:20:58.485340Z",
+            "modified": "2025-06-23T09:20:58.485341Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "POST /api/school/login/oauth",
+          "method": "POST",
+          "url": "{{baseUrl}}/api/school/login/oauth",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": {
+              "email": "user@example.com",
+              "password": "Password123"
+            },
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [],
+            "created": "2025-06-23T09:20:58.485346Z",
+            "modified": "2025-06-23T09:20:58.485347Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "POST /api/school/forgot-password",
+          "method": "POST",
+          "url": "{{baseUrl}}/api/school/forgot-password",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": {
+              "sample": "data"
+            },
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [],
+            "created": "2025-06-23T09:20:58.485354Z",
+            "modified": "2025-06-23T09:20:58.485355Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "POST /api/school/reset-password",
+          "method": "POST",
+          "url": "{{baseUrl}}/api/school/reset-password",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": {
+              "sample": "data"
+            },
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [],
+            "created": "2025-06-23T09:20:58.485361Z",
+            "modified": "2025-06-23T09:20:58.485363Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "GET /api/school/verify-reset-token/:token",
+          "method": "GET",
+          "url": "{{baseUrl}}/api/school/verify-reset-token/:token",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": null,
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [],
+            "created": "2025-06-23T09:20:58.485366Z",
+            "modified": "2025-06-23T09:20:58.485367Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "GET /api/school/all",
+          "method": "GET",
+          "url": "{{baseUrl}}/api/school/all",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": null,
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [],
+            "created": "2025-06-23T09:20:58.485371Z",
+            "modified": "2025-06-23T09:20:58.485373Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "PUT /api/school/update",
+          "method": "PUT",
+          "url": "{{baseUrl}}/api/school/update",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": {
+              "title": "Updated Title"
+            },
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "SCHOOL"
+            ],
+            "created": "2025-06-23T09:20:58.485383Z",
+            "modified": "2025-06-23T09:20:58.485385Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "GET /api/school/fetch-single",
+          "method": "GET",
+          "url": "{{baseUrl}}/api/school/fetch-single",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": null,
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "SCHOOL"
+            ],
+            "created": "2025-06-23T09:20:58.485391Z",
+            "modified": "2025-06-23T09:20:58.485394Z"
+          }
+        }
+      ]
+    },
+    {
+      "type": "http-folder",
+      "name": "Student",
+      "children": [
+        {
+          "type": "http-request",
+          "name": "POST /api/student/register",
+          "method": "POST",
+          "url": "{{baseUrl}}/api/student/register",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": {
+              "name": "Sample Name",
+              "email": "user@example.com",
+              "password": "Password123"
+            },
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "SCHOOL"
+            ],
+            "created": "2025-06-23T09:20:58.485411Z",
+            "modified": "2025-06-23T09:20:58.485414Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "POST /api/student/login",
+          "method": "POST",
+          "url": "{{baseUrl}}/api/student/login",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": {
+              "email": "user@example.com",
+              "password": "Password123"
+            },
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [],
+            "created": "2025-06-23T09:20:58.485422Z",
+            "modified": "2025-06-23T09:20:58.485425Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "GET /api/student/fetch-with-query",
+          "method": "GET",
+          "url": "{{baseUrl}}/api/student/fetch-with-query",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": null,
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "SCHOOL",
+              "TEACHER"
+            ],
+            "created": "2025-06-23T09:20:58.485431Z",
+            "modified": "2025-06-23T09:20:58.485434Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "GET /api/student/fetch-single",
+          "method": "GET",
+          "url": "{{baseUrl}}/api/student/fetch-single",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": null,
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "STUDENT"
+            ],
+            "created": "2025-06-23T09:20:58.485437Z",
+            "modified": "2025-06-23T09:20:58.485438Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "GET /api/student/fetch/:id",
+          "method": "GET",
+          "url": "{{baseUrl}}/api/student/fetch/:id",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": null,
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "SCHOOL"
+            ],
+            "created": "2025-06-23T09:20:58.485441Z",
+            "modified": "2025-06-23T09:20:58.485443Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "PUT /api/student/update/:id",
+          "method": "PUT",
+          "url": "{{baseUrl}}/api/student/update/:id",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": {
+              "title": "Updated Title"
+            },
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "SCHOOL"
+            ],
+            "created": "2025-06-23T09:20:58.485450Z",
+            "modified": "2025-06-23T09:20:58.485451Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "DELETE /api/student/delete/:id",
+          "method": "DELETE",
+          "url": "{{baseUrl}}/api/student/delete/:id",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": null,
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "SCHOOL"
+            ],
+            "created": "2025-06-23T09:20:58.485454Z",
+            "modified": "2025-06-23T09:20:58.485455Z"
+          }
+        }
+      ]
+    },
+    {
+      "type": "http-folder",
+      "name": "Subject",
+      "children": [
+        {
+          "type": "http-request",
+          "name": "POST /api/subject/create",
+          "method": "POST",
+          "url": "{{baseUrl}}/api/subject/create",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": {
+              "title": "New Item",
+              "description": "Sample description"
+            },
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "SCHOOL"
+            ],
+            "created": "2025-06-23T09:20:58.485463Z",
+            "modified": "2025-06-23T09:20:58.485465Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "GET /api/subject/all",
+          "method": "GET",
+          "url": "{{baseUrl}}/api/subject/all",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": null,
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "SCHOOL",
+              "TEACHER",
+              "STUDENT"
+            ],
+            "created": "2025-06-23T09:20:58.485468Z",
+            "modified": "2025-06-23T09:20:58.485469Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "PUT /api/subject/update/:id",
+          "method": "PUT",
+          "url": "{{baseUrl}}/api/subject/update/:id",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": {
+              "title": "Updated Title"
+            },
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "SCHOOL"
+            ],
+            "created": "2025-06-23T09:20:58.485475Z",
+            "modified": "2025-06-23T09:20:58.485476Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "DELETE /api/subject/delete/:id",
+          "method": "DELETE",
+          "url": "{{baseUrl}}/api/subject/delete/:id",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": null,
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "SCHOOL"
+            ],
+            "created": "2025-06-23T09:20:58.485479Z",
+            "modified": "2025-06-23T09:20:58.485480Z"
+          }
+        }
+      ]
+    },
+    {
+      "type": "http-folder",
+      "name": "Teacher",
+      "children": [
+        {
+          "type": "http-request",
+          "name": "POST /api/teacher/register",
+          "method": "POST",
+          "url": "{{baseUrl}}/api/teacher/register",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": {
+              "name": "Sample Name",
+              "email": "user@example.com",
+              "password": "Password123"
+            },
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "SCHOOL"
+            ],
+            "created": "2025-06-23T09:20:58.485487Z",
+            "modified": "2025-06-23T09:20:58.485489Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "POST /api/teacher/login",
+          "method": "POST",
+          "url": "{{baseUrl}}/api/teacher/login",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": {
+              "email": "user@example.com",
+              "password": "Password123"
+            },
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [],
+            "created": "2025-06-23T09:20:58.485551Z",
+            "modified": "2025-06-23T09:20:58.485553Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "GET /api/teacher/fetch-with-query",
+          "method": "GET",
+          "url": "{{baseUrl}}/api/teacher/fetch-with-query",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": null,
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "SCHOOL"
+            ],
+            "created": "2025-06-23T09:20:58.485556Z",
+            "modified": "2025-06-23T09:20:58.485557Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "GET /api/teacher/fetch-single",
+          "method": "GET",
+          "url": "{{baseUrl}}/api/teacher/fetch-single",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": null,
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "TEACHER"
+            ],
+            "created": "2025-06-23T09:20:58.485560Z",
+            "modified": "2025-06-23T09:20:58.485562Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "GET /api/teacher/fetch/:id",
+          "method": "GET",
+          "url": "{{baseUrl}}/api/teacher/fetch/:id",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": null,
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "SCHOOL"
+            ],
+            "created": "2025-06-23T09:20:58.485565Z",
+            "modified": "2025-06-23T09:20:58.485566Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "PUT /api/teacher/update/:id",
+          "method": "PUT",
+          "url": "{{baseUrl}}/api/teacher/update/:id",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": {
+              "title": "Updated Title"
+            },
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "SCHOOL"
+            ],
+            "created": "2025-06-23T09:20:58.485573Z",
+            "modified": "2025-06-23T09:20:58.485574Z"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "DELETE /api/teacher/delete/:id",
+          "method": "DELETE",
+          "url": "{{baseUrl}}/api/teacher/delete/:id",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "tests": [],
+          "envOverrides": {},
+          "body": {
+            "type": "json",
+            "json": null,
+            "formUrlEncoded": [],
+            "formMultipart": [],
+            "text": "",
+            "filePath": "",
+            "graphql": {
+              "query": "",
+              "variables": {}
+            }
+          },
+          "meta": {
+            "tags": [
+              "SCHOOL"
+            ],
+            "created": "2025-06-23T09:20:58.485578Z",
+            "modified": "2025-06-23T09:20:58.485579Z"
+          }
+        }
+      ]
+    }
+  ]
+}
