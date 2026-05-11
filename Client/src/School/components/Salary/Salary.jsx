@@ -1,17 +1,21 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import axios from 'axios';
 import { baseApi } from '../../../environment';
+import { MONTHS, buildSalaryTimelineRows, summarizeSalaryTimelineRows } from './salaryTimeline';
 import {
   Wallet, Plus, CheckCircle, Clock, AlertTriangle,
   Users, Filter, X, XCircle, RefreshCw, Edit, Trash2, Check,
 } from 'lucide-react';
-
-const MONTHS = [
-  'January','February','March','April','May','June',
-  'July','August','September','October','November','December',
-];
 const CURRENT_YEAR = new Date().getFullYear();
-const YEARS = Array.from({ length: 6 }, (_, i) => CURRENT_YEAR - 2 + i);
+
+const buildYearOptions = (teachers = []) => {
+  const teacherYears = teachers
+    .map((teacher) => new Date(teacher.createdAt || Date.now()).getFullYear())
+    .filter((year) => Number.isFinite(year));
+
+  const earliestYear = teacherYears.length > 0 ? Math.min(...teacherYears) : CURRENT_YEAR - 2;
+  return Array.from({ length: CURRENT_YEAR - earliestYear + 1 }, (_, index) => earliestYear + index);
+};
 
 const STATUS = {
   paid:    { label: 'Paid',    bg: 'bg-green-500/15',  text: 'text-green-400',  border: 'border-green-500/30',  Icon: CheckCircle   },
@@ -34,11 +38,10 @@ export default function Salary() {
   const [loading,   setLoading]   = useState(false);
   const [msg,       setMsg]       = useState({ text: '', type: '' });
 
-  // Default to current month / year so all teachers appear immediately
   const [filterTeacher, setFilterTeacher] = useState('');
   const [filterStatus,  setFilterStatus]  = useState('');
-  const [filterMonth,   setFilterMonth]   = useState(MONTHS[new Date().getMonth()]);
-  const [filterYear,    setFilterYear]    = useState(String(CURRENT_YEAR));
+  const [filterMonth,   setFilterMonth]   = useState('');
+  const [filterYear,    setFilterYear]    = useState('');
 
   const [modal,   setModal]   = useState(null);
   const [form,    setForm]    = useState(emptyForm);
@@ -67,67 +70,40 @@ export default function Salary() {
   const loadSalaries = useCallback(async () => {
     setLoading(true);
     try {
-      const params = {};
-      if (filterTeacher) params.teacherId = filterTeacher;
-      if (filterStatus)  params.status    = filterStatus;
-      if (filterMonth)   params.month     = filterMonth;
-      if (filterYear)    params.year      = filterYear;
-      const res = await axios.get(`${baseApi}/salary/all`, { ...hdrs(), params });
+      const res = await axios.get(`${baseApi}/salary/all`, hdrs());
       if (res.data.success) setSalaries(res.data.salaries || []);
     } catch (err) {
       showMsg(err.response?.data?.message || 'Failed to load salaries', 'error');
     } finally {
       setLoading(false);
     }
-  }, [filterTeacher, filterStatus, filterMonth, filterYear, showMsg]);
+  }, [showMsg]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { loadTeachers(); }, []);
   useEffect(() => { loadSalaries(); }, [loadSalaries]);
 
-  // ─── Merged display rows ──────────────────────────────────────────────────
-  // When a month + year are selected, show ALL teachers — those with an existing
-  // salary record show their real status; those without get a virtual "pending" row.
+  const yearOptions = useMemo(() => buildYearOptions(teachers), [teachers]);
+
+  const allRows = useMemo(() => buildSalaryTimelineRows(teachers, salaries), [teachers, salaries]);
+
   const displayRows = useMemo(() => {
-    const isMerged = !!filterMonth && !!filterYear;
-    if (!isMerged) {
-      // No period selected — only show real records
-      return salaries;
-    }
+    let rows = allRows;
+    if (filterTeacher) rows = rows.filter(row => (row.teacher?._id || row.teacher) === filterTeacher);
+    if (filterStatus)  rows = rows.filter(row => row.status === filterStatus);
+    if (filterMonth)   rows = rows.filter(row => row.month === filterMonth);
+    if (filterYear)    rows = rows.filter(row => String(row.year) === String(filterYear));
+    return rows;
+  }, [allRows, filterTeacher, filterStatus, filterMonth, filterYear]);
 
-    const base = filterTeacher
-      ? teachers.filter(t => t._id === filterTeacher)
-      : teachers;
+  const derivedStats = useMemo(() => summarizeSalaryTimelineRows(displayRows), [displayRows]);
 
-    const rows = base.map(teacher => {
-      const record = salaries.find(s => {
-        const tid = typeof s.teacher === 'object' ? s.teacher._id : s.teacher;
-        return tid === teacher._id;
-      });
-      if (record) return { ...record, _virtual: false };
-      return {
-        _id:           null,
-        _virtual:      true,
-        teacher,
-        amount:        teacher.salary || 0,
-        month:         filterMonth,
-        year:          Number(filterYear),
-        status:        'pending',
-        dueDate:       null,
-        paidDate:      null,
-        paymentMethod: null,
-      };
-    });
-
-    return filterStatus ? rows.filter(r => r.status === filterStatus) : rows;
-  }, [teachers, salaries, filterMonth, filterYear, filterTeacher, filterStatus]);
-
-  // Stats derived from displayRows
-  const derivedStats = useMemo(() => ({
-    paid:    displayRows.filter(r => r.status === 'paid').reduce((s, r) => s + (Number(r.amount) || 0), 0),
-    pending: displayRows.filter(r => r.status === 'pending').reduce((s, r) => s + (Number(r.amount) || 0), 0),
-    overdue: displayRows.filter(r => r.status === 'overdue').reduce((s, r) => s + (Number(r.amount) || 0), 0),
-  }), [displayRows]);
+  const activePeriodLabel = useMemo(() => {
+    if (filterMonth && filterYear) return `${filterMonth} ${filterYear}`;
+    if (filterMonth) return filterMonth;
+    if (filterYear) return filterYear;
+    return 'join date to now';
+  }, [filterMonth, filterYear]);
 
   // ─── Handlers ─────────────────────────────────────────────────────────────
   const openCreate = () => {
@@ -208,14 +184,12 @@ export default function Salary() {
       let res;
       if (payModal._id === null) {
         // Virtual row — create a new record
-        const due = new Date();
-        due.setDate(due.getDate() + 7);
         res = await axios.post(`${baseApi}/salary/create`, {
           teacherId:     payModal.teacher._id,
           amount:        payModal.amount || payModal.teacher.salary,
           month:         payModal.month,
           year:          payModal.year,
-          dueDate:       due.toISOString().split('T')[0],
+          dueDate:       payModal.dueDate || new Date().toISOString().split('T')[0],
           status:        payForm.status,
           paymentMethod: payForm.paymentMethod || undefined,
           paidDate:      payForm.status === 'paid' ? payForm.paidDate : undefined,
@@ -275,9 +249,9 @@ export default function Salary() {
           <div>
             <h1 className="text-2xl font-bold text-gray-100">Salary Management</h1>
             <p className="text-sm text-gray-500">
-              {filterMonth && filterYear
-                ? `Showing all teachers for ${filterMonth} ${filterYear}`
-                : 'Track and manage teacher salary payments'}
+              {filterMonth || filterYear
+                ? `Showing salary records for ${activePeriodLabel}`
+                : 'Showing salary records from each teacher join date to now'}
             </p>
           </div>
         </div>
@@ -313,7 +287,7 @@ export default function Salary() {
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Paid</span>
           </div>
           <p className="text-xl font-bold text-green-400">{fmt(derivedStats.paid)}</p>
-          <p className="text-xs text-gray-600 mt-1">{paidCount} teacher{paidCount !== 1 ? 's' : ''}</p>
+          <p className="text-xs text-gray-600 mt-1">{paidCount} record{paidCount !== 1 ? 's' : ''}</p>
         </div>
         <div className="bg-gray-800/60 border border-gray-700/60 rounded-2xl p-4">
           <div className="flex items-center gap-2 mb-3">
@@ -321,7 +295,7 @@ export default function Salary() {
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Pending</span>
           </div>
           <p className="text-xl font-bold text-gray-400">{fmt(derivedStats.pending)}</p>
-          <p className="text-xs text-gray-600 mt-1">{pendingCount} teacher{pendingCount !== 1 ? 's' : ''}</p>
+          <p className="text-xs text-gray-600 mt-1">{pendingCount} record{pendingCount !== 1 ? 's' : ''}</p>
         </div>
         <div className="bg-gray-800/60 border border-gray-700/60 rounded-2xl p-4">
           <div className="flex items-center gap-2 mb-3">
@@ -329,7 +303,7 @@ export default function Salary() {
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Overdue</span>
           </div>
           <p className="text-xl font-bold text-red-400">{fmt(derivedStats.overdue)}</p>
-          <p className="text-xs text-gray-600 mt-1">{overdueCount} teacher{overdueCount !== 1 ? 's' : ''}</p>
+          <p className="text-xs text-gray-600 mt-1">{overdueCount} record{overdueCount !== 1 ? 's' : ''}</p>
         </div>
         <div className="bg-gray-800/60 border border-gray-700/60 rounded-2xl p-4">
           <div className="flex items-center gap-2 mb-3">
@@ -371,7 +345,7 @@ export default function Salary() {
           <select value={filterYear} onChange={e => setFilterYear(e.target.value)}
             className="px-3 py-2 text-sm bg-gray-800 border border-gray-700 text-gray-200 rounded-xl outline-none focus:border-orange-500 cursor-pointer">
             <option value="">All Years</option>
-            {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
+            {yearOptions.map(y => <option key={y} value={y}>{y}</option>)}
           </select>
 
           {(filterTeacher || filterStatus || filterMonth || filterYear) && (
@@ -389,9 +363,9 @@ export default function Salary() {
           </button>
         </div>
 
-        {filterMonth && filterYear && (
+        {(filterMonth || filterYear) && (
           <p className="text-xs text-gray-500">
-            Showing <span className="text-orange-400 font-medium">{displayRows.length}</span> teachers for {filterMonth} {filterYear}
+            Showing <span className="text-orange-400 font-medium">{displayRows.length}</span> salary records for {activePeriodLabel}
             {pendingCount > 0 && <span className="ml-2 text-gray-400">&mdash; <span className="text-amber-400 font-medium">{pendingCount} unpaid</span></span>}
           </p>
         )}
@@ -593,7 +567,7 @@ export default function Salary() {
                   <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Year *</label>
                   <select value={form.year} onChange={e => setForm(p => ({ ...p, year: Number(e.target.value) }))}
                     className="w-full px-3 py-2.5 text-sm bg-gray-800 border border-gray-700 text-gray-200 rounded-xl outline-none focus:border-orange-500 transition-colors cursor-pointer">
-                    {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
+                    {yearOptions.map(y => <option key={y} value={y}>{y}</option>)}
                   </select>
                 </div>
               </div>

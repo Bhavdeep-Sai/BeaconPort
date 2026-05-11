@@ -5,7 +5,7 @@ module.exports = {
   createSalary: async (req, res) => {
     try {
       const { schoolId } = req.user;
-      const { teacherId, amount, month, year, dueDate, paymentMethod, description } = req.body;
+      const { teacherId, amount, month, year, dueDate, paidDate, status, paymentMethod, description } = req.body;
 
       if (!teacherId || !amount || !month || !year || !dueDate) {
         return res.status(400).json({
@@ -30,9 +30,18 @@ module.exports = {
         month,
         year,
         dueDate: new Date(dueDate),
+        paidDate: paidDate ? new Date(paidDate) : null,
+        status: status || 'pending',
         paymentMethod: paymentMethod || null,
         description: description || '',
       });
+
+      if (salary.status !== 'paid') {
+        salary.paidDate = null;
+        salary.paymentMethod = paymentMethod || null;
+      } else if (!salary.paidDate) {
+        salary.paidDate = new Date();
+      }
 
       await salary.save();
 

@@ -4,7 +4,7 @@ const {
   getFeeSettings, updateFeeSettings,
   getOverview, bulkGenerateFees,
   quickPay, quickUnpay, updateStatus,
-  deleteFee, getFeeStats,
+  deleteFee, getFeeStats, getAllFees,
 } = require('../controllers/feeController');
 
 const router = express.Router();
@@ -18,6 +18,7 @@ router.put('/quick-unpay/:id',  authMiddleware(['SCHOOL']), quickUnpay);
 router.put('/update-status/:id', authMiddleware(['SCHOOL']), updateStatus);
 router.delete('/delete/:id',   authMiddleware(['SCHOOL']), deleteFee);
 router.get('/stats',           authMiddleware(['SCHOOL']), getFeeStats);
+router.get('/all',             authMiddleware(['SCHOOL']), getAllFees);
 
 module.exports = router;
 

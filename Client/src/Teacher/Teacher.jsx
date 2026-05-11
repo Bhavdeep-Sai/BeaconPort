@@ -1,5 +1,7 @@
 ﻿import { useState, useEffect } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
+import axios from "axios";
+import { baseApi } from "../environment";
 import {
   LayoutDashboard,
   Calendar,
@@ -33,7 +35,8 @@ function NavItem({ item, isActive, collapsed, onClick }) {
       onClick={() => onClick(link)}
       title={collapsed ? label : undefined}
       className={[
-        "w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-r-lg border-l-4 transition-all duration-150",
+        "w-full flex items-center gap-3 py-2.5 text-sm rounded-r-lg border-l-4 transition-all duration-150",
+        collapsed ? "justify-center" : "px-3",
         active
           ? "border-l-blue-500 bg-blue-500/15 text-blue-400"
           : "border-l-transparent text-gray-400 hover:bg-blue-500/10 hover:text-blue-300",
@@ -99,13 +102,23 @@ function SidebarContent({ collapsed, forceFull, onToggle, onNav, isActive }) {
 export default function Teacher() {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [schoolData, setSchoolData] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
 
+  const authH = () => ({ Authorization: `Bearer ${localStorage.getItem('token')}` });
+
   useEffect(() => { setMobileOpen(false); }, [location.pathname]);
+
+  useEffect(() => {
+    axios.get(`${baseApi}/school/fetch-single`, { headers: authH() })
+      .then(res => { if (res.data?.school) setSchoolData(res.data.school); })
+      .catch(e => console.error('Failed to fetch school data:', e));
+  }, []);
 
   const isActive = (path) => location.pathname === path;
   const handleNav = (link) => { navigate(link); setMobileOpen(false); };
+  const isDashboard = location.pathname === "/teacher";
 
   return (
     <div className="flex min-h-screen bg-gray-950 text-gray-100">
@@ -121,17 +134,34 @@ export default function Teacher() {
         <SidebarContent forceFull collapsed={false} onToggle={() => {}} onNav={handleNav} isActive={isActive} />
       </aside>
 
-      <div className={["flex flex-col flex-1 min-w-0 transition-all duration-200", collapsed ? "md:ml-16" : "md:ml-60"].join(" ")}>
+      <div className={["flex flex-col flex-1 min-w-0 h-screen transition-all duration-200", collapsed ? "md:ml-16" : "md:ml-60"].join(" ")}>
         <header className="sticky top-0 z-30 flex items-center h-16 bg-gray-900 border-b border-gray-700/60 px-4 shrink-0">
           <button onClick={() => setMobileOpen(true)} className="mr-4 p-2 rounded-lg text-gray-400 hover:text-gray-200 hover:bg-gray-700/60 transition-colors md:hidden">
             <Menu size={20} />
           </button>
-          <span className="text-base font-bold text-gray-100 tracking-tight select-none">
-            Beacon<span className="text-blue-500">Port</span>
-          </span>
+          {collapsed ? (
+            <span className="text-base font-bold text-gray-100 tracking-tight select-none hidden md:block">
+              Beacon<span className="text-blue-500">Port</span>
+            </span>
+          ) : (
+            <>
+              {isDashboard ? (
+                <span className="text-base font-bold text-gray-100 tracking-tight select-none hidden md:block">
+                  Beacon<span className="text-blue-500">Port</span>
+                </span>
+              ) : (
+                <span className="text-base font-bold text-gray-100 tracking-tight select-none truncate">
+                  {schoolData?.schoolName || 'School'}
+                </span>
+              )}
+              <span className="text-base font-bold text-gray-100 tracking-tight select-none md:hidden">
+                {isDashboard ? 'Beacon' + 'Port' : (schoolData?.schoolName || 'School')}
+              </span>
+            </>
+          )}
         </header>
 
-        <main className="flex-1 p-4 md:p-6 overflow-auto">
+        <main className="flex-1 p-4 md:p-6 overflow-auto min-h-0">
           <Outlet />
         </main>
       </div>

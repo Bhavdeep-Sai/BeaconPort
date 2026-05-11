@@ -139,6 +139,8 @@ module.exports = {
         .populate('enrolledSubjects', 'subjectFee');
 
       let created = 0, skipped = 0, updated = 0;
+      const createdFees = [];
+      
       await Promise.all(students.map(async (student) => {
         const currentFee = calcTotalFee(student);
         const existing = await Fee.findOne({ school: schoolId, student: student._id, term, year: Number(year) });
@@ -152,7 +154,7 @@ module.exports = {
           }
           return;
         }
-        await Fee.create({
+        const newFee = await Fee.create({
           school:    schoolId,
           student:   student._id,
           class:     student.studentClass ? student.studentClass._id : null,
@@ -162,6 +164,13 @@ module.exports = {
           frequency,
           dueDate:   new Date(dueDate),
           status:    'pending',
+        });
+        createdFees.push({
+          id: newFee._id,
+          student: student.name,
+          term,
+          year,
+          frequency,
         });
         created++;
       }));
@@ -174,7 +183,7 @@ module.exports = {
         skipped,
       });
     } catch (err) {
-      console.error('bulkGenerateFees:', err);
+      console.error('bulkGenerateFees error:', err);
       return res.status(500).json({ success: false, message: 'Server error' });
     }
   },
@@ -235,20 +244,28 @@ module.exports = {
     try {
       const { schoolId } = req.user;
       const { status, paymentMethod, paidAmount } = req.body;
-
+      
       if (!['pending', 'paid', 'overdue', 'partial'].includes(status)) {
         return res.status(400).json({ success: false, message: 'Invalid status' });
       }
 
       const fee = await Fee.findOne({ _id: req.params.id, school: schoolId });
-      if (!fee) return res.status(404).json({ success: false, message: 'Fee record not found' });
+      if (!fee) {
+        return res.status(404).json({ success: false, message: 'Fee record not found' });
+      }
 
       fee.status = status;
       if (status === 'paid' || status === 'partial') {
         if (paymentMethod) fee.paymentMethod = paymentMethod;
         fee.paidDate = fee.paidDate || new Date();
         if (status === 'partial' && paidAmount != null) {
-          fee.paidAmount = Number(paidAmount);
+          const previousPaidAmount = Number(fee.paidAmount || 0);
+          const incomingPaidAmount = Number(paidAmount);
+          const nextPaidAmount = previousPaidAmount + (Number.isFinite(incomingPaidAmount) ? incomingPaidAmount : 0);
+          fee.paidAmount = Math.min(nextPaidAmount, fee.amount);
+          if (fee.paidAmount >= fee.amount) {
+            fee.status = 'paid';
+          }
         } else if (status === 'paid') {
           fee.paidAmount = fee.amount;
         }
@@ -259,9 +276,12 @@ module.exports = {
       }
 
       await fee.save();
-      return res.json({ success: true, message: 'Payment status updated', fee });
+      
+      // Fetch fresh copy to verify save
+      const saved = await Fee.findById(req.params.id);
+      return res.json({ success: true, message: 'Payment status updated', fee: saved });
     } catch (err) {
-      console.error('updateStatus:', err);
+      console.error('❌ updateStatus error:', err);
       return res.status(500).json({ success: false, message: 'Server error' });
     }
   },
@@ -278,10 +298,20 @@ module.exports = {
 
       const stats = await Fee.aggregate([
         { $match: match },
-        { $group: { _id: '$status', totalAmount: { $sum: '$amount' }, count: { $sum: 1 } } },
+        { $group: { _id: '$status', totalAmount: { $sum: { $cond: [ { $ifNull: ['$paidAmount', false] }, '$paidAmount', '$amount' ] } }, count: { $sum: 1 } } },
       ]);
 
-      const result = { paid: 0, pending: 0, overdue: 0, paidAmt: 0, pendingAmt: 0, overdueAmt: 0, totalRecords: 0 };
+      const result = {
+        paid: 0,
+        partial: 0,
+        pending: 0,
+        overdue: 0,
+        paidAmt: 0,
+        partialAmt: 0,
+        pendingAmt: 0,
+        overdueAmt: 0,
+        totalRecords: 0,
+      };
       stats.forEach(s => {
         result[s._id] = s.count;
         result[s._id + 'Amt'] = s.totalAmount;
@@ -291,6 +321,30 @@ module.exports = {
       return res.json({ success: true, stats: result });
     } catch (err) {
       console.error('getFeeStats:', err);
+      return res.status(500).json({ success: false, message: 'Server error' });
+    }
+  },
+
+  // GET /fee/all  (list all fee records for school, optional filters)
+  getAllFees: async (req, res) => {
+    try {
+      const { schoolId } = req.user;
+      const { studentId, status, term, year } = req.query;
+
+      const filter = { school: schoolId };
+      if (studentId) filter.student = studentId;
+      if (status) filter.status = status;
+      if (term) filter.term = term;
+      if (year) filter.year = Number(year);
+
+      const fees = await Fee.find(filter)
+        .populate('student', 'name email studentImg createdAt')
+        .populate('class', 'classText classFee')
+        .sort({ year: -1, term: 1, createdAt: -1 });
+
+      return res.status(200).json({ success: true, fees });
+    } catch (err) {
+      console.error('getAllFees:', err);
       return res.status(500).json({ success: false, message: 'Server error' });
     }
   },

@@ -2,6 +2,7 @@
 import axios from 'axios';
 import { baseApi } from '../../../environment';
 import { Spinner } from '../../../components/ui';
+import { buildFeeTimelineRows } from './feeTimeline';
 import {
   CreditCard, Settings, RefreshCw, CheckCircle, Clock,
   AlertCircle, Users, Filter, MinusCircle, X, Plus, XCircle,
@@ -106,14 +107,32 @@ export default function Fee() {
   const loadOverview = useCallback(async () => {
     setLoading(true);
     try {
-      const params = { term: selectedTerm, year: selectedYear };
-      if (filterClass)  params.classId = filterClass;
-      if (filterStatus) params.status  = filterStatus;
-      const res = await axios.get(`${baseApi}/fee/overview`, { ...hdrs(), params });
-      if (res.data.success) setOverview(res.data.overview || []);
-    } catch { /* ignore */ }
-    finally { setLoading(false); }
-  }, [selectedTerm, selectedYear, filterClass, filterStatus]);
+      // fetch students (optionally by class)
+      const sParams = {};
+      if (filterClass) sParams.studentClass = filterClass;
+      const studentsRes = await axios.get(`${baseApi}/student/fetch-with-query`, { ...hdrs(), params: sParams });
+      const students = studentsRes.data.success ? (studentsRes.data.students || []) : [];
+
+      // fetch all fee records for these students
+      const feesRes = await axios.get(`${baseApi}/fee/all`, { ...hdrs() });
+      const fees = feesRes.data.success ? (feesRes.data.fees || []) : [];
+
+      // Build timeline rows based on current frequency setting
+      const rows = buildFeeTimelineRows(students, fees, frequency, new Date());
+
+      // Filter rows by selected term/year/class/status
+      let filtered = rows;
+      
+      if (filterClass) filtered = filtered.filter(r => String(r.class?._id) === String(filterClass));
+      if (filterStatus) filtered = filtered.filter(r => (r.fee?.status || 'no-record') === filterStatus);
+      if (selectedTerm) filtered = filtered.filter(r => r.term === selectedTerm);
+      if (selectedYear) filtered = filtered.filter(r => Number(r.year) === Number(selectedYear));
+
+      setOverview(filtered);
+    } catch (err) {
+      console.error('❌ loadOverview error:', err);
+    } finally { setLoading(false); }
+  }, [selectedTerm, selectedYear, filterClass, filterStatus, frequency]);
 
   useEffect(() => { loadMeta(); }, [loadMeta]);
   useEffect(() => { loadOverview(); }, [loadOverview]);
@@ -145,7 +164,7 @@ export default function Fee() {
     setPayForm({
       status:        row.fee?.status        || 'paid',
       paymentMethod: row.fee?.paymentMethod || 'cash',
-      paidAmount:    row.fee?.paidAmount != null ? String(row.fee.paidAmount) : '',
+      paidAmount:    '',
     });
   };
 
@@ -157,12 +176,23 @@ export default function Fee() {
       let feeId = payModal.fee?._id;
 
       if (!feeId) {
+        // Fetch fresh school settings to ensure consistency
+        const settingsRes = await axios.get(`${baseApi}/fee/settings`, hdrs());
+        const schoolFrequency = settingsRes.data.feeFrequency || frequency || 'half-yearly';
+
         const genRes = await axios.post(`${baseApi}/fee/bulk-generate`, {
-          term: selectedTerm, year: selectedYear, frequency,
-          dueDate: getDefaultDueDate(selectedTerm, selectedYear, frequency),
+          term: selectedTerm, 
+          year: selectedYear, 
+          frequency: schoolFrequency,
+          dueDate: getDefaultDueDate(selectedTerm, selectedYear, schoolFrequency),
           studentIds: [payModal.student._id],
         }, hdrs());
-        if (!genRes.data.success) { showMsg(genRes.data.message || 'Failed to create record', 'error'); return; }
+
+        if (!genRes.data.success) { 
+          showMsg(genRes.data.message || 'Failed to create record', 'error'); 
+          return; 
+        }
+
         const ovRes = await axios.get(`${baseApi}/fee/overview`, {
           ...hdrs(), params: { term: selectedTerm, year: selectedYear },
         });
@@ -171,14 +201,17 @@ export default function Fee() {
       }
 
       if (feeId) {
-        await axios.put(`${baseApi}/fee/update-status/${feeId}`, {
+        const payload = {
           status:        payForm.status,
           paymentMethod: payForm.paymentMethod || null,
           paidAmount:    payForm.paidAmount ? Number(payForm.paidAmount) : null,
-        }, hdrs());
+        };
+
+        await axios.put(`${baseApi}/fee/update-status/${feeId}`, payload, hdrs());
+
         showMsg(`${payModal.student.name}'s payment status updated`);
         setPayModal(null);
-        loadOverview();
+        await loadOverview();
       }
     } catch {
       showMsg('Failed to update payment status', 'error');
@@ -281,23 +314,26 @@ export default function Fee() {
           { key: 'pending',  label: 'Pending',   Icon: Clock,        colorCls: 'text-gray-400',   bgCls: 'bg-gray-500/15',   amt: stats.pendingAmt, count: stats.pending  },
           { key: 'overdue',  label: 'Overdue',   Icon: AlertCircle,  colorCls: 'text-red-400',    bgCls: 'bg-red-500/15',    amt: stats.overdueAmt, count: stats.overdue  },
           { key: 'noRecord', label: 'No Record', Icon: Users,        colorCls: 'text-orange-400', bgCls: 'bg-orange-500/15', amt: null,             count: stats.noRecord },
-        ].map(({ key, label, colorCls, bgCls, amt, count, Icon: StatIcon }) => (
-          <div key={key} className="bg-gray-800/60 border border-gray-700/60 rounded-2xl p-4">
-            <div className="flex items-center gap-2 mb-3">
-              <div className={`p-1.5 rounded-lg ${bgCls}`}>
-                <StatIcon className={`w-4 h-4 ${colorCls}`} />
+        ].map((item) => {
+          const StatIcon = item.Icon;
+          return (
+            <div key={item.key} className="bg-gray-800/60 border border-gray-700/60 rounded-2xl p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <div className={`p-1.5 rounded-lg ${item.bgCls}`}>
+                  <StatIcon className={`w-4 h-4 ${item.colorCls}`} />
+                </div>
+                <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{item.label}</span>
               </div>
-              <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{label}</span>
+              {item.amt != null
+                ? <p className={`text-xl font-bold ${item.colorCls}`}>{fmt(item.amt)}</p>
+                : <p className={`text-3xl font-bold ${item.colorCls}`}>{item.count}</p>
+              }
+              {item.amt != null && (
+                <p className="text-xs text-gray-500 mt-1">{item.count} student{item.count !== 1 ? 's' : ''}</p>
+              )}
             </div>
-            {amt != null
-              ? <p className={`text-xl font-bold ${colorCls}`}>{fmt(amt)}</p>
-              : <p className={`text-3xl font-bold ${colorCls}`}>{count}</p>
-            }
-            {amt != null && (
-              <p className="text-xs text-gray-500 mt-1">{count} student{count !== 1 ? 's' : ''}</p>
-            )}
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* ── Filters ── */}

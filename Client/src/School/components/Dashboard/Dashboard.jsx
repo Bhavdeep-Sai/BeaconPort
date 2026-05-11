@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { baseApi } from '../../../environment';
 import axios from 'axios';
+import { buildSalaryTimelineRows, summarizeSalaryTimelineRows } from '../Salary/salaryTimeline';
 import {
   Users, GraduationCap, BookOpen, Building2, Bell,
   Calendar as CalendarIcon, Edit, Eye, Upload, X,
@@ -100,7 +101,7 @@ const Dashboard = () => {
         axios.get(`${baseApi}/class/all`,                { headers: h }),
         axios.get(`${baseApi}/subject/all`,              { headers: h }),
         axios.get(`${baseApi}/fee/stats`,    { headers: h, params: { year: currentYear, term: currentTerm } }),
-        axios.get(`${baseApi}/salary/stats`, { headers: h, params: { year: currentYear } }),
+        axios.get(`${baseApi}/salary/all`,   { headers: h }),
       ]);
 
       const safe = (settled, fn) => {
@@ -126,8 +127,14 @@ const Dashboard = () => {
       if (feeR.status === 'fulfilled' && feeR.value.data?.stats)
         setFeeStats(feeR.value.data.stats);
 
-      if (salaryR.status === 'fulfilled' && salaryR.value.data?.stats)
-        setSalaryStats(salaryR.value.data.stats);
+      const teachers = teachersR.status === 'fulfilled' ? (teachersR.value.data?.teachers || []) : [];
+      const salaries = salaryR.status === 'fulfilled' ? (salaryR.value.data?.salaries || []) : [];
+      if (teachers.length > 0 || salaries.length > 0) {
+        const salaryRows = buildSalaryTimelineRows(teachers, salaries);
+        setSalaryStats(summarizeSalaryTimelineRows(salaryRows));
+      } else {
+        setSalaryStats({ paid: 0, pending: 0, overdue: 0, totalRecords: 0, paidCount: 0, pendingCount: 0, overdueCount: 0 });
+      }
 
     } catch { setError('Failed to load dashboard statistics'); }
     finally  { setLoadingStats(false); }
@@ -213,6 +220,7 @@ const Dashboard = () => {
   const feeChartData = feeStats
     ? [
         { name: 'Collected', value: feeStats.paidAmt    || 0, color: '#22c55e' },
+        { name: 'Partial',   value: feeStats.partialAmt || 0, color: '#eab308' },
         { name: 'Pending',   value: feeStats.pendingAmt || 0, color: '#f97316' },
         { name: 'Overdue',   value: feeStats.overdueAmt || 0, color: '#ef4444' },
       ].filter(d => d.value > 0)
@@ -233,9 +241,9 @@ const Dashboard = () => {
 
       {/* ── Edit Full-Screen Overlay ─────────────────────────────────────────── */}
       {edit && (
-        <div className="fixed inset-0 z-50 flex overflow-hidden bg-gray-950">
+        <div className="fixed inset-0 z-50 flex h-screen min-h-screen w-screen overflow-hidden bg-gray-950">
           {/* Decorative left panel */}
-          <div className="hidden md:flex flex-col w-[340px] flex-shrink-0 border-r border-orange-500/20 bg-gradient-to-b from-gray-900 to-gray-950 relative overflow-hidden">
+          <div className="hidden md:flex h-full min-h-0 flex-col w-[340px] flex-shrink-0 border-r border-orange-500/20 bg-gradient-to-b from-gray-900 to-gray-950 relative overflow-hidden">
             <div className="h-0.5 bg-gradient-to-r from-orange-500 to-red-500 flex-shrink-0" />
             <div className="flex-1 flex flex-col px-7 pt-10 pb-6 z-10">
               <div className="w-16 h-16 rounded-2xl bg-orange-500/10 border border-orange-500/30 flex items-center justify-center mb-5">
@@ -270,7 +278,7 @@ const Dashboard = () => {
           </div>
 
           {/* Form panel */}
-          <div className="flex-1 flex flex-col overflow-hidden bg-gray-950">
+          <div className="flex-1 h-full min-h-0 flex flex-col overflow-hidden bg-gray-950">
             <div className="h-0.5 bg-gradient-to-r from-orange-500/30 via-orange-500 to-red-500 flex-shrink-0" />
             {/* Mobile top bar */}
             <div className="flex md:hidden items-center gap-2 px-4 py-3 border-b border-gray-800 flex-shrink-0">
@@ -279,7 +287,7 @@ const Dashboard = () => {
               </button>
               <span className="font-bold text-gray-100 text-sm">Edit School Info</span>
             </div>
-            <div className="flex-1 overflow-auto px-6 md:px-12 py-8">
+            <div className="flex-1 min-h-0 overflow-auto px-6 md:px-12 py-8 pb-16">
               <div className="hidden md:flex items-center gap-3 mb-6">
                 <div className="w-1 h-9 rounded-full bg-orange-500 flex-shrink-0" />
                 <div>
@@ -531,6 +539,7 @@ const Dashboard = () => {
                   <div className="flex-1 space-y-2.5">
                     {[
                       { label: 'Collected', amt: feeStats.paidAmt    || 0, count: feeStats.paid    || 0, dot: 'bg-green-400',  text: 'text-green-400'  },
+                      { label: 'Partial',   amt: feeStats.partialAmt || 0, count: feeStats.partial || 0, dot: 'bg-yellow-400', text: 'text-yellow-400' },
                       { label: 'Pending',   amt: feeStats.pendingAmt || 0, count: feeStats.pending || 0, dot: 'bg-orange-400', text: 'text-orange-400' },
                       { label: 'Overdue',   amt: feeStats.overdueAmt || 0, count: feeStats.overdue || 0, dot: 'bg-red-400',    text: 'text-red-400'    },
                     ].map(item => {
@@ -558,8 +567,8 @@ const Dashboard = () => {
 
                 {/* Collection rate bar */}
                 {(() => {
-                  const total = (feeStats.paidAmt || 0) + (feeStats.pendingAmt || 0) + (feeStats.overdueAmt || 0);
-                  const pct = total > 0 ? Math.round((feeStats.paidAmt || 0) / total * 100) : 0;
+                  const total = (feeStats.paidAmt || 0) + (feeStats.partialAmt || 0) + (feeStats.pendingAmt || 0) + (feeStats.overdueAmt || 0);
+                  const pct = total > 0 ? Math.round(((feeStats.paidAmt || 0) + (feeStats.partialAmt || 0)) / total * 100) : 0;
                   return (
                     <div className="mt-4 pt-4 border-t border-gray-700/60">
                       <div className="flex justify-between text-xs mb-1.5">
@@ -588,7 +597,7 @@ const Dashboard = () => {
               </div>
               <div>
                 <h3 className="text-sm font-bold text-gray-100">Salary Expenses</h3>
-                <p className="text-xs text-gray-500">{new Date().getFullYear()} overview</p>
+                <p className="text-xs text-gray-500">From join date to now</p>
               </div>
               {salaryStats && (
                 <div className="ml-auto text-xs text-purple-400 bg-purple-500/10 border border-purple-500/20 px-2 py-1 rounded-lg">
