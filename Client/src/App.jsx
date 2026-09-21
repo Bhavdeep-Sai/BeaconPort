@@ -34,6 +34,7 @@ import StudentExamination from './Student/Components/Examination/Examination'
 import StudentNotice from './Student/Components/Notice/Notice'
 import ProtectedRoute from './Guard/ProtectedRoute'
 import { AuthProvider } from './context/AuthContext'
+import { ThemeProvider } from './context/ThemeContext'
 import AttendanceDetails from './School/components/Attendance/AttendanceDetails'
 import Fee from './School/components/Fee/Fee'
 import Salary from './School/components/Salary/Salary'
@@ -43,8 +44,9 @@ import ChatBot from './Student/Components/ChatBot/ChatBot'
 
 const App = () => {
   return (
-    <AuthProvider>
-      <BrowserRouter>
+    <ThemeProvider>
+      <AuthProvider>
+        <BrowserRouter>
         <Routes>
           {/* Home Route */}
           <Route path='/' element={<Client />}>
@@ -120,6 +122,7 @@ const App = () => {
         </Routes>
       </BrowserRouter>
     </AuthProvider>
+  </ThemeProvider>
   )
 }
 

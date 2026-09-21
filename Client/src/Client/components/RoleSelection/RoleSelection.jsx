@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { School, Users, GraduationCap, ArrowLeft } from 'lucide-react';
+import { School, Users, GraduationCap, ArrowLeft, Sparkles } from 'lucide-react';
+import ThemeToggle from '../../../components/ui/ThemeToggle';
 
 const roles = [
   {
@@ -9,9 +10,9 @@ const roles = [
     description: 'Manage your entire institution from one powerful dashboard.',
     gradient: 'from-orange-500 to-red-600',
     hoverGlow: 'hover:shadow-orange-500/20',
-    borderHover: 'hover:border-orange-500/40',
+    borderHover: 'hover:border-orange-500/50',
     badgeBg: 'bg-orange-500/15',
-    badgeText: 'text-orange-400',
+    badgeText: 'text-orange-500 dark:text-orange-400',
     btnGradient: 'from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600',
     dotColor: 'bg-orange-500',
     icon: <School className="w-8 h-8 text-white" />,
@@ -24,11 +25,11 @@ const roles = [
     description: 'Access your teaching dashboard to manage classes and track progress.',
     gradient: 'from-blue-500 to-indigo-600',
     hoverGlow: 'hover:shadow-blue-500/20',
-    borderHover: 'hover:border-blue-500/40',
+    borderHover: 'hover:border-blue-500/50',
     badgeBg: 'bg-blue-500/15',
-    badgeText: 'text-blue-400',
+    badgeText: 'text-blue-500 dark:text-blue-400',
     btnGradient: 'from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600',
-    dotColor: 'bg-blue-400',
+    dotColor: 'bg-blue-500',
     icon: <Users className="w-8 h-8 text-white" />,
     iconBg: 'bg-gradient-to-br from-blue-500 to-indigo-600',
     features: ['Weekly Schedule View', 'Mark Attendance', 'Grade Examinations', 'School Notices'],
@@ -39,11 +40,11 @@ const roles = [
     description: 'Access your classes, attendance records, and stay up to date.',
     gradient: 'from-green-600 to-green-800',
     hoverGlow: 'hover:shadow-green-600/20',
-    borderHover: 'hover:border-green-600/40',
+    borderHover: 'hover:border-green-600/50',
     badgeBg: 'bg-green-600/15',
-    badgeText: 'text-green-400',
+    badgeText: 'text-green-600 dark:text-green-400',
     btnGradient: 'from-green-600 to-green-600 hover:from-green-800 hover:to-green-800',
-    dotColor: 'bg-green-400',
+    dotColor: 'bg-green-500',
     icon: <GraduationCap className="w-8 h-8 text-white" />,
     iconBg: 'bg-gradient-to-br from-green-600 to-green-800',
     features: ['View Timetable', 'Attendance Records', 'Exam Schedules & Results', 'AI Tutor Assistant'],
@@ -54,23 +55,26 @@ const RoleSelection = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="h-screen overflow-hidden bg-gray-900 flex flex-col">
+    <div className="h-screen overflow-hidden bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 flex flex-col transition-colors duration-200">
 
       {/* Top bar */}
-      <div className="flex-shrink-0 flex items-center justify-between px-8 py-5 border-b border-gray-800">
+      <div className="flex-shrink-0 flex items-center justify-between px-6 sm:px-8 py-4 sm:py-5 border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md">
         {/* Logo */}
         <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => navigate('/')}>
-          <img src="/bell.svg" alt="BeaconPort" className="w-8 h-8 brightness-0 invert" />
-          <span className="text-xl font-bold text-white tracking-wide">BeaconPort</span>
+          <img src="/bell.svg" alt="BeaconPort" className="w-8 h-8 dark:brightness-0 dark:invert" />
+          <span className="text-xl font-bold text-gray-900 dark:text-white tracking-wide">Beacon<span className="text-orange-500">Port</span></span>
         </div>
-        {/* Back */}
-        <button
-          onClick={() => navigate('/')}
-          className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-orange-400 transition-colors cursor-pointer bg-transparent border-none"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span className="hidden sm:inline">Back to Home</span>
-        </button>
+        {/* Right actions */}
+        <div className="flex items-center gap-4">
+          <ThemeToggle size="sm" />
+          <button
+            onClick={() => navigate('/')}
+            className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500 dark:hover:text-orange-400 transition-colors cursor-pointer bg-transparent border-none"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span className="hidden sm:inline">Back to Home</span>
+          </button>
+        </div>
       </div>
 
       {/* Main */}
@@ -79,8 +83,8 @@ const RoleSelection = () => {
 
           {/* Heading */}
           <div className="text-center mb-10">
-            <h1 className="text-4xl font-bold text-white mb-3">Choose Your Role</h1>
-            <p className="text-gray-400 text-base max-w-xl mx-auto">
+            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-3">Choose Your Role</h1>
+            <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base max-w-xl mx-auto">
               Select the portal that matches your role to access the right tools and dashboard.
             </p>
           </div>
@@ -91,10 +95,10 @@ const RoleSelection = () => {
               <div
                 key={role.id}
                 onClick={() => navigate(`/login/${role.id}`)}
-                className={`group relative bg-gray-800 border border-gray-700 ${role.borderHover} rounded-2xl p-7 cursor-pointer transition-all duration-300 hover:scale-[1.03] hover:shadow-2xl ${role.hoverGlow} overflow-hidden`}
+                className={`group relative bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 ${role.borderHover} rounded-2xl p-7 cursor-pointer transition-all duration-300 hover:scale-[1.02] shadow-sm hover:shadow-xl ${role.hoverGlow} overflow-hidden`}
               >
                 {/* Subtle gradient wash on hover */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${role.gradient} opacity-0 group-hover:opacity-[0.07] transition-opacity duration-300 rounded-2xl pointer-events-none`} />
+                <div className={`absolute inset-0 bg-gradient-to-br ${role.gradient} opacity-0 group-hover:opacity-[0.05] transition-opacity duration-300 rounded-2xl pointer-events-none`} />
 
                 {/* Decorative orb */}
                 <div className={`absolute -top-8 -right-8 w-24 h-24 bg-gradient-to-br ${role.gradient} opacity-10 rounded-full group-hover:opacity-20 transition-opacity duration-300 pointer-events-none`} />
@@ -106,17 +110,22 @@ const RoleSelection = () => {
                   </div>
 
                   {/* Badge */}
-                  <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-medium mb-3 ${role.badgeBg} ${role.badgeText}`}>
-                    {role.title}
-                  </span>
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-semibold ${role.badgeBg} ${role.badgeText}`}>
+                      {role.title}
+                    </span>
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
+                      <Sparkles className="w-2.5 h-2.5" /> Demo Ready
+                    </span>
+                  </div>
 
                   {/* Description */}
-                  <p className="text-gray-400 text-sm leading-relaxed mb-5">{role.description}</p>
+                  <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed mb-5">{role.description}</p>
 
                   {/* Features */}
                   <ul className="space-y-2 mb-7">
                     {role.features.map((f, i) => (
-                      <li key={i} className="flex items-center gap-2.5 text-sm text-gray-300">
+                      <li key={i} className="flex items-center gap-2.5 text-sm text-gray-700 dark:text-gray-300">
                         <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${role.dotColor}`} />
                         {f}
                       </li>
@@ -139,7 +148,7 @@ const RoleSelection = () => {
             New school?{' '}
             <span
               onClick={() => navigate('/register')}
-              className="text-orange-400 hover:text-orange-300 cursor-pointer font-medium underline underline-offset-4 transition-colors"
+              className="text-orange-500 dark:text-orange-400 hover:text-orange-600 dark:hover:text-orange-300 cursor-pointer font-medium underline underline-offset-4 transition-colors"
             >
               Create an account
             </span>

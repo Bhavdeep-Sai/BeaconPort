@@ -8,3 +8,4 @@ export { Modal } from './Modal';
 export { Select } from './Select';
 export { Spinner } from './Spinner';
 export { Table, Thead, Tbody, Th, Td, Tr } from './Table';
+export { ThemeToggle } from './ThemeToggle';

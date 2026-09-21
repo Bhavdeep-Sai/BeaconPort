@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { baseApi } from '../../../environment';
 import {
@@ -24,7 +24,6 @@ const fmtDate = iso => {
 
 const DAY_OF_WEEK = iso => {
   const d = new Date(iso);
-  // 0=Sun,1=Mon,...,6=Sat  — map to our DAYS array (Mon=idx0)
   const map = { 1: 'Monday', 2: 'Tuesday', 3: 'Wednesday', 4: 'Thursday', 5: 'Friday', 6: 'Saturday' };
   return map[d.getDay()] || null;
 };
@@ -41,7 +40,6 @@ export default function Schedule() {
     return map[d] || 'Monday';
   });
 
-  // ─── Fetch student → class → schedule + exams ─────────────────────
   const fetchStudentData = async () => {
     setLoading(true);
     setError('');
@@ -62,7 +60,6 @@ export default function Schedule() {
   };
 
   const fetchClassEvents = async (classId) => {
-    // Fetch schedule
     let parsedSchedule = [];
     try {
       const res = await axios.get(`${baseApi}/schedule/fetch-with-class/${classId}`);
@@ -81,7 +78,6 @@ export default function Schedule() {
 
     setScheduleEvents(parsedSchedule);
 
-    // Fetch exams
     try {
       const res = await axios.get(`${baseApi}/examination/class/${classId}`);
       if (res.data?.success && res.data?.data) {
@@ -110,14 +106,11 @@ export default function Schedule() {
 
   useEffect(() => { fetchStudentData(); }, []);
 
-  // ─── Derived data ─────────────────────────────────────────────────
-  // Group schedule events by weekday
   const byDay = DAYS.reduce((acc, d) => ({ ...acc, [d]: [] }), {});
   scheduleEvents.forEach(ev => {
     const day = DAY_OF_WEEK(ev.start);
     if (day) byDay[day].push(ev);
   });
-  // Sort each day by start time
   DAYS.forEach(d => byDay[d].sort((a, b) => a.start - b.start));
 
   const todayEvents   = byDay[activeDay] || [];
@@ -130,40 +123,37 @@ export default function Schedule() {
   const totalExams    = examEvents.length;
   const classText     = studentData?.studentClass?.classText || 'Loading…';
 
-  // ─── Status badge ─────────────────────────────────────────────────
   const statusBadge = status => {
-    if (status === 'completed') return 'bg-gray-700/50 border-gray-600 text-gray-400';
-    if (status === 'cancelled') return 'bg-red-500/10 border-red-500/20 text-red-400 line-through';
-    return 'bg-green-500/10 border-green-500/20 text-green-400';
+    if (status === 'completed') return 'bg-gray-100 dark:bg-gray-800/60 border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400';
+    if (status === 'cancelled') return 'bg-red-50 dark:bg-red-500/10 border-red-200 dark:border-red-500/20 text-red-600 dark:text-red-400 line-through';
+    return 'bg-white dark:bg-gray-900/60 border-emerald-200 dark:border-emerald-500/20 text-gray-900 dark:text-white shadow-sm';
   };
 
-  // ─── Major exam types ─────────────────────────────────────────────
   const majorTypes = ['Mid Term', 'Final Term', 'Annual Exam', 'Semester Exam'];
   const examBadge  = type => majorTypes.includes(type)
-    ? 'bg-red-500/15 border-red-500/30 text-red-400'
-    : 'bg-blue-500/15 border-blue-500/30 text-blue-400';
+    ? 'bg-red-50 dark:bg-red-500/15 border-red-200 dark:border-red-500/30 text-red-600 dark:text-red-400'
+    : 'bg-blue-50 dark:bg-blue-500/15 border-blue-200 dark:border-blue-500/30 text-blue-600 dark:text-blue-400';
 
-  // ─── Render ────────────────────────────────────────────────────────
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="w-10 h-10 rounded-full border-4 border-green-500/30 border-t-green-500 animate-spin" />
+    <div className="min-h-[50vh] flex items-center justify-center">
+      <div className="w-10 h-10 rounded-full border-4 border-emerald-500/30 border-t-emerald-500 animate-spin" />
     </div>
   );
 
   return (
-    <div className="min-h-screen p-4 md:p-6 space-y-6">
+    <div className="space-y-6 max-w-7xl mx-auto w-full">
 
       {/* ─── Hero ─── */}
-      <div className="bg-gradient-to-br from-green-600/25 via-green-500/10 to-gray-900 border border-green-500/20 rounded-2xl p-6 md:p-8">
+      <div className="bg-gradient-to-br from-emerald-500/10 via-emerald-500/5 to-white dark:from-emerald-600/25 dark:via-emerald-500/10 dark:to-gray-900 border border-emerald-500/20 rounded-2xl p-6 md:p-8 shadow-sm">
         <div className="flex items-center gap-3 mb-3">
-          <div className="p-2 bg-green-500/15 rounded-xl border border-green-500/20">
-            <CalendarDays size={20} className="text-green-400" />
+          <div className="p-2 bg-emerald-500/15 rounded-xl border border-emerald-500/20">
+            <CalendarDays size={20} className="text-emerald-600 dark:text-emerald-400" />
           </div>
-          <span className="text-xs text-green-400 font-semibold uppercase tracking-widest">Schedule</span>
+          <span className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold uppercase tracking-widest">Schedule</span>
         </div>
-        <h1 className="text-2xl md:text-3xl font-bold text-white">My Class Schedule</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">My Class Schedule</h1>
         {studentData && (
-          <p className="text-gray-400 mt-1 text-sm">
+          <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm">
             {studentData.name} &bull; Class: {classText}
           </p>
         )}
@@ -171,7 +161,7 @@ export default function Schedule() {
 
       {/* ─── Error ─── */}
       {error && (
-        <div className="flex items-center gap-2 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm">
+        <div className="flex items-center gap-2 p-4 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-xl text-red-600 dark:text-red-400 text-sm">
           <AlertCircle size={16} /> {error}
         </div>
       )}
@@ -179,29 +169,29 @@ export default function Schedule() {
       {/* ─── Stat cards ─── */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
-          { label: 'My Class',         value: classText,      icon: <GraduationCap size={18} />, color: 'text-green-400' },
-          { label: 'Weekly Sessions',  value: totalSchedule,  icon: <BookOpen      size={18} />, color: 'text-emerald-400' },
-          { label: 'Examinations',     value: totalExams,     icon: <FlaskConical  size={18} />, color: 'text-blue-400' },
+          { label: 'My Class',         value: classText,      icon: <GraduationCap size={18} />, color: 'text-emerald-600 dark:text-emerald-400' },
+          { label: 'Weekly Sessions',  value: totalSchedule,  icon: <BookOpen      size={18} />, color: 'text-green-600 dark:text-emerald-400' },
+          { label: 'Examinations',     value: totalExams,     icon: <FlaskConical  size={18} />, color: 'text-blue-600 dark:text-blue-400' },
         ].map((s, i) => (
-          <div key={i} className="bg-gray-900/50 border border-green-500/20 rounded-2xl p-5 flex items-center gap-4">
-            <div className={`p-3 rounded-xl bg-green-500/10 border border-green-500/20 ${s.color}`}>{s.icon}</div>
+          <div key={i} className="bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-emerald-500/20 rounded-2xl p-5 flex items-center gap-4 shadow-sm">
+            <div className={`p-3 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 ${s.color}`}>{s.icon}</div>
             <div className="min-w-0">
               <p className={`text-2xl font-bold truncate ${s.color}`}>{s.value}</p>
-              <p className="text-gray-400 text-sm">{s.label}</p>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">{s.label}</p>
             </div>
           </div>
         ))}
       </div>
 
       {/* ─── Weekly Timetable ─── */}
-      <div className="bg-gray-900/50 border border-green-500/20 rounded-2xl overflow-hidden">
-        <div className="flex items-center gap-2 px-5 py-4 border-b border-green-500/15 bg-green-500/5">
-          <CalendarDays size={16} className="text-green-400" />
-          <h2 className="font-semibold text-white text-sm">Weekly Timetable</h2>
+      <div className="bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-emerald-500/20 rounded-2xl overflow-hidden shadow-sm">
+        <div className="flex items-center gap-2 px-5 py-4 border-b border-gray-200 dark:border-emerald-500/15 bg-emerald-50/50 dark:bg-emerald-500/5">
+          <CalendarDays size={16} className="text-emerald-600 dark:text-emerald-400" />
+          <h2 className="font-semibold text-gray-900 dark:text-white text-sm">Weekly Timetable</h2>
         </div>
 
         {/* Day tabs */}
-        <div className="flex overflow-x-auto border-b border-green-500/10 bg-gray-900/30">
+        <div className="flex overflow-x-auto border-b border-gray-200 dark:border-emerald-500/10 bg-gray-50/50 dark:bg-gray-900/30">
           {DAYS.map(day => {
             const count     = byDay[day].length;
             const isToday   = day === activeDay;
@@ -209,17 +199,17 @@ export default function Schedule() {
               <button
                 key={day}
                 onClick={() => setActiveDay(day)}
-                className={`flex-shrink-0 px-4 py-3 text-xs font-medium border-b-2 transition-colors relative ${
+                className={`flex-shrink-0 px-4 py-3 text-xs font-medium border-b-2 transition-colors relative cursor-pointer ${
                   isToday
-                    ? 'border-green-500 text-green-400 bg-green-500/5'
-                    : 'border-transparent text-gray-500 hover:text-gray-300 hover:bg-gray-800/30'
+                    ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400 bg-white dark:bg-emerald-500/5 font-semibold'
+                    : 'border-transparent text-gray-500 hover:text-gray-800 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/30'
                 }`}
               >
                 <span className="hidden sm:inline">{day}</span>
                 <span className="sm:hidden">{DAY_SHORT[day]}</span>
                 {count > 0 && (
                   <span className={`ml-1.5 text-xs px-1.5 py-0.5 rounded-full ${
-                    isToday ? 'bg-green-500 text-white' : 'bg-gray-700 text-gray-400'
+                    isToday ? 'bg-emerald-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-400'
                   }`}>
                     {count}
                   </span>
@@ -232,7 +222,7 @@ export default function Schedule() {
         {/* Day events */}
         <div className="p-5 min-h-[180px]">
           {todayEvents.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-10 gap-2 text-gray-600">
+            <div className="flex flex-col items-center justify-center py-10 gap-2 text-gray-400 dark:text-gray-600">
               <CalendarDays size={32} className="opacity-30" />
               <p className="text-sm">No classes on {activeDay}</p>
             </div>
@@ -241,28 +231,28 @@ export default function Schedule() {
               {todayEvents.map(ev => (
                 <div
                   key={ev.id}
-                  className={`rounded-xl border p-4 transition-colors hover:bg-green-500/5 ${statusBadge(ev.status)}`}
+                  className={`rounded-xl border p-4 transition-colors hover:border-emerald-400 ${statusBadge(ev.status)}`}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <BookOpen size={14} className="text-green-400 flex-shrink-0" />
-                        <p className="font-medium text-white text-sm">{ev.title}</p>
+                        <BookOpen size={14} className="text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+                        <p className="font-semibold text-gray-900 dark:text-white text-sm">{ev.title}</p>
                         {ev.status === 'cancelled' && (
-                          <span className="text-xs bg-red-500/15 border border-red-500/30 text-red-400 px-2 py-0.5 rounded-full">Cancelled</span>
+                          <span className="text-xs bg-red-100 dark:bg-red-500/15 border border-red-200 dark:border-red-500/30 text-red-600 dark:text-red-400 px-2 py-0.5 rounded-full font-medium">Cancelled</span>
                         )}
                         {ev.status === 'completed' && (
-                          <span className="text-xs bg-gray-700/60 border border-gray-600 text-gray-400 px-2 py-0.5 rounded-full">Completed</span>
+                          <span className="text-xs bg-gray-100 dark:bg-gray-700/60 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 px-2 py-0.5 rounded-full font-medium">Completed</span>
                         )}
                       </div>
-                      <div className="flex flex-wrap items-center gap-3 mt-1.5 text-xs text-gray-400">
+                      <div className="flex flex-wrap items-center gap-3 mt-1.5 text-xs text-gray-500 dark:text-gray-400">
                         <span className="flex items-center gap-1">
-                          <Clock size={11} className="text-green-400" />
+                          <Clock size={11} className="text-emerald-600 dark:text-emerald-400" />
                           {fmtTime(ev.start)} – {fmtTime(ev.end)}
                         </span>
                         {ev.teacher && (
                           <span className="flex items-center gap-1">
-                            <Users size={11} className="text-green-400" />
+                            <Users size={11} className="text-emerald-600 dark:text-emerald-400" />
                             {ev.teacher}
                           </span>
                         )}
@@ -276,37 +266,37 @@ export default function Schedule() {
         </div>
 
         {/* Legend */}
-        <div className="flex flex-wrap gap-4 px-5 py-3 border-t border-green-500/10 text-xs text-gray-500">
-          <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-green-500" />Regular Class</span>
-          <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-gray-500" />Completed</span>
+        <div className="flex flex-wrap gap-4 px-5 py-3 border-t border-gray-200 dark:border-emerald-500/10 text-xs text-gray-500">
+          <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-emerald-500" />Regular Class</span>
+          <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-gray-400 dark:bg-gray-500" />Completed</span>
           <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-red-500" />Cancelled</span>
         </div>
       </div>
 
       {/* ─── Upcoming Exams ─── */}
       {upcomingExams.length > 0 && (
-        <div className="bg-gray-900/50 border border-green-500/20 rounded-2xl overflow-hidden">
-          <div className="flex items-center gap-2 px-5 py-4 border-b border-green-500/15 bg-green-500/5">
-            <FlaskConical size={16} className="text-green-400" />
-            <h2 className="font-semibold text-white text-sm">Upcoming Examinations</h2>
-            <span className="ml-auto text-xs bg-green-500/10 border border-green-500/20 text-green-400 px-2 py-0.5 rounded-full">
+        <div className="bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-emerald-500/20 rounded-2xl overflow-hidden shadow-sm">
+          <div className="flex items-center gap-2 px-5 py-4 border-b border-gray-200 dark:border-emerald-500/15 bg-emerald-50/50 dark:bg-emerald-500/5">
+            <FlaskConical size={16} className="text-emerald-600 dark:text-emerald-400" />
+            <h2 className="font-semibold text-gray-900 dark:text-white text-sm">Upcoming Examinations</h2>
+            <span className="ml-auto text-xs bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded-full font-medium">
               {upcomingExams.length}
             </span>
           </div>
-          <div className="divide-y divide-gray-800/60">
+          <div className="divide-y divide-gray-100 dark:divide-gray-800/60">
             {upcomingExams.map(exam => (
-              <div key={exam.id} className="px-5 py-4 hover:bg-green-500/5 transition-colors flex items-center justify-between gap-4">
+              <div key={exam.id} className="px-5 py-4 hover:bg-emerald-50/50 dark:hover:bg-emerald-500/5 transition-colors flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="p-2 bg-blue-500/10 border border-blue-500/20 rounded-xl flex-shrink-0">
-                    <FlaskConical size={14} className="text-blue-400" />
+                  <div className="p-2 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-xl flex-shrink-0">
+                    <FlaskConical size={14} className="text-blue-600 dark:text-blue-400" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-white text-sm font-medium truncate">{exam.title}</p>
+                    <p className="text-gray-900 dark:text-white text-sm font-semibold truncate">{exam.title}</p>
                     <div className="flex flex-wrap items-center gap-2 mt-0.5">
-                      <span className="text-xs text-gray-400 flex items-center gap-1">
+                      <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
                         <CalendarDays size={10} />{fmtDate(exam.examDate)}
                       </span>
-                      <span className="text-xs text-gray-400 flex items-center gap-1">
+                      <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
                         <Clock size={10} />{fmtTime(exam.start)} – {fmtTime(exam.end)}
                       </span>
                     </div>
@@ -325,20 +315,20 @@ export default function Schedule() {
 
       {/* ─── Past Exams (collapsed) ─── */}
       {pastExams.length > 0 && (
-        <div className="bg-gray-900/50 border border-gray-700/30 rounded-2xl overflow-hidden">
-          <div className="flex items-center gap-2 px-5 py-4 border-b border-gray-700/30">
-            <FlaskConical size={16} className="text-gray-500" />
-            <h2 className="font-medium text-gray-400 text-sm">Past Examinations ({pastExams.length})</h2>
+        <div className="bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700/30 rounded-2xl overflow-hidden shadow-sm">
+          <div className="flex items-center gap-2 px-5 py-4 border-b border-gray-200 dark:border-gray-700/30">
+            <FlaskConical size={16} className="text-gray-400 dark:text-gray-500" />
+            <h2 className="font-medium text-gray-600 dark:text-gray-400 text-sm">Past Examinations ({pastExams.length})</h2>
           </div>
-          <div className="divide-y divide-gray-800/40 max-h-64 overflow-y-auto">
+          <div className="divide-y divide-gray-100 dark:divide-gray-800/40 max-h-64 overflow-y-auto">
             {[...pastExams].sort((a, b) => new Date(b.examDate) - new Date(a.examDate)).map(exam => (
-              <div key={exam.id} className="px-5 py-3 flex items-center justify-between gap-4 opacity-60">
+              <div key={exam.id} className="px-5 py-3 flex items-center justify-between gap-4 opacity-75">
                 <div className="min-w-0">
-                  <p className="text-gray-400 text-sm truncate">{exam.title}</p>
-                  <p className="text-gray-600 text-xs">{fmtDate(exam.examDate)}</p>
+                  <p className="text-gray-700 dark:text-gray-400 text-sm truncate">{exam.title}</p>
+                  <p className="text-gray-400 dark:text-gray-600 text-xs">{fmtDate(exam.examDate)}</p>
                 </div>
                 {exam.examType && (
-                  <span className="flex-shrink-0 text-xs px-2 py-0.5 rounded-full bg-gray-700/50 border border-gray-600 text-gray-500">
+                  <span className="flex-shrink-0 text-xs px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400">
                     {exam.examType}
                   </span>
                 )}
@@ -350,7 +340,7 @@ export default function Schedule() {
 
       {/* Empty state */}
       {scheduleEvents.length === 0 && examEvents.length === 0 && !loading && !error && (
-        <div className="flex flex-col items-center justify-center py-16 gap-3 text-gray-600">
+        <div className="flex flex-col items-center justify-center py-16 gap-3 text-gray-400 dark:text-gray-600">
           <CalendarDays size={40} className="opacity-20" />
           <p className="text-sm">No schedule data loaded yet</p>
         </div>

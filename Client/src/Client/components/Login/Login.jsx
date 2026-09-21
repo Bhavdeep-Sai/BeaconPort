@@ -1,12 +1,13 @@
 import * as React from 'react';
 import axios from 'axios';
 import { useFormik } from 'formik';
-import { Eye, EyeOff, School, Users, GraduationCap } from 'lucide-react';
+import { Eye, EyeOff, School, Users, GraduationCap, Sparkles, Check, Copy } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { loginSchema } from '../../../yupSchema/loginSchema';
 import { AuthContext } from '../../../context/AuthContext';
 import { baseApi } from '../../../environment';
 import { Spinner, Modal } from '../../../components/ui';
+import ThemeToggle from '../../../components/ui/ThemeToggle';
 
 const roleConfig = {
   school: {
@@ -47,15 +48,42 @@ const roleConfig = {
   },
 };
 
+const demoAccounts = {
+  school: {
+    title: 'Demo School Admin',
+    email: 'demo@beaconport.com',
+    password: 'demo1234',
+    badge: 'Demo School Ready',
+    hint: 'Full admin access: teachers, students, fees, salaries, exams, timetables',
+    theme: 'border-orange-500/30 bg-orange-500/10 text-orange-400 btn:bg-orange-500 hover:bg-orange-600',
+  },
+  teacher: {
+    title: 'Demo Teacher (Mathematics)',
+    email: 'teacher.math@beaconport.com',
+    password: 'demo1234',
+    badge: 'Demo Teacher Ready',
+    hint: 'Sarah Jenkins • Class 8A, 9A, 10A • Schedule & attendance management',
+    theme: 'border-blue-500/30 bg-blue-500/10 text-blue-400 btn:bg-blue-500 hover:bg-blue-600',
+  },
+  student: {
+    title: 'Demo Student (Class 8A)',
+    email: 'student1@beaconport.com',
+    password: 'demo1234',
+    badge: 'Demo Student Ready',
+    hint: 'Aarav Sharma • Timetable, exams, fee status & AI Tutor',
+    theme: 'border-green-500/30 bg-green-500/10 text-green-400 btn:bg-green-500 hover:bg-green-600',
+  },
+};
+
 function FieldInput({ id, label, type = 'text', value, onChange, onBlur, error, ringColor, children }) {
   return (
     <div>
-      <label htmlFor={id} className="block text-sm font-medium text-gray-300 mb-1">{label}</label>
+      <label htmlFor={id} className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{label}</label>
       <div className="relative">
         <input
           id={id} name={id} type={type} value={value} onChange={onChange} onBlur={onBlur} autoComplete={id}
           className={[
-            'w-full px-3 py-2.5 rounded-xl bg-gray-800 border border-gray-700 text-gray-100 placeholder-gray-500 text-sm',
+            'w-full px-3 py-2.5 rounded-xl bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 text-sm shadow-sm',
             'outline-none focus:ring-2 transition-colors',
             ringColor,
             error ? 'border-red-500' : '',
@@ -63,7 +91,7 @@ function FieldInput({ id, label, type = 'text', value, onChange, onBlur, error, 
         />
         {children}
       </div>
-      {error && <p className="text-xs text-red-400 mt-1">{error}</p>}
+      {error && <p className="text-xs text-red-500 dark:text-red-400 mt-1">{error}</p>}
     </div>
   );
 }
@@ -83,6 +111,31 @@ export default function Login() {
   const [forgotLoading, setForgotLoading] = React.useState(false);
   const [forgotMsg, setForgotMsg] = React.useState('');
   const [forgotErr, setForgotErr] = React.useState('');
+  const [copied, setCopied] = React.useState(false);
+  const [demoTooltipOpen, setDemoTooltipOpen] = React.useState(false);
+  const demoTooltipRef = React.useRef(null);
+
+  React.useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (demoTooltipRef.current && !demoTooltipRef.current.contains(e.target)) {
+        setDemoTooltipOpen(false);
+      }
+    };
+    if (demoTooltipOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [demoTooltipOpen]);
+
+  const handleFillDemo = () => {
+    if (role && demoAccounts[role]) {
+      formik.setFieldValue('email', demoAccounts[role].email);
+      formik.setFieldValue('password', demoAccounts[role].password);
+      setError(null);
+    }
+  };
 
   const formik = useFormik({
     initialValues: { email: '', password: '' },
@@ -131,7 +184,7 @@ export default function Login() {
   }, [role]);
 
   const handleForgotPassword = async () => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+$/;
     if (!forgotEmail) { setForgotErr('Please enter your email address'); return; }
     if (!emailRegex.test(forgotEmail)) { setForgotErr('Please enter a valid email address'); return; }
     setForgotLoading(true); setForgotMsg(''); setForgotErr('');
@@ -185,14 +238,14 @@ export default function Login() {
     }
   }, []);
 
-  if (!role || !roleConfig[role]) return <div className="min-h-screen bg-gray-900 flex items-center justify-center"><div className="text-white">Redirecting...</div></div>;
+  if (!role || !roleConfig[role]) return <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center"><div className="text-gray-900 dark:text-white">Redirecting...</div></div>;
 
   const cr = roleConfig[role];
 
   return (
-    <div className="h-screen overflow-hidden bg-gray-900 flex flex-col">
+    <div className="h-screen overflow-hidden bg-gray-50 dark:bg-gray-900 flex flex-col transition-colors duration-200">
       {(error || success) && (
-        <div className={`flex-shrink-0 px-5 py-2.5 flex items-center gap-3 text-sm font-medium ${error ? 'bg-red-900/40 text-red-300 border-b border-red-800' : 'bg-green-900/40 text-green-300 border-b border-green-800'}`}>
+        <div className={`flex-shrink-0 px-5 py-2.5 flex items-center gap-3 text-sm font-medium ${error ? 'bg-red-500/10 text-red-600 dark:text-red-300 border-b border-red-500/20' : 'bg-green-500/10 text-green-600 dark:text-green-300 border-b border-green-500/20'}`}>
           <span>{error || success}</span>
           <button onClick={() => { setError(null); setSuccess(null); }} className="ml-auto text-lg opacity-60 hover:opacity-100 bg-transparent border-none cursor-pointer">&times;</button>
         </div>
@@ -224,7 +277,71 @@ export default function Login() {
         </div>
 
         {/* Right form panel */}
-        <div className="flex-1 flex flex-col overflow-hidden bg-gray-900">
+        <div className="flex-1 flex flex-col overflow-hidden bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 relative transition-colors duration-200">
+          {/* Top-Right Bar: ThemeToggle & Demo Button */}
+          <div className="absolute top-4 right-4 sm:top-6 sm:right-8 z-30 flex items-center gap-3">
+            <ThemeToggle size="sm" />
+            {demoAccounts[role] && (
+              <div className="relative" ref={demoTooltipRef}>
+                <button
+                  type="button"
+                  onClick={() => setDemoTooltipOpen((prev) => !prev)}
+                  className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-750 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white text-xs sm:text-sm font-medium transition-all shadow-sm backdrop-blur-sm cursor-pointer active:scale-95 ${demoTooltipOpen ? 'ring-2 ring-orange-500/40 border-orange-500/50' : ''}`}
+                  title="Click to view Demo Credentials"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="text-orange-500" viewBox="0 0 16 16">
+                    <path d="M6.79 5.093A.5.5 0 0 0 6 5.5v5a.5.5 0 0 0 .79.407l3.5-2.5a.5.5 0 0 0 0-.814z"/>
+                    <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm15 0a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1z"/>
+                  </svg>
+                  <span>Demo</span>
+                </button>
+
+                {demoTooltipOpen && (
+                  <div className="absolute right-0 mt-2.5 w-76 sm:w-88 rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 shadow-2xl backdrop-blur-xl z-50 text-left animate-in fade-in zoom-in-95 duration-150">
+                    {/* Tooltip pointer */}
+                    <div className="absolute -top-1.5 right-5 w-3 h-3 bg-white dark:bg-gray-800 border-t border-l border-gray-200 dark:border-gray-700 transform rotate-45" />
+
+                    <div className="flex items-center justify-between gap-2 mb-2 relative z-10">
+                      <div className="flex items-center gap-1.5">
+                        <span className={`flex items-center justify-center w-5 h-5 rounded-md ${cr.badgeBg}`}>
+                          <Sparkles className={`w-3 h-3 ${cr.accentText}`} />
+                        </span>
+                        <span className="text-xs font-bold uppercase tracking-wider text-gray-900 dark:text-gray-200">
+                          {demoAccounts[role].title}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          handleFillDemo();
+                          setDemoTooltipOpen(false);
+                        }}
+                        className={`text-[11px] px-2.5 py-1 rounded-lg text-white font-semibold shadow transition-all active:scale-95 cursor-pointer border-none flex items-center gap-1 ${cr.btnGradient}`}
+                      >
+                        <span>⚡ Auto-fill</span>
+                      </button>
+                    </div>
+
+                    <p className="text-[11px] text-gray-500 dark:text-gray-400 mb-2.5 leading-relaxed relative z-10">
+                      {demoAccounts[role].hint}
+                    </p>
+
+                    <div className="bg-gray-50 dark:bg-gray-900/95 rounded-xl p-2.5 border border-gray-200 dark:border-gray-800 text-xs font-mono space-y-1.5 relative z-10">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-gray-500 dark:text-gray-400 text-[11px]">Email:</span>
+                        <code className="text-gray-900 dark:text-gray-100 font-semibold selection:bg-orange-500">{demoAccounts[role].email}</code>
+                      </div>
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-gray-500 dark:text-gray-400 text-[11px]">Password:</span>
+                        <code className="text-gray-900 dark:text-gray-100 font-semibold selection:bg-orange-500">{demoAccounts[role].password}</code>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
           <div className="flex-1 overflow-y-auto">
             <div className="min-h-full flex items-center justify-center p-6 lg:p-10">
               <div className="w-full max-w-md">
@@ -234,8 +351,8 @@ export default function Login() {
                 </div>
                 <div className="mb-8">
                   <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium mb-4 ${cr.badgeBg} ${cr.badgeText}`}>{cr.smallIcon} {cr.title}</div>
-                  <h2 className="text-3xl font-bold text-white">Welcome back</h2>
-                  <p className="text-gray-400 mt-1">Sign in to your {cr.title.toLowerCase()} account</p>
+                  <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Welcome back</h2>
+                  <p className="text-gray-600 dark:text-gray-400 mt-1">Sign in to your {cr.title.toLowerCase()} account</p>
                 </div>
 
                 <form onSubmit={formik.handleSubmit} noValidate className="space-y-5">
@@ -247,7 +364,7 @@ export default function Login() {
                     value={formik.values.password} onChange={formik.handleChange} onBlur={formik.handleBlur}
                     error={formik.touched.password && formik.errors.password} ringColor={cr.ringColor}>
                     <button type="button" onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300">
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
                       {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
                   </FieldInput>
@@ -255,7 +372,7 @@ export default function Login() {
                   <div className="flex items-center justify-between">
                     <label className="flex items-center gap-2 cursor-pointer select-none">
                       <input type="checkbox" checked={rememberMe} onChange={() => setRememberMe(!rememberMe)} className="h-4 w-4 rounded accent-orange-500" />
-                      <span className="text-sm text-gray-300">Remember me</span>
+                      <span className="text-sm text-gray-700 dark:text-gray-300">Remember me</span>
                     </label>
                     {role === 'school' && (
                       <button type="button" onClick={() => { setForgotEmail(formik.values.email || ''); setForgotMsg(''); setForgotErr(''); setForgotOpen(true); }}
@@ -272,9 +389,9 @@ export default function Login() {
 
                   {role === 'school' && (
                     <>
-                      <div className="flex items-center gap-3"><div className="flex-1 h-px bg-gray-700" /><span className="text-xs text-gray-500">OR CONTINUE WITH</span><div className="flex-1 h-px bg-gray-700" /></div>
+                      <div className="flex items-center gap-3"><div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" /><span className="text-xs text-gray-500">OR CONTINUE WITH</span><div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" /></div>
                       <button type="button" onClick={handleGoogleLogin} disabled={loading || oauthLoading}
-                        className="w-full h-11 inline-flex justify-center items-center gap-2.5 border border-gray-700 rounded-xl bg-gray-800 text-sm font-medium text-gray-200 hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm">
+                        className="w-full h-11 inline-flex justify-center items-center gap-2.5 border border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm">
                         {oauthLoading ? <Spinner size="sm" color="gray" /> : (
                           <>
                             <svg className="h-5 w-5" viewBox="0 0 24 24" aria-hidden="true">
@@ -291,7 +408,7 @@ export default function Login() {
                   )}
 
                   {role === 'school' && (
-                    <p className="text-sm text-center text-gray-400">
+                    <p className="text-sm text-center text-gray-600 dark:text-gray-400">
                       Don&apos;t have an account?{' '}
                       <span onClick={() => navigate('/register')} className={`font-medium cursor-pointer hover:underline ${cr.accentText}`}>Create one</span>
                     </p>
@@ -299,7 +416,7 @@ export default function Login() {
 
                   <p className="text-xs text-center text-gray-500">
                     Wrong portal?{' '}
-                    <span onClick={() => navigate('/select-role')} className="underline cursor-pointer hover:text-gray-300">Switch role</span>
+                    <span onClick={() => navigate('/select-role')} className="underline cursor-pointer hover:text-gray-700 dark:hover:text-gray-300">Switch role</span>
                   </p>
                 </form>
               </div>
@@ -313,7 +430,7 @@ export default function Login() {
         footer={
           <div className="flex gap-2 justify-end w-full">
             <button onClick={() => setForgotOpen(false)} disabled={forgotLoading}
-              className="px-4 py-2 text-sm text-gray-400 hover:text-gray-200 border border-gray-600 rounded-lg transition-colors disabled:opacity-50">Cancel</button>
+              className="px-4 py-2 text-sm text-gray-700 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-lg transition-colors disabled:opacity-50">Cancel</button>
             <button onClick={handleForgotPassword} disabled={forgotLoading}
               className="px-5 py-2 text-sm font-semibold text-white bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 rounded-lg flex items-center gap-2 disabled:opacity-50">
               {forgotLoading ? <><Spinner size="xs" color="white" /> Sending...</> : 'Send Reset Link'}
@@ -321,14 +438,14 @@ export default function Login() {
           </div>
         }
       >
-        <p className="text-sm text-gray-400 mb-4">Enter your email and we&apos;ll send you a link to reset your password.</p>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Enter your email and we&apos;ll send you a link to reset your password.</p>
         <input
           type="email" value={forgotEmail} onChange={e => setForgotEmail(e.target.value)} autoFocus
           placeholder="Email address"
-          className="w-full px-3 py-2.5 rounded-xl bg-gray-800 border border-gray-700 text-gray-100 text-sm outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-500 transition-colors"
+          className="w-full px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100 text-sm outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-500 transition-colors"
         />
-        {forgotMsg && <div className="mt-3 text-sm text-green-400 bg-green-900/20 border border-green-700/40 rounded-lg px-3 py-2">{forgotMsg}</div>}
-        {forgotErr && <div className="mt-3 text-sm text-red-400 bg-red-900/20 border border-red-700/40 rounded-lg px-3 py-2">{forgotErr}</div>}
+        {forgotMsg && <div className="mt-3 text-sm text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700/40 rounded-lg px-3 py-2">{forgotMsg}</div>}
+        {forgotErr && <div className="mt-3 text-sm text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700/40 rounded-lg px-3 py-2">{forgotErr}</div>}
       </Modal>
     </div>
   );

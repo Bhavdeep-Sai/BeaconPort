@@ -70,31 +70,31 @@ export default function Payment() {
 
   const today = new Date();
 
-  const selectCls = 'bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-gray-200 text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-colors cursor-pointer';
+  const selectCls = 'bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl px-3 py-2 text-gray-900 dark:text-gray-200 text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-colors cursor-pointer';
 
   return (
-    <div className="text-gray-100 space-y-5">
+    <div className="space-y-6 max-w-7xl mx-auto w-full">
 
       {/* ── Hero Banner ───────────────────────────────────────────── */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-blue-600/25 via-blue-500/10 to-gray-900 border border-blue-500/20 rounded-2xl px-6 py-5">
+      <div className="relative overflow-hidden bg-gradient-to-r from-blue-500/15 via-blue-500/5 to-transparent bg-blue-50/50 dark:bg-transparent border border-blue-500/20 rounded-2xl px-6 py-5 shadow-sm">
         <div className="absolute -right-8 -top-8 w-40 h-40 rounded-full bg-blue-500/10 blur-2xl pointer-events-none" />
         <div className="flex flex-col sm:flex-row sm:items-center gap-3">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-xl bg-blue-500/20 border border-blue-500/30">
-              <Wallet size={22} className="text-blue-300" />
+            <div className="p-3 rounded-xl bg-blue-500/15 border border-blue-500/30">
+              <Wallet size={22} className="text-blue-600 dark:text-blue-300" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-gray-100">My Payments</h1>
-              <p className="text-xs text-gray-400 mt-0.5">Track your salary payments from school</p>
+              <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">My Payments</h1>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Track your salary payments from school</p>
             </div>
           </div>
           <div className="sm:ml-auto flex flex-wrap gap-2 items-center shrink-0">
-            <div className="flex items-center gap-1.5 text-xs text-gray-400 bg-gray-800/60 border border-gray-700/60 px-3 py-1.5 rounded-lg">
-              <CalendarDays size={11} className="text-blue-400" />
+            <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400 bg-white/80 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/60 px-3 py-1.5 rounded-lg shadow-sm">
+              <CalendarDays size={11} className="text-blue-500 dark:text-blue-400" />
               {today.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
             </div>
             <button onClick={fetchSalaries}
-              className="p-2 bg-gray-800/60 border border-gray-700/60 rounded-lg text-gray-400 hover:text-blue-400 hover:border-blue-500/40 transition-colors">
+              className="p-2 bg-white/80 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/60 rounded-lg text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-500/40 transition-colors shadow-sm">
               <RefreshCw size={15} />
             </button>
           </div>
@@ -104,18 +104,18 @@ export default function Payment() {
       {/* ── Stat Cards ─────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          { label: 'Total Records', count: salaries.length, icon: <DollarSign size={18}/>,   color: 'text-blue-400',   bg: 'bg-blue-500/10',   border: 'border-blue-500/20',   isAmt: false },
-          { label: 'Paid',          count: totalPaid,        icon: <CheckCircle2 size={18}/>, color: 'text-green-400',  bg: 'bg-green-500/10',  border: 'border-green-500/20',  isAmt: true  },
-          { label: 'Pending',       count: totalPending,     icon: <Clock size={18}/>,        color: 'text-yellow-400', bg: 'bg-yellow-500/10', border: 'border-yellow-500/20', isAmt: true  },
-          { label: 'Overdue',       count: totalOverdue,     icon: <AlertTriangle size={18}/>,color: 'text-red-400',    bg: 'bg-red-500/10',    border: 'border-red-500/20',    isAmt: true  },
+          { label: 'Total Records', count: salaries.length, icon: <DollarSign size={18}/>,   color: 'text-blue-600 dark:text-blue-400',   bg: 'bg-blue-500/10',   border: 'border-blue-500/20',   isAmt: false },
+          { label: 'Paid',          count: totalPaid,        icon: <CheckCircle2 size={18}/>, color: 'text-green-600 dark:text-green-400',  bg: 'bg-green-500/10',  border: 'border-green-500/20',  isAmt: true  },
+          { label: 'Pending',       count: totalPending,     icon: <Clock size={18}/>,        color: 'text-amber-600 dark:text-yellow-400', bg: 'bg-amber-500/10', border: 'border-amber-500/20', isAmt: true  },
+          { label: 'Overdue',       count: totalOverdue,     icon: <AlertTriangle size={18}/>,color: 'text-red-600 dark:text-red-400',    bg: 'bg-red-500/10',    border: 'border-red-500/20',    isAmt: true  },
         ].map(s => (
-          <div key={s.label} className={`${s.bg} border ${s.border} rounded-xl p-4 flex items-center gap-3`}>
+          <div key={s.label} className={`bg-white dark:bg-gray-900/60 border ${s.border} rounded-xl p-4 flex items-center gap-3 shadow-sm`}>
             <div className={`p-2 rounded-lg ${s.bg} border ${s.border} ${s.color} shrink-0`}>{s.icon}</div>
             <div className="min-w-0">
               <p className={`font-bold leading-none ${s.color} ${s.isAmt ? 'text-base' : 'text-2xl'} truncate`}>
                 {s.isAmt ? fmt(s.count) : s.count}
               </p>
-              <p className="text-xs text-gray-500 mt-1">{s.label}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{s.label}</p>
             </div>
           </div>
         ))}
@@ -123,17 +123,17 @@ export default function Payment() {
 
       {/* ── Error ───────────────────────────────────────────────────── */}
       {error && (
-        <div className="flex items-center justify-between px-4 py-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm">
+        <div className="flex items-center justify-between px-4 py-3 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-xl text-red-600 dark:text-red-400 text-sm shadow-sm">
           <div className="flex items-center gap-2"><AlertTriangle size={14}/>{error}</div>
           <button onClick={() => setError('')}><X size={14}/></button>
         </div>
       )}
 
       {/* ── Filter Bar ─────────────────────────────────────────────── */}
-      <div className="bg-gray-800/40 border border-gray-700/60 rounded-2xl p-4">
+      <div className="bg-white dark:bg-gray-800/40 border border-gray-200 dark:border-gray-700/60 rounded-2xl p-4 shadow-sm">
         <div className="flex flex-wrap gap-3 items-center">
-          <div className="flex items-center gap-1.5 text-xs text-gray-500 font-medium">
-            <Filter size={12} className="text-blue-400" /> Filters:
+          <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 font-medium">
+            <Filter size={12} className="text-blue-500 dark:text-blue-400" /> Filters:
           </div>
 
           {/* Year */}
@@ -156,7 +156,7 @@ export default function Payment() {
           <div className="flex gap-2 flex-wrap">
             {[['', 'All'], ['paid', 'Paid'], ['pending', 'Pending'], ['overdue', 'Overdue']].map(([v, l]) => (
               <button key={v} onClick={() => setFilterStatus(v)}
-                className={['px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border', filterStatus === v ? 'bg-blue-500 text-white border-blue-500' : 'bg-gray-700/50 text-gray-400 border-gray-600/60 hover:bg-gray-700 hover:text-gray-200'].join(' ')}>
+                className={['px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border', filterStatus === v ? 'bg-blue-500 text-white border-blue-500 shadow-sm' : 'bg-gray-50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-600/60 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-200'].join(' ')}>
                 {l}
               </button>
             ))}
@@ -164,7 +164,7 @@ export default function Payment() {
 
           {(filterYear || filterMonth || filterStatus) && (
             <button onClick={() => { setFilterYear(''); setFilterMonth(''); setFilterStatus(''); }}
-              className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-300 transition-colors ml-auto">
+              className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors ml-auto">
               <X size={12}/> Clear
             </button>
           )}
@@ -172,28 +172,28 @@ export default function Payment() {
       </div>
 
       {/* ── Records ────────────────────────────────────────────────── */}
-      <div className="bg-gray-800/40 border border-gray-700/60 rounded-2xl overflow-hidden">
+      <div className="bg-white dark:bg-gray-800/40 border border-gray-200 dark:border-gray-700/60 rounded-2xl overflow-hidden shadow-sm">
         {/* Header bar */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-700/60 bg-gray-800/60">
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-200 dark:border-gray-700/60 bg-gray-50/80 dark:bg-gray-800/60">
           <div className="flex items-center gap-2">
-            <Wallet size={14} className="text-blue-400" />
-            <span className="font-semibold text-gray-100 text-sm">Salary Records</span>
-            <span className="text-xs font-bold text-blue-400 bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded-full ml-0.5">{salaries.length}</span>
+            <Wallet size={14} className="text-blue-500 dark:text-blue-400" />
+            <span className="font-semibold text-gray-900 dark:text-gray-100 text-sm">Salary Records</span>
+            <span className="text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded-full ml-0.5">{salaries.length}</span>
           </div>
           {loading && <div className="w-4 h-4 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin" />}
         </div>
 
         {loading ? (
           <div className="p-5 space-y-3">
-            {[1,2,3].map(i => <div key={i} className="h-16 bg-gray-700/30 rounded-xl animate-pulse" />)}
+            {[1,2,3].map(i => <div key={i} className="h-16 bg-gray-100 dark:bg-gray-700/30 rounded-xl animate-pulse" />)}
           </div>
         ) : salaries.length === 0 ? (
           <div className="flex flex-col items-center py-16 gap-3 text-center px-6">
             <div className="p-4 rounded-2xl bg-blue-500/10 border border-blue-500/20">
-              <Wallet size={36} className="text-blue-400" />
+              <Wallet size={36} className="text-blue-500 dark:text-blue-400" />
             </div>
-            <p className="font-semibold text-gray-300">No Salary Records Found</p>
-            <p className="text-sm text-gray-500 max-w-xs">
+            <p className="font-semibold text-gray-800 dark:text-gray-300">No Salary Records Found</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs">
               {filterYear || filterMonth || filterStatus ? 'Try adjusting your filters.' : 'No salary records have been added yet.'}
             </p>
           </div>
@@ -202,37 +202,37 @@ export default function Payment() {
             {/* Desktop Table */}
             <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="border-b border-gray-700/60 bg-gray-900/40">
+                <thead className="border-b border-gray-200 dark:border-gray-700/60 bg-gray-50/50 dark:bg-gray-900/40">
                   <tr>
                     {['Month & Year', 'Amount', 'Status', 'Due Date', 'Paid Date', 'Method', 'Note'].map(h => (
-                      <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">{h}</th>
+                      <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{h}</th>
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-700/40">
+                <tbody className="divide-y divide-gray-200 dark:divide-gray-700/40">
                   {salaries.map(s => {
                     const b = statusBadge(s.status);
                     return (
                       <tr key={s._id} className="hover:bg-blue-500/5 transition-colors">
                         <td className="px-4 py-3">
-                          <span className="font-semibold text-gray-200">{s.month} {s.year}</span>
+                          <span className="font-semibold text-gray-900 dark:text-gray-200">{s.month} {s.year}</span>
                         </td>
                         <td className="px-4 py-3">
-                          <span className="font-bold text-blue-400">{fmt(s.amount)}</span>
+                          <span className="font-bold text-blue-600 dark:text-blue-400">{fmt(s.amount)}</span>
                         </td>
                         <td className="px-4 py-3">
                           <span className={`inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-semibold ${b.cls}`}>
                             {b.icon} {b.label}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-gray-400 text-xs">
+                        <td className="px-4 py-3 text-gray-600 dark:text-gray-400 text-xs">
                           {s.dueDate ? new Date(s.dueDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
                         </td>
-                        <td className="px-4 py-3 text-gray-400 text-xs">
-                          {s.paidDate ? new Date(s.paidDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) : <span className="text-gray-600">Not paid yet</span>}
+                        <td className="px-4 py-3 text-gray-600 dark:text-gray-400 text-xs">
+                          {s.paidDate ? new Date(s.paidDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) : <span className="text-gray-400 dark:text-gray-600">Not paid yet</span>}
                         </td>
-                        <td className="px-4 py-3 text-gray-400 text-xs">{methodLabel(s.paymentMethod)}</td>
-                        <td className="px-4 py-3 text-gray-500 text-xs max-w-[160px] truncate">{s.description || '—'}</td>
+                        <td className="px-4 py-3 text-gray-600 dark:text-gray-400 text-xs">{methodLabel(s.paymentMethod)}</td>
+                        <td className="px-4 py-3 text-gray-500 dark:text-gray-500 text-xs max-w-[160px] truncate">{s.description || '—'}</td>
                       </tr>
                     );
                   })}
@@ -246,22 +246,22 @@ export default function Payment() {
                 const b = statusBadge(s.status);
                 const leftBorder = s.status === 'paid' ? 'border-l-green-500' : s.status === 'overdue' ? 'border-l-red-500' : 'border-l-yellow-500';
                 return (
-                  <div key={s._id} className={`bg-gray-800/60 border border-gray-700/60 border-l-4 ${leftBorder} rounded-xl p-4`}>
+                  <div key={s._id} className={`bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/60 border-l-4 ${leftBorder} rounded-xl p-4 shadow-sm`}>
                     <div className="flex items-start justify-between mb-2">
                       <div>
-                        <p className="font-bold text-gray-100">{s.month} {s.year}</p>
-                        <p className="text-blue-400 font-bold text-lg leading-tight">{fmt(s.amount)}</p>
+                        <p className="font-bold text-gray-900 dark:text-gray-100">{s.month} {s.year}</p>
+                        <p className="text-blue-600 dark:text-blue-400 font-bold text-lg leading-tight">{fmt(s.amount)}</p>
                       </div>
                       <span className={`inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-semibold ${b.cls}`}>
                         {b.icon} {b.label}
                       </span>
                     </div>
-                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
+                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500 dark:text-gray-400">
                       <span>Due: {s.dueDate ? new Date(s.dueDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</span>
-                      {s.paidDate && <span className="text-green-400">Paid: {new Date(s.paidDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}</span>}
+                      {s.paidDate && <span className="text-green-600 dark:text-green-400">Paid: {new Date(s.paidDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}</span>}
                       {s.paymentMethod && <span>Via: {methodLabel(s.paymentMethod)}</span>}
                     </div>
-                    {s.description && <p className="text-gray-600 text-xs mt-1.5 italic">{s.description}</p>}
+                    {s.description && <p className="text-gray-500 dark:text-gray-600 text-xs mt-1.5 italic">{s.description}</p>}
                   </div>
                 );
               })}

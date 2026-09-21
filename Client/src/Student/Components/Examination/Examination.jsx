@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { format } from 'date-fns';
 import { baseApi } from '../../../environment';
@@ -30,7 +30,6 @@ const Examination = () => {
   const [selectedExamId, setSelectedExamId]     = useState(null);
   const [calculatingDuration, setCalculatingDuration] = useState(false);
 
-  // ─── Init ──────────────────────────────────────────────────────────
   useEffect(() => { initializeComponent(); }, []);
 
   useEffect(() => {
@@ -74,7 +73,6 @@ const Examination = () => {
     }
   });
 
-  // ─── Fetchers ──────────────────────────────────────────────────────
   const fetchExaminations = async () => {
     setLoading(true);
     try {
@@ -118,7 +116,6 @@ const Examination = () => {
     } catch {}
   };
 
-  // ─── CRUD (SCHOOL/TEACHER only) ────────────────────────────────────
   const handleChange = e => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -204,7 +201,6 @@ const Examination = () => {
     setError('');
   };
 
-  // ─── Helpers ───────────────────────────────────────────────────────
   const canEditExam = exam => {
     if (userRole === 'SCHOOL') return true;
     if (userRole === 'TEACHER' && exam.creatorRole === 'TEACHER') {
@@ -236,15 +232,13 @@ const Examination = () => {
 
   const majorTypes = ['Mid Term', 'Final Term', 'Annual Exam', 'Semester Exam'];
   const typeBadge  = type => majorTypes.includes(type)
-    ? 'bg-red-500/15 border border-red-500/30 text-red-400'
-    : 'bg-blue-500/15 border border-blue-500/30 text-blue-400';
+    ? 'bg-red-50 dark:bg-red-500/15 border border-red-200 dark:border-red-500/30 text-red-600 dark:text-red-400'
+    : 'bg-blue-50 dark:bg-blue-500/15 border border-blue-200 dark:border-blue-500/30 text-blue-600 dark:text-blue-400';
 
-  // Filtered exams
   const filteredExams = examinations.filter(e =>
     (!selectedType || e.examType === selectedType)
   );
 
-  // Unique exam types for filter pills
   const examTypesInData = [...new Set(examinations.map(e => e.examType))];
 
   const totalExams    = examinations.length;
@@ -252,20 +246,20 @@ const Examination = () => {
   const pastExams     = totalExams - upcomingExams;
 
   return (
-    <div className="min-h-screen p-4 md:p-6 space-y-6">
+    <div className="space-y-6 max-w-7xl mx-auto w-full">
 
       {/* ─── Hero ─── */}
-      <div className="bg-gradient-to-br from-green-600/25 via-green-500/10 to-gray-900 border border-green-500/20 rounded-2xl p-6 md:p-8">
+      <div className="bg-gradient-to-br from-emerald-500/10 via-emerald-500/5 to-white dark:from-emerald-600/25 dark:via-emerald-500/10 dark:to-gray-900 border border-emerald-500/20 rounded-2xl p-6 md:p-8 shadow-sm">
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
             <div className="flex items-center gap-3 mb-3">
-              <div className="p-2 bg-green-500/15 rounded-xl border border-green-500/20">
-                <ClipboardList size={20} className="text-green-400" />
+              <div className="p-2 bg-emerald-500/15 rounded-xl border border-emerald-500/20">
+                <ClipboardList size={20} className="text-emerald-600 dark:text-emerald-400" />
               </div>
-              <span className="text-xs text-green-400 font-semibold uppercase tracking-widest">Examinations</span>
+              <span className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold uppercase tracking-widest">Examinations</span>
             </div>
-            <h1 className="text-2xl md:text-3xl font-bold text-white">Examination Schedule</h1>
-            <p className="text-gray-400 mt-1 text-sm">
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Examination Schedule</h1>
+            <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm">
               {userRole === 'STUDENT'
                 ? 'View your upcoming and past examinations'
                 : 'Manage examination schedules'}
@@ -274,7 +268,7 @@ const Examination = () => {
           {canCreateExam && (
             <button
               onClick={openCreateModal}
-              className="px-4 py-2.5 bg-green-500 hover:bg-green-600 text-white rounded-xl text-sm font-medium transition-colors shadow-lg shadow-green-900/30"
+              className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-medium transition-colors shadow-lg shadow-emerald-900/20 cursor-pointer"
             >
               + New Examination
             </button>
@@ -285,15 +279,15 @@ const Examination = () => {
       {/* ─── Stat cards ─── */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
-          { label: 'Total Exams',    value: totalExams,    icon: <ClipboardList size={18} />, color: 'text-green-400' },
-          { label: 'Upcoming',       value: upcomingExams, icon: <Calendar      size={18} />, color: 'text-blue-400'  },
-          { label: 'Completed',      value: pastExams,     icon: <GraduationCap size={18} />, color: 'text-gray-400'  },
+          { label: 'Total Exams',    value: totalExams,    icon: <ClipboardList size={18} />, color: 'text-emerald-600 dark:text-emerald-400' },
+          { label: 'Upcoming',       value: upcomingExams, icon: <Calendar      size={18} />, color: 'text-blue-600 dark:text-blue-400'  },
+          { label: 'Completed',      value: pastExams,     icon: <GraduationCap size={18} />, color: 'text-gray-500 dark:text-gray-400'  },
         ].map((s, i) => (
-          <div key={i} className="bg-gray-900/50 border border-green-500/20 rounded-2xl p-5 flex items-center gap-4">
-            <div className={`p-3 rounded-xl bg-green-500/10 border border-green-500/20 ${s.color}`}>{s.icon}</div>
+          <div key={i} className="bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-emerald-500/20 rounded-2xl p-5 flex items-center gap-4 shadow-sm">
+            <div className={`p-3 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 ${s.color}`}>{s.icon}</div>
             <div>
               <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
-              <p className="text-gray-400 text-sm">{s.label}</p>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">{s.label}</p>
             </div>
           </div>
         ))}
@@ -301,29 +295,29 @@ const Examination = () => {
 
       {/* ─── Alerts ─── */}
       {success && (
-        <div className="flex items-center justify-between p-4 bg-green-500/10 border border-green-500/30 rounded-xl text-green-400 text-sm">
+        <div className="flex items-center justify-between p-4 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30 rounded-xl text-emerald-700 dark:text-emerald-400 text-sm">
           <span>{success}</span>
-          <button onClick={() => setSuccess('')} className="opacity-60 hover:opacity-100">✕</button>
+          <button onClick={() => setSuccess('')} className="opacity-60 hover:opacity-100 cursor-pointer">✕</button>
         </div>
       )}
       {error && (
-        <div className="flex items-center justify-between p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm">
+        <div className="flex items-center justify-between p-4 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-xl text-red-600 dark:text-red-400 text-sm">
           <span className="flex items-center gap-2"><AlertCircle size={15} />{error}</span>
-          <button onClick={() => setError('')} className="opacity-60 hover:opacity-100">✕</button>
+          <button onClick={() => setError('')} className="opacity-60 hover:opacity-100 cursor-pointer">✕</button>
         </div>
       )}
 
       {/* ─── Filters ─── */}
-      <div className="bg-gray-900/50 border border-green-500/20 rounded-2xl p-4 flex flex-wrap items-center gap-3">
-        <span className="flex items-center gap-1.5 text-gray-400 text-sm flex-shrink-0">
+      <div className="bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-emerald-500/20 rounded-2xl p-4 flex flex-wrap items-center gap-3 shadow-sm">
+        <span className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400 text-sm flex-shrink-0">
           <Filter size={14} /> Filter:
         </span>
         <button
           onClick={() => setSelectedType('')}
-          className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+          className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors cursor-pointer ${
             !selectedType
-              ? 'bg-green-500 text-white border-green-500'
-              : 'bg-gray-800 text-gray-400 border-gray-700 hover:border-green-500/50'
+              ? 'bg-emerald-600 text-white border-emerald-600'
+              : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-emerald-500/50'
           }`}
         >
           All Types
@@ -332,10 +326,10 @@ const Examination = () => {
           <button
             key={t}
             onClick={() => setSelectedType(t === selectedType ? '' : t)}
-            className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+            className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors cursor-pointer ${
               selectedType === t
-                ? 'bg-green-500 text-white border-green-500'
-                : 'bg-gray-800 text-gray-400 border-gray-700 hover:border-green-500/50'
+                ? 'bg-emerald-600 text-white border-emerald-600'
+                : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-emerald-500/50'
             }`}
           >
             {t}
@@ -347,7 +341,7 @@ const Examination = () => {
           <select
             value={selectedClass}
             onChange={e => setSelectedClass(e.target.value)}
-            className="ml-auto text-xs bg-gray-800 border border-gray-700 text-gray-300 rounded-lg px-3 py-1.5 focus:outline-none focus:border-green-500"
+            className="ml-auto text-xs bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-300 rounded-lg px-3 py-1.5 focus:outline-none focus:border-emerald-500"
           >
             <option value="">All Classes</option>
             {classes.map(c => (
@@ -360,17 +354,17 @@ const Examination = () => {
       {/* ─── Loading ─── */}
       {loading && (
         <div className="flex justify-center py-12">
-          <div className="w-9 h-9 rounded-full border-4 border-green-500/30 border-t-green-500 animate-spin" />
+          <div className="w-9 h-9 rounded-full border-4 border-emerald-500/30 border-t-emerald-500 animate-spin" />
         </div>
       )}
 
       {/* ─── Table ─── */}
       {!loading && filteredExams.length > 0 && (
-        <div className="bg-gray-900/50 border border-green-500/20 rounded-2xl overflow-hidden">
-          <div className="flex items-center gap-2 px-5 py-4 border-b border-green-500/15 bg-green-500/5">
-            <ClipboardList size={16} className="text-green-400" />
-            <h2 className="font-semibold text-white text-sm">Examination List</h2>
-            <span className="ml-auto text-xs bg-green-500/10 border border-green-500/20 text-green-400 px-2.5 py-0.5 rounded-full">
+        <div className="bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-emerald-500/20 rounded-2xl overflow-hidden shadow-sm">
+          <div className="flex items-center gap-2 px-5 py-4 border-b border-gray-200 dark:border-emerald-500/15 bg-emerald-50/50 dark:bg-emerald-500/5">
+            <ClipboardList size={16} className="text-emerald-600 dark:text-emerald-400" />
+            <h2 className="font-semibold text-gray-900 dark:text-white text-sm">Examination List</h2>
+            <span className="ml-auto text-xs bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-400 px-2.5 py-0.5 rounded-full font-medium">
               {filteredExams.length} exam{filteredExams.length !== 1 ? 's' : ''}
             </span>
           </div>
@@ -378,7 +372,7 @@ const Examination = () => {
           {/* Desktop */}
           <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-gray-950 text-gray-400 text-xs uppercase tracking-wider">
+              <thead className="bg-gray-50 dark:bg-gray-950 text-gray-600 dark:text-gray-400 text-xs uppercase tracking-wider">
                 <tr>
                   <th className="px-5 py-3 text-left">Date</th>
                   <th className="px-5 py-3 text-left">Subject</th>
@@ -390,27 +384,27 @@ const Examination = () => {
                   {canViewActions && <th className="px-5 py-3 text-center">Actions</th>}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-800/60">
+              <tbody className="divide-y divide-gray-100 dark:divide-gray-800/60">
                 {filteredExams.map(exam => (
-                  <tr key={exam._id} className="hover:bg-green-500/5 transition-colors">
-                    <td className="px-5 py-3 text-white">
+                  <tr key={exam._id} className="hover:bg-emerald-50/40 dark:hover:bg-emerald-500/5 transition-colors">
+                    <td className="px-5 py-3 text-gray-900 dark:text-white font-medium">
                       {exam.examDate ? format(new Date(exam.examDate), 'MMM dd, yyyy') : 'N/A'}
                     </td>
-                    <td className="px-5 py-3 text-green-400 font-medium">{getSubjectName(exam.subject)}</td>
-                    <td className="px-5 py-3 text-gray-300">{getClassName(exam.class)}</td>
+                    <td className="px-5 py-3 text-emerald-600 dark:text-emerald-400 font-semibold">{getSubjectName(exam.subject)}</td>
+                    <td className="px-5 py-3 text-gray-700 dark:text-gray-300">{getClassName(exam.class)}</td>
                     <td className="px-5 py-3 text-center">
-                      <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${typeBadge(exam.examType)}`}>
+                      <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${typeBadge(exam.examType)}`}>
                         {exam.examType}
                       </span>
                     </td>
-                    <td className="px-5 py-3 text-center text-gray-300 text-xs">
+                    <td className="px-5 py-3 text-center text-gray-600 dark:text-gray-300 text-xs font-mono">
                       {formatTime(exam.startTime)} – {formatTime(exam.endTime)}
                     </td>
-                    <td className="px-5 py-3 text-center text-green-400 font-medium">
+                    <td className="px-5 py-3 text-center text-emerald-600 dark:text-emerald-400 font-medium">
                       {formatDuration(exam.duration)}
                     </td>
                     <td className="px-5 py-3 text-center">
-                      <div className={`text-xs font-medium ${exam.creatorRole === 'SCHOOL' ? 'text-orange-400' : 'text-blue-400'}`}>
+                      <div className={`text-xs font-medium ${exam.creatorRole === 'SCHOOL' ? 'text-orange-600 dark:text-orange-400' : 'text-blue-600 dark:text-blue-400'}`}>
                         {exam.creatorRole === 'SCHOOL' ? 'School' : 'Teacher'}
                       </div>
                     </td>
@@ -420,15 +414,15 @@ const Examination = () => {
                           <div className="flex justify-center gap-2">
                             <button
                               onClick={() => openUpdateModal(exam)}
-                              className="px-2.5 py-1 bg-green-500/10 border border-green-500/20 text-green-400 rounded-lg text-xs hover:bg-green-500/20 transition-colors"
+                              className="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-400 rounded-lg text-xs hover:bg-emerald-100 dark:hover:bg-emerald-500/20 transition-colors cursor-pointer"
                             >Edit</button>
                             <button
                               onClick={() => handleDelete(exam._id)}
-                              className="px-2.5 py-1 bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg text-xs hover:bg-red-500/20 transition-colors"
+                              className="px-2.5 py-1 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-red-600 dark:text-red-400 rounded-lg text-xs hover:bg-red-100 dark:hover:bg-red-500/20 transition-colors cursor-pointer"
                             >Delete</button>
                           </div>
                         ) : (
-                          <span className="text-gray-600 text-xs">View Only</span>
+                          <span className="text-gray-400 dark:text-gray-600 text-xs">View Only</span>
                         )}
                       </td>
                     )}
@@ -439,32 +433,32 @@ const Examination = () => {
           </div>
 
           {/* Mobile cards */}
-          <div className="md:hidden divide-y divide-gray-800/60">
+          <div className="md:hidden divide-y divide-gray-100 dark:divide-gray-800/60">
             {filteredExams.map(exam => (
-              <div key={exam._id} className="p-4 hover:bg-green-500/5 transition-colors space-y-2">
+              <div key={exam._id} className="p-4 hover:bg-emerald-50/40 dark:hover:bg-emerald-500/5 transition-colors space-y-2">
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="text-white font-medium text-sm">{getSubjectName(exam.subject)}</p>
-                    <p className="text-gray-400 text-xs mt-0.5">{getClassName(exam.class)}</p>
+                    <p className="text-gray-900 dark:text-white font-medium text-sm">{getSubjectName(exam.subject)}</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-xs mt-0.5">{getClassName(exam.class)}</p>
                   </div>
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${typeBadge(exam.examType)}`}>
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${typeBadge(exam.examType)}`}>
                     {exam.examType}
                   </span>
                 </div>
-                <div className="flex flex-wrap gap-3 text-xs text-gray-400">
+                <div className="flex flex-wrap gap-3 text-xs text-gray-500 dark:text-gray-400">
                   <span className="flex items-center gap-1">
-                    <Calendar size={11} className="text-green-400" />
+                    <Calendar size={11} className="text-emerald-600 dark:text-emerald-400" />
                     {exam.examDate ? format(new Date(exam.examDate), 'MMM dd, yyyy') : 'N/A'}
                   </span>
                   <span className="flex items-center gap-1">
-                    <Clock size={11} className="text-green-400" />
+                    <Clock size={11} className="text-emerald-600 dark:text-emerald-400" />
                     {formatTime(exam.startTime)} – {formatTime(exam.endTime)}
                   </span>
                 </div>
                 {canViewActions && canEditExam(exam) && (
                   <div className="flex gap-2 pt-1">
-                    <button onClick={() => openUpdateModal(exam)} className="px-2.5 py-1 bg-green-500/10 border border-green-500/20 text-green-400 rounded-lg text-xs hover:bg-green-500/20 transition-colors">Edit</button>
-                    <button onClick={() => handleDelete(exam._id)} className="px-2.5 py-1 bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg text-xs hover:bg-red-500/20 transition-colors">Delete</button>
+                    <button onClick={() => openUpdateModal(exam)} className="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-400 rounded-lg text-xs hover:bg-emerald-100 dark:hover:bg-emerald-500/20 transition-colors cursor-pointer">Edit</button>
+                    <button onClick={() => handleDelete(exam._id)} className="px-2.5 py-1 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-red-600 dark:text-red-400 rounded-lg text-xs hover:bg-red-100 dark:hover:bg-red-500/20 transition-colors cursor-pointer">Delete</button>
                   </div>
                 )}
               </div>
@@ -475,13 +469,13 @@ const Examination = () => {
 
       {/* ─── Empty ─── */}
       {!loading && filteredExams.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-16 gap-3 text-gray-500">
+        <div className="flex flex-col items-center justify-center py-16 gap-3 text-gray-400 dark:text-gray-500">
           <ClipboardList size={40} className="opacity-20" />
           <p className="text-sm">
             {selectedType ? `No ${selectedType} examinations found` : 'No examinations found'}
           </p>
           {canCreateExam && (
-            <button onClick={openCreateModal} className="mt-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-xl text-sm transition-colors">
+            <button onClick={openCreateModal} className="mt-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm transition-colors cursor-pointer">
               Create First Examination
             </button>
           )}
@@ -490,82 +484,82 @@ const Examination = () => {
 
       {/* ─── Modal (SCHOOL/TEACHER only) ─── */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-900 border border-green-500/20 rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-green-500/15 bg-green-500/5">
-              <h2 className="font-semibold text-white">
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-emerald-500/20 rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-emerald-500/15 bg-emerald-50/50 dark:bg-emerald-500/5">
+              <h2 className="font-semibold text-gray-900 dark:text-white">
                 {modalType === 'create' ? 'Create Examination' : 'Edit Examination'}
               </h2>
-              <button onClick={closeModal} className="text-gray-400 hover:text-white transition-colors">✕</button>
+              <button onClick={closeModal} className="text-gray-400 hover:text-gray-600 dark:hover:text-white transition-colors cursor-pointer">✕</button>
             </div>
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
-                <label className="text-green-400 text-sm mb-1 block">Exam Date *</label>
+                <label className="text-emerald-700 dark:text-emerald-400 text-sm mb-1 block font-medium">Exam Date *</label>
                 <input type="date" name="date" value={formData.date} onChange={handleChange} min={format(new Date(), 'yyyy-MM-dd')} required
-                  className="w-full bg-gray-800 border border-gray-700 text-white rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-500" />
+                  className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 [color-scheme:light] dark:[color-scheme:dark]" />
               </div>
               <div>
-                <label className="text-green-400 text-sm mb-1 block">Subject *</label>
+                <label className="text-emerald-700 dark:text-emerald-400 text-sm mb-1 block font-medium">Subject *</label>
                 <select name="subjectId" value={formData.subjectId} onChange={handleChange} required
-                  className="w-full bg-gray-800 border border-gray-700 text-white rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-500">
+                  className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 [color-scheme:light] dark:[color-scheme:dark]">
                   <option value="">Select Subject</option>
                   {subjects.map(s => <option key={s._id} value={s._id}>{s.subjectName}</option>)}
                 </select>
               </div>
               {modalType === 'create' && (
                 <div>
-                  <label className="text-green-400 text-sm mb-1 block">Class *</label>
+                  <label className="text-emerald-700 dark:text-emerald-400 text-sm mb-1 block font-medium">Class *</label>
                   <select name="classId" value={formData.classId} onChange={handleChange} required
-                    className="w-full bg-gray-800 border border-gray-700 text-white rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-500">
+                    className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 [color-scheme:light] dark:[color-scheme:dark]">
                     <option value="">Select Class</option>
                     {classes.map(c => <option key={c._id} value={c._id}>{c.classText}</option>)}
                   </select>
                 </div>
               )}
               <div>
-                <label className="text-green-400 text-sm mb-1 block">Exam Type *</label>
+                <label className="text-emerald-700 dark:text-emerald-400 text-sm mb-1 block font-medium">Exam Type *</label>
                 <select name="examType" value={formData.examType} onChange={handleChange} required
-                  className="w-full bg-gray-800 border border-gray-700 text-white rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-500">
+                  className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 [color-scheme:light] dark:[color-scheme:dark]">
                   <option value="">Select Type</option>
                   {availableExamTypes.map(t => <option key={t} value={t}>{t}</option>)}
                 </select>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-green-400 text-sm mb-1 block">Start Time *</label>
+                  <label className="text-emerald-700 dark:text-emerald-400 text-sm mb-1 block font-medium">Start Time *</label>
                   <input type="time" name="startTime" value={formData.startTime} onChange={handleChange} required
-                    className="w-full bg-gray-800 border border-gray-700 text-white rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-500" />
+                    className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 [color-scheme:light] dark:[color-scheme:dark]" />
                 </div>
                 <div>
-                  <label className="text-green-400 text-sm mb-1 block">End Time *</label>
+                  <label className="text-emerald-700 dark:text-emerald-400 text-sm mb-1 block font-medium">End Time *</label>
                   <input type="time" name="endTime" value={formData.endTime} onChange={handleChange} required
-                    className="w-full bg-gray-800 border border-gray-700 text-white rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-500" />
+                    className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 [color-scheme:light] dark:[color-scheme:dark]" />
                 </div>
               </div>
               <div>
-                <label className="text-green-400 text-sm mb-1 block">Duration</label>
-                <div className="bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-gray-300">
+                <label className="text-emerald-700 dark:text-emerald-400 text-sm mb-1 block font-medium">Duration</label>
+                <div className="bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl px-3 py-2 text-sm text-gray-700 dark:text-gray-300">
                   {calculatingDuration ? (
                     <span className="flex items-center gap-2">
-                      <span className="w-3 h-3 rounded-full border-2 border-green-500/30 border-t-green-500 animate-spin" />
+                      <span className="w-3 h-3 rounded-full border-2 border-emerald-500/30 border-t-emerald-500 animate-spin" />
                       Calculating…
                     </span>
                   ) : formData.duration ? (
-                    <span className="text-green-400 font-medium">{formatDuration(formData.duration)}</span>
+                    <span className="text-emerald-600 dark:text-emerald-400 font-semibold">{formatDuration(formData.duration)}</span>
                   ) : (
-                    <span className="text-gray-500">Set start & end times</span>
+                    <span className="text-gray-400 dark:text-gray-500">Set start & end times</span>
                   )}
                 </div>
               </div>
               {error && (
-                <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm">{error}</div>
+                <div className="p-3 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-xl text-red-600 dark:text-red-400 text-sm">{error}</div>
               )}
               <div className="flex justify-end gap-3 pt-1">
-                <button type="button" onClick={closeModal} className="px-4 py-2 bg-gray-800 border border-gray-700 text-gray-300 rounded-xl text-sm hover:bg-gray-700 transition-colors">
+                <button type="button" onClick={closeModal} className="px-4 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors cursor-pointer">
                   Cancel
                 </button>
                 <button type="submit" disabled={loading || calculatingDuration}
-                  className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-xl text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer">
                   {loading ? (
                     <><span className="w-3.5 h-3.5 rounded-full border-2 border-white/30 border-t-white animate-spin" />
                     {modalType === 'create' ? 'Creating…' : 'Saving…'}</>
@@ -583,3 +577,4 @@ const Examination = () => {
 };
 
 export default Examination;
+

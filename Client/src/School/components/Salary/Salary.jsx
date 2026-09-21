@@ -238,17 +238,17 @@ export default function Salary() {
   const overdueCount = displayRows.filter(r => r.status === 'overdue').length;
 
   return (
-    <div className="min-h-screen bg-gray-950 text-gray-100 p-4 md:p-6 space-y-5">
+    <div className="space-y-6 max-w-7xl mx-auto w-full">
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
         <div className="flex items-center gap-3">
           <div className="p-2.5 bg-orange-500/15 rounded-xl border border-orange-500/20">
-            <Wallet className="w-6 h-6 text-orange-400" />
+            <Wallet className="w-6 h-6 text-orange-500 dark:text-orange-400" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-100">Salary Management</h1>
-            <p className="text-sm text-gray-500">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Salary Management</h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               {filterMonth || filterYear
                 ? `Showing salary records for ${activePeriodLabel}`
                 : 'Showing salary records from each teacher join date to now'}
@@ -257,7 +257,7 @@ export default function Salary() {
         </div>
         <button
           onClick={openCreate}
-          className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 rounded-xl transition-all"
+          className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 rounded-xl transition-all shadow-md shadow-orange-500/20 cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           Add Salary Record
@@ -268,68 +268,68 @@ export default function Salary() {
       {msg.text && (
         <div className={`flex items-center gap-3 px-4 py-3 rounded-xl border text-sm ${
           msg.type === 'error'
-            ? 'bg-red-900/20 border-red-700/40 text-red-300'
-            : 'bg-green-900/20 border-green-700/40 text-green-300'
+            ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-700/40 text-red-600 dark:text-red-300'
+            : 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700/40 text-green-600 dark:text-green-300'
         }`}>
           {msg.type === 'error' ? <XCircle className="w-4 h-4 shrink-0" /> : <CheckCircle className="w-4 h-4 shrink-0" />}
           <span className="flex-1">{msg.text}</span>
-          <button onClick={() => setMsg({ text: '', type: '' })} className="opacity-60 hover:opacity-100">
+          <button onClick={() => setMsg({ text: '', type: '' })} className="opacity-60 hover:opacity-100 cursor-pointer">
             <X className="w-4 h-4" />
           </button>
         </div>
       )}
 
       {/* Stats cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-gray-800/60 border border-gray-700/60 rounded-2xl p-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5 sm:gap-4">
+        <div className="bg-white dark:bg-gray-900/60 border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm">
           <div className="flex items-center gap-2 mb-3">
-            <div className="p-1.5 rounded-lg bg-green-500/15"><CheckCircle className="w-4 h-4 text-green-400" /></div>
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Paid</span>
+            <div className="p-1.5 rounded-lg bg-green-500/15"><CheckCircle className="w-4 h-4 text-green-500 dark:text-green-400" /></div>
+            <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total Paid</span>
           </div>
-          <p className="text-xl font-bold text-green-400">{fmt(derivedStats.paid)}</p>
-          <p className="text-xs text-gray-600 mt-1">{paidCount} record{paidCount !== 1 ? 's' : ''}</p>
+          <p className="text-xl font-bold text-green-600 dark:text-green-400">{fmt(derivedStats.paid)}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">{paidCount} record{paidCount !== 1 ? 's' : ''}</p>
         </div>
-        <div className="bg-gray-800/60 border border-gray-700/60 rounded-2xl p-4">
+        <div className="bg-white dark:bg-gray-900/60 border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm">
           <div className="flex items-center gap-2 mb-3">
-            <div className="p-1.5 rounded-lg bg-gray-500/15"><Clock className="w-4 h-4 text-gray-400" /></div>
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Pending</span>
+            <div className="p-1.5 rounded-lg bg-gray-500/15"><Clock className="w-4 h-4 text-gray-500 dark:text-gray-400" /></div>
+            <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Pending</span>
           </div>
-          <p className="text-xl font-bold text-gray-400">{fmt(derivedStats.pending)}</p>
-          <p className="text-xs text-gray-600 mt-1">{pendingCount} record{pendingCount !== 1 ? 's' : ''}</p>
+          <p className="text-xl font-bold text-gray-700 dark:text-gray-300">{fmt(derivedStats.pending)}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">{pendingCount} record{pendingCount !== 1 ? 's' : ''}</p>
         </div>
-        <div className="bg-gray-800/60 border border-gray-700/60 rounded-2xl p-4">
+        <div className="bg-white dark:bg-gray-900/60 border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm">
           <div className="flex items-center gap-2 mb-3">
-            <div className="p-1.5 rounded-lg bg-red-500/15"><AlertTriangle className="w-4 h-4 text-red-400" /></div>
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Overdue</span>
+            <div className="p-1.5 rounded-lg bg-red-500/15"><AlertTriangle className="w-4 h-4 text-red-500 dark:text-red-400" /></div>
+            <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Overdue</span>
           </div>
-          <p className="text-xl font-bold text-red-400">{fmt(derivedStats.overdue)}</p>
-          <p className="text-xs text-gray-600 mt-1">{overdueCount} record{overdueCount !== 1 ? 's' : ''}</p>
+          <p className="text-xl font-bold text-red-600 dark:text-red-400">{fmt(derivedStats.overdue)}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">{overdueCount} record{overdueCount !== 1 ? 's' : ''}</p>
         </div>
-        <div className="bg-gray-800/60 border border-gray-700/60 rounded-2xl p-4">
+        <div className="bg-white dark:bg-gray-900/60 border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm">
           <div className="flex items-center gap-2 mb-3">
-            <div className="p-1.5 rounded-lg bg-orange-500/15"><Users className="w-4 h-4 text-orange-400" /></div>
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Teachers</span>
+            <div className="p-1.5 rounded-lg bg-orange-500/15"><Users className="w-4 h-4 text-orange-500 dark:text-orange-400" /></div>
+            <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Teachers</span>
           </div>
-          <p className="text-xl font-bold text-orange-400">{teachers.length}</p>
-          <p className="text-xs text-gray-600 mt-1">registered</p>
+          <p className="text-xl font-bold text-orange-600 dark:text-orange-400">{teachers.length}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">registered</p>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="bg-gray-800/40 border border-gray-700/60 rounded-2xl p-4 space-y-3">
+      <div className="bg-white dark:bg-gray-900/40 border border-gray-200 dark:border-gray-800 rounded-2xl p-4 space-y-3 shadow-sm">
         <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-1.5 text-sm text-orange-400 font-semibold">
+          <div className="flex items-center gap-1.5 text-sm text-orange-500 dark:text-orange-400 font-semibold">
             <Filter className="w-4 h-4" /> Filters
           </div>
 
           <select value={filterTeacher} onChange={e => setFilterTeacher(e.target.value)}
-            className="px-3 py-2 text-sm bg-gray-800 border border-gray-700 text-gray-200 rounded-xl outline-none focus:border-orange-500 cursor-pointer">
+            className="px-3 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-200 rounded-xl outline-none focus:border-orange-500 cursor-pointer">
             <option value="">All Teachers</option>
             {teachers.map(t => <option key={t._id} value={t._id}>{t.name}</option>)}
           </select>
 
           <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
-            className="px-3 py-2 text-sm bg-gray-800 border border-gray-700 text-gray-200 rounded-xl outline-none focus:border-orange-500 cursor-pointer">
+            className="px-3 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-200 rounded-xl outline-none focus:border-orange-500 cursor-pointer">
             <option value="">All Statuses</option>
             <option value="paid">Paid</option>
             <option value="pending">Pending</option>
@@ -337,13 +337,13 @@ export default function Salary() {
           </select>
 
           <select value={filterMonth} onChange={e => setFilterMonth(e.target.value)}
-            className="px-3 py-2 text-sm bg-gray-800 border border-gray-700 text-gray-200 rounded-xl outline-none focus:border-orange-500 cursor-pointer">
+            className="px-3 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-200 rounded-xl outline-none focus:border-orange-500 cursor-pointer">
             <option value="">All Months</option>
             {MONTHS.map(m => <option key={m} value={m}>{m}</option>)}
           </select>
 
           <select value={filterYear} onChange={e => setFilterYear(e.target.value)}
-            className="px-3 py-2 text-sm bg-gray-800 border border-gray-700 text-gray-200 rounded-xl outline-none focus:border-orange-500 cursor-pointer">
+            className="px-3 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-200 rounded-xl outline-none focus:border-orange-500 cursor-pointer">
             <option value="">All Years</option>
             {yearOptions.map(y => <option key={y} value={y}>{y}</option>)}
           </select>
@@ -351,35 +351,35 @@ export default function Salary() {
           {(filterTeacher || filterStatus || filterMonth || filterYear) && (
             <button
               onClick={() => { setFilterTeacher(''); setFilterStatus(''); setFilterMonth(''); setFilterYear(''); }}
-              className="flex items-center gap-1.5 px-3 py-2 text-xs text-gray-400 hover:text-gray-200 border border-gray-700 rounded-xl transition-colors"
+              className="flex items-center gap-1.5 px-3 py-2 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 border border-gray-300 dark:border-gray-700 rounded-xl transition-colors"
             >
               <X className="w-3 h-3" /> Clear
             </button>
           )}
 
           <button onClick={loadSalaries}
-            className="ml-auto flex items-center gap-2 px-3 py-2 text-sm text-gray-400 bg-gray-700/60 hover:bg-gray-700 rounded-xl transition-colors">
+            className="ml-auto flex items-center gap-2 px-3 py-2 text-sm text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700/60 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-xl transition-colors">
             <RefreshCw className="w-3.5 h-3.5" /> Refresh
           </button>
         </div>
 
         {(filterMonth || filterYear) && (
-          <p className="text-xs text-gray-500">
-            Showing <span className="text-orange-400 font-medium">{displayRows.length}</span> salary records for {activePeriodLabel}
-            {pendingCount > 0 && <span className="ml-2 text-gray-400">&mdash; <span className="text-amber-400 font-medium">{pendingCount} unpaid</span></span>}
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            Showing <span className="text-orange-500 dark:text-orange-400 font-medium">{displayRows.length}</span> salary records for {activePeriodLabel}
+            {pendingCount > 0 && <span className="ml-2 text-gray-500 dark:text-gray-400">&mdash; <span className="text-amber-500 dark:text-amber-400 font-medium">{pendingCount} unpaid</span></span>}
           </p>
         )}
       </div>
 
       {/* Table */}
-      <div className="bg-gray-800/40 border border-gray-700/60 rounded-2xl overflow-hidden">
+      <div className="bg-white dark:bg-gray-900/40 border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden shadow-sm">
         {loading ? (
           <div className="flex justify-center py-20">
             <div className="w-8 h-8 border-4 border-orange-500/30 border-t-orange-500 rounded-full animate-spin" />
           </div>
         ) : displayRows.length === 0 ? (
-          <div className="flex flex-col items-center gap-3 py-20 text-gray-500">
-            <Wallet className="w-12 h-12 opacity-20" />
+          <div className="flex flex-col items-center gap-3 py-20 text-gray-400 dark:text-gray-500">
+            <Wallet className="w-12 h-12 opacity-30" />
             <p className="text-sm">
               {teachers.length === 0
                 ? 'No teachers found. Add teachers first.'
@@ -389,19 +389,19 @@ export default function Salary() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="border-b border-gray-700/60 bg-gray-800/60">
+              <thead className="border-b border-gray-200 dark:border-gray-800 bg-gray-50/80 dark:bg-gray-800/60">
                 <tr>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Teacher</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Amount</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden sm:table-cell">Period</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden md:table-cell">Due Date</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden md:table-cell">Paid On</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">Method</th>
-                  <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Teacher</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Amount</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider hidden sm:table-cell">Period</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider hidden md:table-cell">Due Date</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider hidden md:table-cell">Paid On</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider hidden lg:table-cell">Method</th>
+                  <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-700/40">
+              <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
                 {displayRows.map((row, idx) => {
                   const status  = row.status || 'pending';
                   const sc      = STATUS[status] || STATUS.pending;
@@ -409,46 +409,46 @@ export default function Salary() {
                   const teacher = typeof row.teacher === 'object' ? row.teacher : null;
 
                   return (
-                    <tr key={row._id || `v-${idx}`} className={`hover:bg-gray-700/20 transition-colors ${row._virtual ? 'opacity-80' : ''}`}>
+                    <tr key={row._id || `v-${idx}`} className={`hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors ${row._virtual ? 'opacity-80' : ''}`}>
 
                       {/* Teacher */}
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
                           {teacher?.teacherImg ? (
                             <img src={teacher.teacherImg} alt={teacher.name}
-                              className="w-9 h-9 rounded-full object-cover shrink-0 border border-gray-600" />
+                              className="w-9 h-9 rounded-full object-cover shrink-0 border border-gray-200 dark:border-gray-700" />
                           ) : (
-                            <div className="w-9 h-9 rounded-full bg-orange-500/15 border border-gray-600 flex items-center justify-center shrink-0">
-                              <span className="text-sm font-semibold text-orange-400">
+                            <div className="w-9 h-9 rounded-full bg-orange-500/15 border border-orange-500/30 flex items-center justify-center shrink-0">
+                              <span className="text-sm font-semibold text-orange-500 dark:text-orange-400">
                                 {(teacher?.name || 'T').charAt(0).toUpperCase()}
                               </span>
                             </div>
                           )}
                           <div className="min-w-0">
-                            <p className="font-medium text-gray-100 truncate">{teacher?.name || '—'}</p>
-                            <p className="text-xs text-gray-500 truncate">{teacher?.email || ''}</p>
+                            <p className="font-medium text-gray-900 dark:text-gray-100 truncate">{teacher?.name || '—'}</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{teacher?.email || ''}</p>
                           </div>
                         </div>
                       </td>
 
                       {/* Amount */}
-                      <td className="px-4 py-3 font-bold text-orange-400">
-                        {row.amount ? fmt(row.amount) : <span className="text-gray-600 text-xs font-normal">Not set</span>}
+                      <td className="px-4 py-3 font-bold text-orange-600 dark:text-orange-400">
+                        {row.amount ? fmt(row.amount) : <span className="text-gray-400 dark:text-gray-600 text-xs font-normal">Not set</span>}
                       </td>
 
                       {/* Period */}
-                      <td className="px-4 py-3 text-gray-300 hidden sm:table-cell">{row.month} {row.year}</td>
+                      <td className="px-4 py-3 text-gray-700 dark:text-gray-300 hidden sm:table-cell">{row.month} {row.year}</td>
 
                       {/* Due Date */}
-                      <td className="px-4 py-3 text-xs text-gray-400 hidden md:table-cell">
-                        {row._virtual ? <span className="text-gray-600">Auto</span> : fmtDate(row.dueDate)}
+                      <td className="px-4 py-3 text-xs text-gray-500 dark:text-gray-400 hidden md:table-cell">
+                        {row._virtual ? <span className="text-gray-400 dark:text-gray-600">Auto</span> : fmtDate(row.dueDate)}
                       </td>
 
                       {/* Paid On */}
                       <td className="px-4 py-3 text-xs hidden md:table-cell">
                         {row.paidDate
-                          ? <span className="text-green-400">{fmtDate(row.paidDate)}</span>
-                          : <span className="text-gray-600">—</span>}
+                          ? <span className="text-green-600 dark:text-green-400">{fmtDate(row.paidDate)}</span>
+                          : <span className="text-gray-400 dark:text-gray-600">—</span>}
                       </td>
 
                       {/* Status */}
@@ -460,7 +460,7 @@ export default function Salary() {
                       </td>
 
                       {/* Method */}
-                      <td className="px-4 py-3 text-xs text-gray-400 capitalize hidden lg:table-cell">
+                      <td className="px-4 py-3 text-xs text-gray-500 dark:text-gray-400 capitalize hidden lg:table-cell">
                         {row.paymentMethod?.replace('_', ' ') || '—'}
                       </td>
 
@@ -472,10 +472,10 @@ export default function Salary() {
                             onClick={() => openPayModal(row)}
                             className={`inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold rounded-lg border transition-colors ${
                               status === 'paid'
-                                ? 'text-green-400 bg-green-500/10 border-green-500/30 hover:bg-green-500/20'
+                                ? 'text-green-600 dark:text-green-400 bg-green-500/10 border-green-500/30 hover:bg-green-500/20'
                                 : status === 'overdue'
-                                ? 'text-red-400 bg-red-500/10 border-red-500/30 hover:bg-red-500/20'
-                                : 'text-orange-300 bg-orange-500/10 border-orange-500/30 hover:bg-orange-500/20'
+                                ? 'text-red-600 dark:text-red-400 bg-red-500/10 border-red-500/30 hover:bg-red-500/20'
+                                : 'text-orange-600 dark:text-orange-300 bg-orange-500/10 border-orange-500/30 hover:bg-orange-500/20'
                             }`}
                           >
                             <Check className="w-3 h-3" />
@@ -484,14 +484,14 @@ export default function Salary() {
 
                           {/* Edit */}
                           <button onClick={() => openEdit(row)}
-                            className="p-1.5 text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors" title="Edit">
+                            className="p-1.5 text-blue-500 dark:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors" title="Edit">
                             <Edit className="w-4 h-4" />
                           </button>
 
                           {/* Delete — only for real records */}
                           {!row._virtual && (
                             <button onClick={() => setDelId(row._id)}
-                              className="p-1.5 text-red-400 hover:bg-red-500/10 rounded-lg transition-colors" title="Delete">
+                              className="p-1.5 text-red-500 dark:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors" title="Delete">
                               <Trash2 className="w-4 h-4" />
                             </button>
                           )}
@@ -510,33 +510,33 @@ export default function Salary() {
       {modal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => !saving && setModal(null)} />
-          <div className="relative bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-700">
+          <div className="relative bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-800">
               <div>
-                <h2 className="text-base font-semibold text-gray-100">
+                <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">
                   {modal.mode === 'create' ? 'Add Salary Record' : 'Edit Salary Record'}
                 </h2>
-                <p className="text-xs text-gray-500 mt-0.5">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                   {modal.mode === 'create' ? 'Fill in the details to create a new record' : 'Update salary payment details'}
                 </p>
               </div>
               <button onClick={() => setModal(null)} disabled={saving}
-                className="text-gray-400 hover:text-gray-200 p-1 rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50">
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors disabled:opacity-50">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <form onSubmit={handleSubmit} className="px-6 py-5 space-y-4">
               {formErr && (
-                <div className="flex items-center gap-2 px-3 py-2.5 bg-red-900/20 border border-red-700/40 text-red-300 rounded-xl text-sm">
+                <div className="flex items-center gap-2 px-3 py-2.5 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700/40 text-red-600 dark:text-red-300 rounded-xl text-sm">
                   <XCircle className="w-4 h-4 shrink-0" />{formErr}
                 </div>
               )}
 
               <div>
-                <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Teacher *</label>
+                <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1.5">Teacher *</label>
                 <select value={form.teacherId} onChange={handleTeacherSelect} required
-                  className="w-full px-3 py-2.5 text-sm bg-gray-800 border border-gray-700 text-gray-200 rounded-xl outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-colors cursor-pointer">
+                  className="w-full px-3 py-2.5 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-200 rounded-xl outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-colors cursor-pointer">
                   <option value="">Select a teacher...</option>
                   {teachers.map(t => (
                     <option key={t._id} value={t._id}>
@@ -547,50 +547,50 @@ export default function Salary() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Amount (₹) *</label>
+                <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1.5">Amount (₹) *</label>
                 <input type="number" min="0" required value={form.amount}
                   onChange={e => setForm(p => ({ ...p, amount: e.target.value }))}
                   placeholder="e.g. 25000"
-                  className="w-full px-3 py-2.5 text-sm bg-gray-800 border border-gray-700 text-gray-200 rounded-xl outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-colors placeholder-gray-600" />
+                  className="w-full px-3 py-2.5 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-200 rounded-xl outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-colors placeholder-gray-400 dark:placeholder-gray-600" />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Month *</label>
+                  <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1.5">Month *</label>
                   <select value={form.month} onChange={e => setForm(p => ({ ...p, month: e.target.value }))} required
-                    className="w-full px-3 py-2.5 text-sm bg-gray-800 border border-gray-700 text-gray-200 rounded-xl outline-none focus:border-orange-500 transition-colors cursor-pointer">
+                    className="w-full px-3 py-2.5 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-200 rounded-xl outline-none focus:border-orange-500 transition-colors cursor-pointer">
                     <option value="">Select...</option>
                     {MONTHS.map(m => <option key={m} value={m}>{m}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Year *</label>
+                  <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1.5">Year *</label>
                   <select value={form.year} onChange={e => setForm(p => ({ ...p, year: Number(e.target.value) }))}
-                    className="w-full px-3 py-2.5 text-sm bg-gray-800 border border-gray-700 text-gray-200 rounded-xl outline-none focus:border-orange-500 transition-colors cursor-pointer">
+                    className="w-full px-3 py-2.5 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-200 rounded-xl outline-none focus:border-orange-500 transition-colors cursor-pointer">
                     {yearOptions.map(y => <option key={y} value={y}>{y}</option>)}
                   </select>
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Due Date *</label>
+                <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1.5">Due Date *</label>
                 <input type="date" required value={form.dueDate}
                   onChange={e => setForm(p => ({ ...p, dueDate: e.target.value }))}
-                  className="w-full px-3 py-2.5 text-sm bg-gray-800 border border-gray-700 text-gray-200 rounded-xl outline-none focus:border-orange-500 transition-colors [color-scheme:dark]" />
+                  className="w-full px-3 py-2.5 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-200 rounded-xl outline-none focus:border-orange-500 transition-colors [color-scheme:light] dark:[color-scheme:dark]" />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Status</label>
+                <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1.5">Status</label>
                 <div className="grid grid-cols-3 gap-2">
                   {[
-                    { value: 'pending', label: 'Pending', active: 'border-gray-400/60 bg-gray-500/15 text-gray-200' },
-                    { value: 'paid',    label: 'Paid',    active: 'border-green-500/60 bg-green-500/15 text-green-300' },
-                    { value: 'overdue', label: 'Overdue', active: 'border-red-500/60 bg-red-500/15 text-red-300' },
+                    { value: 'pending', label: 'Pending', active: 'border-gray-400 dark:border-gray-400/60 bg-gray-100 dark:bg-gray-500/15 text-gray-800 dark:text-gray-200' },
+                    { value: 'paid',    label: 'Paid',    active: 'border-green-500/60 bg-green-500/15 text-green-600 dark:text-green-300' },
+                    { value: 'overdue', label: 'Overdue', active: 'border-red-500/60 bg-red-500/15 text-red-600 dark:text-red-300' },
                   ].map(opt => (
                     <button key={opt.value} type="button"
                       onClick={() => setForm(p => ({ ...p, status: opt.value }))}
                       className={`py-2 rounded-xl border text-sm font-semibold transition-all ${
-                        form.status === opt.value ? opt.active : 'border-gray-700 bg-gray-800 text-gray-500 hover:border-gray-500 hover:text-gray-300'
+                        form.status === opt.value ? opt.active : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-500 hover:border-gray-400 dark:hover:border-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
                       }`}>
                       {opt.label}
                     </button>
@@ -601,13 +601,13 @@ export default function Salary() {
               {form.status === 'paid' && (
                 <>
                   <div>
-                    <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Payment Date</label>
+                    <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1.5">Payment Date</label>
                     <input type="date" value={form.paidDate}
                       onChange={e => setForm(p => ({ ...p, paidDate: e.target.value }))}
-                      className="w-full px-3 py-2.5 text-sm bg-gray-800 border border-gray-700 text-gray-200 rounded-xl outline-none focus:border-orange-500 transition-colors [color-scheme:dark]" />
+                      className="w-full px-3 py-2.5 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-200 rounded-xl outline-none focus:border-orange-500 transition-colors [color-scheme:light] dark:[color-scheme:dark]" />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Payment Method</label>
+                    <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1.5">Payment Method</label>
                     <div className="grid grid-cols-2 gap-2">
                       {[
                         { value: 'cash', label: 'Cash' },
@@ -619,8 +619,8 @@ export default function Salary() {
                           onClick={() => setForm(p => ({ ...p, paymentMethod: m.value }))}
                           className={`py-2 rounded-xl border text-xs font-semibold transition-all ${
                             form.paymentMethod === m.value
-                              ? 'border-orange-500/60 bg-orange-500/15 text-orange-300'
-                              : 'border-gray-700 bg-gray-800 text-gray-500 hover:border-gray-500 hover:text-gray-300'
+                              ? 'border-orange-500/60 bg-orange-500/15 text-orange-600 dark:text-orange-300'
+                              : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-500 hover:border-gray-400 dark:hover:border-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
                           }`}>
                           {m.label}
                         </button>
@@ -631,20 +631,20 @@ export default function Salary() {
               )}
 
               <div>
-                <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Notes (optional)</label>
+                <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1.5">Notes (optional)</label>
                 <textarea rows={2} value={form.description}
                   onChange={e => setForm(p => ({ ...p, description: e.target.value }))}
                   placeholder="Any additional notes..."
-                  className="w-full px-3 py-2.5 text-sm bg-gray-800 border border-gray-700 text-gray-200 rounded-xl outline-none focus:border-orange-500 transition-colors placeholder-gray-600 resize-none" />
+                  className="w-full px-3 py-2.5 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-200 rounded-xl outline-none focus:border-orange-500 transition-colors placeholder-gray-400 dark:placeholder-gray-600 resize-none" />
               </div>
 
               <div className="flex gap-2 pt-2">
                 <button type="button" onClick={() => setModal(null)} disabled={saving}
-                  className="flex-1 px-4 py-2.5 text-sm text-gray-400 hover:text-gray-200 border border-gray-600 rounded-xl transition-colors disabled:opacity-50">
+                  className="flex-1 px-4 py-2.5 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-xl transition-colors disabled:opacity-50">
                   Cancel
                 </button>
                 <button type="submit" disabled={saving}
-                  className="flex-[2] flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 rounded-xl disabled:opacity-50 transition-all">
+                  className="flex-[2] flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 rounded-xl disabled:opacity-50 transition-all shadow-md shadow-orange-500/20">
                   {saving && <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
                   {modal.mode === 'create' ? 'Create Record' : 'Save Changes'}
                 </button>
@@ -658,38 +658,38 @@ export default function Salary() {
       {payModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => !paying && setPayModal(null)} />
-          <div className="relative bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl w-full max-w-sm">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-700">
+          <div className="relative bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-2xl w-full max-w-sm">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-800">
               <div>
-                <h2 className="text-base font-semibold text-gray-100">Update Payment</h2>
-                <p className="text-xs text-gray-500 mt-0.5">
+                <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">Update Payment</h2>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                   {(typeof payModal.teacher === 'object' ? payModal.teacher?.name : '') || 'Teacher'} &mdash; {payModal.month} {payModal.year}
                 </p>
               </div>
               <button onClick={() => setPayModal(null)} disabled={paying}
-                className="text-gray-400 hover:text-gray-200 p-1 rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50">
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors disabled:opacity-50">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <div className="px-6 py-5 space-y-4">
-              <div className="bg-gray-800/60 border border-gray-700/60 rounded-xl px-4 py-3 flex items-center justify-between text-sm">
-                <span className="text-gray-400">Salary Amount</span>
-                <span className="font-bold text-gray-100">{fmt(payModal.amount)}</span>
+              <div className="bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/60 rounded-xl px-4 py-3 flex items-center justify-between text-sm">
+                <span className="text-gray-500 dark:text-gray-400">Salary Amount</span>
+                <span className="font-bold text-gray-900 dark:text-gray-100">{fmt(payModal.amount)}</span>
               </div>
 
               <div>
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Payment Status</p>
+                <p className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">Payment Status</p>
                 <div className="grid grid-cols-3 gap-2">
                   {[
-                    { value: 'pending', label: 'Pending', active: 'border-gray-400/60 bg-gray-500/15 text-gray-200' },
-                    { value: 'paid',    label: 'Paid',    active: 'border-green-500/60 bg-green-500/15 text-green-300' },
-                    { value: 'overdue', label: 'Overdue', active: 'border-red-500/60 bg-red-500/15 text-red-300' },
+                    { value: 'pending', label: 'Pending', active: 'border-gray-400 dark:border-gray-400/60 bg-gray-100 dark:bg-gray-500/15 text-gray-800 dark:text-gray-200' },
+                    { value: 'paid',    label: 'Paid',    active: 'border-green-500/60 bg-green-500/15 text-green-600 dark:text-green-300' },
+                    { value: 'overdue', label: 'Overdue', active: 'border-red-500/60 bg-red-500/15 text-red-600 dark:text-red-300' },
                   ].map(opt => (
                     <button key={opt.value}
                       onClick={() => setPayForm(p => ({ ...p, status: opt.value }))}
                       className={`py-2.5 rounded-xl border text-sm font-semibold transition-all ${
-                        payForm.status === opt.value ? opt.active : 'border-gray-700 bg-gray-800 text-gray-500 hover:border-gray-500 hover:text-gray-300'
+                        payForm.status === opt.value ? opt.active : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-500 hover:border-gray-400 dark:hover:border-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
                       }`}>
                       {opt.label}
                     </button>
@@ -700,13 +700,13 @@ export default function Salary() {
               {payForm.status === 'paid' && (
                 <>
                   <div>
-                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Payment Date</p>
+                    <p className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">Payment Date</p>
                     <input type="date" value={payForm.paidDate}
                       onChange={e => setPayForm(p => ({ ...p, paidDate: e.target.value }))}
-                      className="w-full px-3 py-2.5 text-sm bg-gray-800 border border-gray-700 text-gray-200 rounded-xl outline-none focus:border-orange-500 transition-colors [color-scheme:dark]" />
+                      className="w-full px-3 py-2.5 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-200 rounded-xl outline-none focus:border-orange-500 transition-colors [color-scheme:light] dark:[color-scheme:dark]" />
                   </div>
                   <div>
-                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Payment Method</p>
+                    <p className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">Payment Method</p>
                     <div className="grid grid-cols-2 gap-2">
                       {[
                         { value: 'cash', label: 'Cash' },
@@ -718,8 +718,8 @@ export default function Salary() {
                           onClick={() => setPayForm(p => ({ ...p, paymentMethod: m.value }))}
                           className={`py-2 rounded-xl border text-xs font-semibold transition-all ${
                             payForm.paymentMethod === m.value
-                              ? 'border-orange-500/60 bg-orange-500/15 text-orange-300'
-                              : 'border-gray-700 bg-gray-800 text-gray-500 hover:border-gray-500 hover:text-gray-300'
+                              ? 'border-orange-500/60 bg-orange-500/15 text-orange-600 dark:text-orange-300'
+                              : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-500 hover:border-gray-400 dark:hover:border-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
                           }`}>
                           {m.label}
                         </button>
@@ -730,13 +730,13 @@ export default function Salary() {
               )}
             </div>
 
-            <div className="flex gap-2 justify-end px-6 py-4 border-t border-gray-700">
+            <div className="flex gap-2 justify-end px-6 py-4 border-t border-gray-200 dark:border-gray-800">
               <button onClick={() => setPayModal(null)} disabled={paying}
-                className="px-4 py-2 text-sm text-gray-400 hover:text-gray-200 border border-gray-600 rounded-lg transition-colors disabled:opacity-50">
+                className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-lg transition-colors disabled:opacity-50">
                 Cancel
               </button>
               <button onClick={handleSavePay} disabled={paying}
-                className="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 rounded-lg disabled:opacity-50 transition-all">
+                className="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 rounded-lg disabled:opacity-50 transition-all shadow-md shadow-orange-500/20">
                 {paying && <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
                 Save
               </button>
@@ -749,21 +749,21 @@ export default function Salary() {
       {delId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => !deleting && setDelId(null)} />
-          <div className="relative bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl w-full max-w-sm p-6">
+          <div className="relative bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-2xl w-full max-w-sm p-6">
             <div className="flex items-center gap-3 mb-3">
               <div className="p-2 bg-red-500/10 rounded-xl">
-                <Trash2 className="w-5 h-5 text-red-400" />
+                <Trash2 className="w-5 h-5 text-red-500 dark:text-red-400" />
               </div>
-              <h3 className="font-bold text-gray-100">Delete Salary Record</h3>
+              <h3 className="font-bold text-gray-900 dark:text-gray-100">Delete Salary Record</h3>
             </div>
-            <p className="text-gray-400 text-sm mb-6">Are you sure? This action cannot be undone.</p>
+            <p className="text-gray-600 dark:text-gray-400 text-sm mb-6">Are you sure? This action cannot be undone.</p>
             <div className="flex gap-2">
               <button onClick={() => setDelId(null)} disabled={deleting}
-                className="flex-1 px-4 py-2.5 text-sm text-gray-400 hover:text-gray-200 border border-gray-600 rounded-xl transition-colors disabled:opacity-50">
+                className="flex-1 px-4 py-2.5 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-xl transition-colors disabled:opacity-50">
                 Cancel
               </button>
               <button onClick={handleDelete} disabled={deleting}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 rounded-xl disabled:opacity-50 transition-colors">
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 rounded-xl disabled:opacity-50 transition-colors shadow-md shadow-red-500/20">
                 {deleting && <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
                 Delete
               </button>

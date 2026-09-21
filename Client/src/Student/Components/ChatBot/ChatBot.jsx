@@ -203,31 +203,31 @@ const MessageContent = ({ message, isBot }) => {
                     a: ({ ...props }) => (
                         <a
                             {...props}
-                            className="text-amber-300 hover:text-amber-200 underline decoration-amber-300/50 hover:decoration-amber-200 transition-all duration-200"
+                            className="text-amber-600 dark:text-amber-300 hover:text-amber-700 dark:hover:text-amber-200 underline decoration-amber-400/50 hover:decoration-amber-300 transition-all duration-200 font-medium"
                             target="_blank"
                             rel="noopener noreferrer"
                         />
                     ),
                     // Paragraphs with proper spacing
                     p: ({ ...props }) => (
-                        <p {...props} className="mb-3 last:mb-0 leading-relaxed" />
+                        <p {...props} className="mb-3 last:mb-0 leading-relaxed text-gray-800 dark:text-gray-100" />
                     ),
                     // Headings with better hierarchy
                     h1: ({ ...props }) => (
-                        <h1 {...props} className="text-lg font-bold text-amber-300 mb-3 mt-2 first:mt-0" />
+                        <h1 {...props} className="text-lg font-bold text-amber-700 dark:text-amber-300 mb-3 mt-2 first:mt-0" />
                     ),
                     h2: ({ ...props }) => (
-                        <h2 {...props} className="text-base font-semibold text-amber-300 mb-2 mt-3 first:mt-0" />
+                        <h2 {...props} className="text-base font-semibold text-amber-700 dark:text-amber-300 mb-2 mt-3 first:mt-0" />
                     ),
                     h3: ({ ...props }) => (
-                        <h3 {...props} className="text-sm font-medium text-amber-300 mb-2 mt-2 first:mt-0" />
+                        <h3 {...props} className="text-sm font-medium text-amber-700 dark:text-amber-300 mb-2 mt-2 first:mt-0" />
                     ),
                     // Lists with better spacing
                     ul: ({ ...props }) => (
-                        <ul {...props} className="list-disc list-inside mb-3 space-y-1 pl-2" />
+                        <ul {...props} className="list-disc list-inside mb-3 space-y-1 pl-2 text-gray-800 dark:text-gray-100" />
                     ),
                     ol: ({ ...props }) => (
-                        <ol {...props} className="list-decimal list-inside mb-3 space-y-1 pl-2" />
+                        <ol {...props} className="list-decimal list-inside mb-3 space-y-1 pl-2 text-gray-800 dark:text-gray-100" />
                     ),
                     li: ({ ...props }) => (
                         <li {...props} className="text-sm leading-relaxed" />
@@ -237,13 +237,13 @@ const MessageContent = ({ message, isBot }) => {
                         inline ? (
                             <code
                                 {...props}
-                                className="bg-gray-700/80 text-amber-200 px-1.5 py-0.5 rounded text-xs font-mono border border-gray-600/50"
+                                className="bg-gray-100 dark:bg-gray-700/80 text-amber-800 dark:text-amber-200 px-1.5 py-0.5 rounded text-xs font-mono border border-gray-300 dark:border-gray-600/50"
                             />
                         ) : (
-                            <pre className="bg-gray-700/80 border border-gray-600/50 rounded-lg p-3 mb-3 overflow-x-auto">
+                            <pre className="bg-gray-100 dark:bg-gray-700/80 border border-gray-300 dark:border-gray-600/50 rounded-lg p-3 mb-3 overflow-x-auto">
                                 <code
                                     {...props}
-                                    className="text-amber-200 text-xs font-mono block"
+                                    className="text-amber-800 dark:text-amber-200 text-xs font-mono block"
                                 />
                             </pre>
                         ),
@@ -251,31 +251,31 @@ const MessageContent = ({ message, isBot }) => {
                     blockquote: ({ ...props }) => (
                         <blockquote
                             {...props}
-                            className="border-l-4 border-amber-500/60 pl-4 py-2 italic text-gray-300 mb-3 bg-gray-800/30 rounded-r"
+                            className="border-l-4 border-amber-500 pl-4 py-2 italic text-gray-700 dark:text-gray-300 mb-3 bg-amber-50/50 dark:bg-gray-800/30 rounded-r"
                         />
                     ),
                     // Tables with better styling
                     table: ({ ...props }) => (
                         <div className="overflow-x-auto mb-3">
-                            <table {...props} className="border-collapse border border-gray-600/50 w-full text-xs rounded" />
+                            <table {...props} className="border-collapse border border-gray-200 dark:border-gray-600/50 w-full text-xs rounded" />
                         </div>
                     ),
                     th: ({ ...props }) => (
-                        <th {...props} className="border border-gray-600/50 px-3 py-2 bg-gray-700/60 font-semibold text-amber-300 text-left" />
+                        <th {...props} className="border border-gray-200 dark:border-gray-600/50 px-3 py-2 bg-gray-100 dark:bg-gray-700/60 font-semibold text-amber-800 dark:text-amber-300 text-left" />
                     ),
                     td: ({ ...props }) => (
-                        <td {...props} className="border border-gray-600/50 px-3 py-2" />
+                        <td {...props} className="border border-gray-200 dark:border-gray-600/50 px-3 py-2" />
                     ),
                     // Bold and italic text
                     strong: ({ ...props }) => (
-                        <strong {...props} className="font-semibold text-amber-200" />
+                        <strong {...props} className="font-semibold text-amber-800 dark:text-amber-200" />
                     ),
                     em: ({ ...props }) => (
-                        <em {...props} className="italic text-gray-300" />
+                        <em {...props} className="italic text-gray-600 dark:text-gray-300" />
                     ),
                     // Horizontal rule
                     hr: ({ ...props }) => (
-                        <hr {...props} className="border-gray-600/50 my-4" />
+                        <hr {...props} className="border-gray-200 dark:border-gray-600/50 my-4" />
                     ),
                 }}
             >
@@ -1025,7 +1025,7 @@ const ChatBot = () => {
                 <div
                     ref={chatRef}
                     className={`
-                        bg-gray-900 border-2 overflow-hidden border-amber-600 shadow-2xl flex flex-col 
+                        bg-white dark:bg-gray-900 border-2 overflow-hidden border-amber-500 dark:border-amber-600 shadow-2xl flex flex-col 
                         animate-in slide-in-from-bottom-5 duration-300 relative
                         ${isMobile ? 'rounded-lg ' : 'rounded-lg'}
                     `}
@@ -1060,7 +1060,7 @@ const ChatBot = () => {
                             {connectionStatus === "error" && (
                                 <button
                                     onClick={retryConnection}
-                                    className="p-1 hover:bg-black/10 rounded transition-colors"
+                                    className="p-1 hover:bg-black/10 rounded transition-colors cursor-pointer"
                                     title="Retry Connection"
                                 >
                                     <RefreshCw size={16} />
@@ -1071,7 +1071,7 @@ const ChatBot = () => {
                             <button
                                 onClick={handleManualSave}
                                 disabled={isSaving || !hasUnsavedChanges || messages.length <= 1}
-                                className="p-1 hover:bg-black/10 rounded transition-colors disabled:opacity-50"
+                                className="p-1 hover:bg-black/10 rounded transition-colors disabled:opacity-50 cursor-pointer"
                                 title="Save Session"
                             >
                                 <Save size={16} />
@@ -1080,7 +1080,7 @@ const ChatBot = () => {
                             {/* History Toggle */}
                             <button
                                 onClick={() => setShowHistory(!showHistory)}
-                                className="p-1 hover:bg-black/10 rounded transition-colors"
+                                className="p-1 hover:bg-black/10 rounded transition-colors cursor-pointer"
                                 title="Chat History"
                             >
                                 <History size={16} />
@@ -1089,7 +1089,7 @@ const ChatBot = () => {
                             {/* New Chat */}
                             <button
                                 onClick={startNewChat}
-                                className="p-1 hover:bg-black/10 rounded transition-colors"
+                                className="p-1 hover:bg-black/10 rounded transition-colors cursor-pointer"
                                 title="New Chat"
                             >
                                 <BookOpen size={16} />
@@ -1098,7 +1098,7 @@ const ChatBot = () => {
                             {/* Minimize */}
                             <button
                                 onClick={minimizeChat}
-                                className="p-1 hover:bg-black/10 rounded transition-colors"
+                                className="p-1 hover:bg-black/10 rounded transition-colors cursor-pointer"
                                 title="Minimize"
                             >
                                 <Minus size={16} />
@@ -1107,7 +1107,7 @@ const ChatBot = () => {
                             {/* Close */}
                             <button
                                 onClick={closeAndClearChat}
-                                className="p-1 hover:bg-black/10 rounded transition-colors"
+                                className="p-1 hover:bg-black/10 rounded transition-colors cursor-pointer"
                                 title="Close & Clear"
                             >
                                 <X size={16} />
@@ -1117,29 +1117,29 @@ const ChatBot = () => {
 
                     {/* Chat History Sidebar */}
                     {showHistory && (
-                        <div className="bg-gray-800 border-b border-gray-700 max-h-48 overflow-y-auto">
+                        <div className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 max-h-48 overflow-y-auto">
                             <div className="p-3">
-                                <h4 className="text-amber-300 font-semibold text-sm mb-2">Recent Sessions</h4>
+                                <h4 className="text-amber-700 dark:text-amber-300 font-semibold text-sm mb-2">Recent Sessions</h4>
                                 {chatHistory.length === 0 ? (
-                                    <p className="text-gray-400 text-xs">No saved sessions yet</p>
+                                    <p className="text-gray-500 dark:text-gray-400 text-xs">No saved sessions yet</p>
                                 ) : (
                                     <div className="space-y-2">
                                         {chatHistory.map((session) => (
                                             <div
                                                 key={session.sessionId}
-                                                className="bg-gray-700 rounded p-2 text-xs hover:bg-gray-600 transition-colors group"
+                                                className="bg-white dark:bg-gray-700 rounded p-2 text-xs hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors group shadow-sm"
                                             >
                                                 <div className="flex items-center justify-between">
                                                     <button
                                                         onClick={() => loadChatSession(session.sessionId)}
-                                                        className="flex-1 text-left text-gray-200 hover:text-amber-300 transition-colors truncate"
+                                                        className="flex-1 text-left text-gray-800 dark:text-gray-200 hover:text-amber-600 dark:hover:text-amber-300 transition-colors truncate cursor-pointer font-medium"
                                                         title={session.title}
                                                     >
                                                         {session.title}
                                                     </button>
                                                     <button
                                                         onClick={() => deleteChatSession(session.sessionId)}
-                                                        className="ml-2 text-red-400 hover:text-red-300 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                        className="ml-2 text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
                                                         title="Delete Session"
                                                     >
                                                         <Trash2 size={12} />
@@ -1157,40 +1157,40 @@ const ChatBot = () => {
                     )}
 
                     {/* Messages Area */}
-                    <div className="flex-1 scroll-container overflow-y-auto p-4 space-y-4 bg-gray-900">
+                    <div className="flex-1 scroll-container overflow-y-auto p-4 space-y-4 bg-gray-50 dark:bg-gray-900">
                         {messages.map((message) => (
                             <div key={message.id} className={`flex mb-4 ${message.isBot ? "justify-start" : "justify-end"}`}>
                                 {message.isBot && (
                                     // Bot Icon (only show for bot messages on the left)
-                                    <div className="w-8 h-8 flex items-center justify-center rounded-full bg-amber-500 text-black font-bold mr-3 flex-shrink-0">
-                                        <TutorIcon size={16} className="text-amber-900" />
+                                    <div className="w-8 h-8 flex items-center justify-center rounded-full bg-amber-500 text-black font-bold mr-3 flex-shrink-0 shadow-sm">
+                                        <TutorIcon size={16} className="text-amber-950" />
                                     </div>
                                 )}
 
                                 {/* Message Container */}
-                                <div className={`max-w-[70%] flex flex-col ${message.isBot ? "" : "items-end"}`}>
+                                <div className={`max-w-[75%] flex flex-col ${message.isBot ? "" : "items-end"}`}>
                                     {message.isBot && (
                                         <div className="flex items-center mb-1 ml-1">
-                                            <span className="text-xs font-medium text-amber-400">AI Study Buddy</span>
+                                            <span className="text-xs font-semibold text-amber-700 dark:text-amber-400">AI Study Buddy</span>
                                         </div>
                                     )}
 
-                                    <div className={`p-3 rounded-lg shadow-md ${message.isBot
-                                        ? "bg-gray-800 text-gray-100 border border-gray-700 rounded-tl-none"
-                                        : "bg-gradient-to-r from-amber-600 to-orange-600 text-black rounded-tr-none"
+                                    <div className={`p-3 rounded-lg shadow-sm ${message.isBot
+                                        ? "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700 rounded-tl-none"
+                                        : "bg-gradient-to-r from-amber-600 to-orange-600 text-black rounded-tr-none font-medium shadow-md"
                                         }`}>
                                         <MessageContent message={message} isBot={message.isBot} />
                                     </div>
 
                                     {/* Timestamp */}
-                                    <div className={`text-xs mt-1 ${message.isBot ? "text-gray-400 ml-1" : "text-gray-400 mr-1"}`}>
+                                    <div className={`text-[11px] mt-1 ${message.isBot ? "text-gray-400 dark:text-gray-500 ml-1" : "text-gray-400 dark:text-gray-500 mr-1"}`}>
                                         {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                                     </div>
                                 </div>
 
                                 {!message.isBot && (
                                     // Student's Initials Icon (only show for user messages on the right)
-                                    <div className="w-8 h-8 flex items-center justify-center rounded-full bg-amber-600 text-black font-bold ml-3 flex-shrink-0">
+                                    <div className="w-8 h-8 flex items-center justify-center rounded-full bg-gradient-to-r from-amber-600 to-orange-600 text-black font-bold ml-3 flex-shrink-0 shadow-sm text-xs">
                                         {getInitials(studentName)}
                                     </div>
                                 )}
@@ -1200,18 +1200,18 @@ const ChatBot = () => {
                         {/* Loading Message */}
                         {isLoading && (
                             <div className="flex justify-start">
-                                <div className="max-w-[85%] p-3 rounded-lg bg-gray-800 text-gray-100 border border-gray-700">
+                                <div className="max-w-[85%] p-3 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700 shadow-sm">
                                     <div className="flex items-center mb-2">
                                         <TutorIcon size={16} />
-                                        <span className="ml-2 text-xs font-medium text-amber-300">AI Study Buddy</span>
+                                        <span className="ml-2 text-xs font-semibold text-amber-700 dark:text-amber-300">AI Study Buddy</span>
                                     </div>
                                     <div className="flex items-center space-x-2">
                                         <div className="flex space-x-1">
-                                            <div className="w-2 h-2 bg-amber-400 rounded-full animate-bounce"></div>
-                                            <div className="w-2 h-2 bg-amber-400 rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></div>
-                                            <div className="w-2 h-2 bg-amber-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
+                                            <div className="w-2 h-2 bg-amber-500 rounded-full animate-bounce"></div>
+                                            <div className="w-2 h-2 bg-amber-500 rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></div>
+                                            <div className="w-2 h-2 bg-amber-500 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
                                         </div>
-                                        <span className="text-sm text-gray-300">Thinking...</span>
+                                        <span className="text-sm text-gray-500 dark:text-gray-400">Thinking...</span>
                                     </div>
                                 </div>
                             </div>
@@ -1219,12 +1219,12 @@ const ChatBot = () => {
 
                         {/* Status Messages */}
                         {connectionStatus === "error" && (
-                            <div className="bg-red-900/50 border border-red-600 p-3 rounded-lg">
+                            <div className="bg-red-50 dark:bg-red-900/50 border border-red-200 dark:border-red-600 p-3 rounded-lg">
                                 <div className="flex items-center space-x-2">
-                                    <AlertCircle size={16} className="text-red-400" />
-                                    <span className="text-red-300 text-sm font-medium">Connection Error</span>
+                                    <AlertCircle size={16} className="text-red-600 dark:text-red-400" />
+                                    <span className="text-red-700 dark:text-red-300 text-sm font-medium">Connection Error</span>
                                 </div>
-                                <p className="text-red-200 text-xs mt-1">{lastError}</p>
+                                <p className="text-red-600 dark:text-red-200 text-xs mt-1">{lastError}</p>
                             </div>
                         )}
 
@@ -1238,9 +1238,8 @@ const ChatBot = () => {
                         <div ref={messagesEndRef} />
                     </div>
 
-
                     {/* Input Area */}
-                    <div className="p-4 border-t border-gray-700 bg-gray-900">
+                    <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
                         <form onSubmit={handleSubmit} className="flex space-x-2">
                             <input
                                 type="text"
@@ -1252,22 +1251,22 @@ const ChatBot = () => {
                                         : "AI service unavailable..."
                                 }
                                 disabled={isLoading || connectionStatus !== "connected"}
-                                className="flex-1 p-3 bg-gray-800 border border-gray-600 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="flex-1 p-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
                             />
                             <button
                                 type="submit"
                                 disabled={isLoading || !inputValue.trim() || connectionStatus !== "connected"}
-                                className="p-3 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-black rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-500 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:from-amber-600 disabled:hover:to-orange-600"
+                                className="p-3 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-black rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-500 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:from-amber-600 disabled:hover:to-orange-600 cursor-pointer"
                             >
                                 <Send size={20} />
                             </button>
                         </form>
 
                         {/* Status Bar */}
-                        <div className="flex items-center justify-between mt-2 text-xs text-gray-400">
+                        <div className="flex items-center justify-between mt-2 text-xs text-gray-400 dark:text-gray-500">
                             <div className="flex items-center space-x-4">
                                 {hasUnsavedChanges && (
-                                    <span className="text-blue-400">• Unsaved changes</span>
+                                    <span className="text-blue-500 dark:text-blue-400 font-medium">• Unsaved changes</span>
                                 )}
                             </div>
                             <div className="text-right">

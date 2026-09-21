@@ -143,22 +143,22 @@ const Schedule = () => {
   const selectedClassName = classes.find(c => c._id === selectedClass)?.classText || '';
 
   return (
-    <div className="text-gray-100 p-4 md:p-6 space-y-5">
+    <div className="space-y-6 max-w-7xl mx-auto w-full">
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
         <div className="flex items-center gap-3">
           <div className="p-2.5 bg-orange-500/15 rounded-xl border border-orange-500/20">
-            <CalendarDays className="w-6 h-6 text-orange-400" />
+            <CalendarDays className="w-6 h-6 text-orange-500 dark:text-orange-400" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-100">Class Schedule</h1>
-            <p className="text-sm text-gray-500">View and manage class timetable and events</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Class Schedule</h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400">View and manage class timetable and events</p>
           </div>
         </div>
         {!newPeriod && (
           <button onClick={toggleNewPeriod}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 rounded-xl transition-all">
+            className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 rounded-xl transition-all shadow-sm shadow-orange-500/20">
             <Plus className="w-4 h-4" /> Add Period
           </button>
         )}
@@ -167,7 +167,7 @@ const Schedule = () => {
       {/* Toast */}
       {toast.text && (
         <div className={`flex items-center gap-3 px-4 py-3 rounded-xl border text-sm ${
-          toast.type === 'error' ? 'bg-red-900/20 border-red-700/40 text-red-300' : 'bg-green-900/20 border-green-700/40 text-green-300'
+          toast.type === 'error' ? 'bg-red-500/10 border-red-500/30 text-red-600 dark:text-red-300' : 'bg-green-500/10 border-green-500/30 text-green-600 dark:text-green-300'
         }`}>
           <span className="flex-1">{toast.text}</span>
           <button onClick={() => setToast({ text: '', type: '' })}><X className="w-4 h-4" /></button>
@@ -175,11 +175,11 @@ const Schedule = () => {
       )}
 
       {/* Class selector */}
-      <div className="bg-gray-800/40 border border-gray-700/60 rounded-2xl p-4 flex flex-wrap items-center gap-3">
-        <CalendarDays className="w-4 h-4 text-orange-400" />
-        <span className="text-sm font-semibold text-gray-400">Class:</span>
+      <div className="bg-white dark:bg-gray-800/40 border border-gray-200 dark:border-gray-700/60 rounded-2xl p-4 flex flex-wrap items-center gap-3 shadow-sm">
+        <CalendarDays className="w-4 h-4 text-orange-500 dark:text-orange-400" />
+        <span className="text-sm font-semibold text-gray-700 dark:text-gray-400">Class:</span>
         <select value={selectedClass} onChange={e => setSelectedClass(e.target.value)}
-          className="flex-1 min-w-[180px] px-3 py-2 text-sm bg-gray-800 border border-gray-700 text-gray-200 rounded-xl outline-none focus:border-orange-500 transition-colors cursor-pointer">
+          className="flex-1 min-w-[180px] px-3 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-200 rounded-xl outline-none focus:border-orange-500 transition-colors cursor-pointer">
           {classes.map(c => <option key={c._id} value={c._id}>{c.classText}</option>)}
         </select>
         {loading && <div className="w-4 h-4 border-2 border-orange-500/30 border-t-orange-500 rounded-full animate-spin" />}
@@ -190,7 +190,7 @@ const Schedule = () => {
         <div>
           <div className="flex items-center gap-3 mb-3">
             <button onClick={closeForm}
-              className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-200 transition-colors">
+              className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors">
               <ArrowLeft className="w-4 h-4" /> Back to Calendar
             </button>
           </div>
@@ -204,7 +204,7 @@ const Schedule = () => {
           {editMode && selectedEvent && (
             <div className="mt-3 flex justify-end">
               <button onClick={() => setDeleteOpen(true)}
-                className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-red-400 border border-red-500/30 rounded-xl hover:bg-red-500/10 transition-colors">
+                className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-red-600 dark:text-red-400 border border-red-500/30 rounded-xl hover:bg-red-500/10 transition-colors">
                 <Trash2 className="w-4 h-4" /> Delete Period
               </button>
             </div>
@@ -214,34 +214,34 @@ const Schedule = () => {
 
       {/* Calendar */}
       {!newPeriod && (
-        <div className="bg-gray-800/40 border border-gray-700/60 rounded-2xl overflow-hidden">
+        <div className="bg-white dark:bg-gray-800/40 border border-gray-200 dark:border-gray-700/60 rounded-2xl overflow-hidden shadow-sm">
           <style>{`
-            .rbc-calendar { background: transparent; color: #e2e8f0; font-family: inherit; }
-            .rbc-toolbar { padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.07); }
-            .rbc-toolbar button { color: #94a3b8; border: 1px solid #334155; background: rgba(30,41,59,0.8); border-radius: 8px; padding: 4px 12px; font-size: 0.8rem; }
+            .rbc-calendar { background: transparent; color: inherit; font-family: inherit; }
+            .rbc-toolbar { padding: 12px 16px; border-bottom: 1px solid rgba(150,150,150,0.15); }
+            .rbc-toolbar button { color: inherit; border: 1px solid rgba(150,150,150,0.25); background: rgba(150,150,150,0.08); border-radius: 8px; padding: 4px 12px; font-size: 0.8rem; }
             .rbc-toolbar button:hover { background: rgba(249,115,22,0.15); color: #f97316; border-color: rgba(249,115,22,0.4); }
-            .rbc-toolbar button.rbc-active { background: rgba(249,115,22,0.2); color: #f97316; border-color: rgba(249,115,22,0.5); }
-            .rbc-toolbar .rbc-toolbar-label { color: #f1f5f9; font-weight: 700; font-size: 1rem; }
-            .rbc-header { background: rgba(15,23,42,0.8); color: #64748b; border-bottom: 1px solid rgba(255,255,255,0.07); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; padding: 8px 4px; }
+            .rbc-toolbar button.rbc-active { background: rgba(249,115,22,0.2); color: #f97316; border-color: rgba(249,115,22,0.5); font-weight: 600; }
+            .rbc-toolbar .rbc-toolbar-label { font-weight: 700; font-size: 1rem; color: inherit; }
+            .rbc-header { background: rgba(150,150,150,0.08); color: inherit; opacity: 0.8; border-bottom: 1px solid rgba(150,150,150,0.15); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; padding: 8px 4px; }
             .rbc-month-view { border: none; }
-            .rbc-day-bg { border-right: 1px solid rgba(255,255,255,0.05); }
+            .rbc-day-bg { border-right: 1px solid rgba(150,150,150,0.1); }
             .rbc-day-bg.rbc-today { background: rgba(249,115,22,0.06); }
-            .rbc-off-range-bg { background: rgba(0,0,0,0.3); }
-            .rbc-date-cell { color: #94a3b8; font-size: 0.8rem; padding: 4px 6px; }
+            .rbc-off-range-bg { background: rgba(150,150,150,0.05); }
+            .rbc-date-cell { font-size: 0.8rem; padding: 4px 6px; color: inherit; opacity: 0.8; }
             .rbc-date-cell.rbc-now a { color: #f97316; font-weight: 700; }
             .rbc-time-view { border: none; }
-            .rbc-time-header { background: rgba(15,23,42,0.8); border-bottom: 1px solid rgba(255,255,255,0.07); }
-            .rbc-time-header-content { border-left: 1px solid rgba(255,255,255,0.07); }
-            .rbc-time-content { border-top: 1px solid rgba(255,255,255,0.07); }
+            .rbc-time-header { background: rgba(150,150,150,0.08); border-bottom: 1px solid rgba(150,150,150,0.15); }
+            .rbc-time-header-content { border-left: 1px solid rgba(150,150,150,0.15); }
+            .rbc-time-content { border-top: 1px solid rgba(150,150,150,0.15); }
             .rbc-time-gutter .rbc-timeslot-group { border-bottom: none; }
-            .rbc-time-gutter .rbc-label { color: #475569; font-size: 0.72rem; padding: 0 8px; }
-            .rbc-timeslot-group { border-bottom: 1px solid rgba(255,255,255,0.04); }
-            .rbc-time-slot { border-top: 1px solid rgba(255,255,255,0.02); }
+            .rbc-time-gutter .rbc-label { color: inherit; opacity: 0.6; font-size: 0.72rem; padding: 0 8px; }
+            .rbc-timeslot-group { border-bottom: 1px solid rgba(150,150,150,0.08); }
+            .rbc-time-slot { border-top: 1px solid rgba(150,150,150,0.05); }
             .rbc-current-time-indicator { background: #f97316; }
             .rbc-agenda-view { background: transparent; }
             .rbc-agenda-table { border-collapse: collapse; }
-            .rbc-agenda-date-cell, .rbc-agenda-time-cell { color: #94a3b8; font-size: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.06); background: rgba(15,23,42,0.6); }
-            .rbc-agenda-event-cell { color: #f1f5f9; border-bottom: 1px solid rgba(255,255,255,0.06); }
+            .rbc-agenda-date-cell, .rbc-agenda-time-cell { font-size: 0.8rem; border-bottom: 1px solid rgba(150,150,150,0.1); background: rgba(150,150,150,0.05); color: inherit; }
+            .rbc-agenda-event-cell { border-bottom: 1px solid rgba(150,150,150,0.1); color: inherit; }
             .rbc-event { border-radius: 6px !important; font-size: 0.8rem; }
             .rbc-show-more { color: #f97316; font-size: 0.72rem; }
           `}</style>
@@ -266,7 +266,7 @@ const Schedule = () => {
 
       {/* Legend */}
       {!newPeriod && (
-        <div className="flex flex-wrap gap-3 text-xs text-gray-400">
+        <div className="flex flex-wrap gap-3 text-xs text-gray-600 dark:text-gray-400">
           <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-[#ea6c0c] inline-block" /> Active Period</span>
           <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-[#073B3A] inline-block" /> Completed</span>
           <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-[#555] inline-block" /> Cancelled</span>
@@ -278,19 +278,19 @@ const Schedule = () => {
       {deleteOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setDeleteOpen(false)} />
-          <div className="relative bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl w-full max-w-sm p-6">
+          <div className="relative bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-2xl w-full max-w-sm p-6">
             <div className="flex items-center gap-3 mb-3">
-              <div className="p-2 bg-red-500/10 rounded-xl"><Trash2 className="w-5 h-5 text-red-400" /></div>
-              <h3 className="font-bold text-gray-100">Delete Schedule Period</h3>
+              <div className="p-2 bg-red-500/10 rounded-xl"><Trash2 className="w-5 h-5 text-red-500 dark:text-red-400" /></div>
+              <h3 className="font-bold text-gray-900 dark:text-gray-100">Delete Schedule Period</h3>
             </div>
-            <p className="text-gray-400 text-sm mb-6">Are you sure? This action cannot be undone.</p>
+            <p className="text-gray-600 dark:text-gray-400 text-sm mb-6">Are you sure? This action cannot be undone.</p>
             <div className="flex gap-2">
               <button onClick={() => setDeleteOpen(false)}
-                className="flex-1 px-4 py-2.5 text-sm text-gray-400 hover:text-gray-200 border border-gray-600 rounded-xl transition-colors">
+                className="flex-1 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-xl transition-colors">
                 Cancel
               </button>
               <button onClick={handleDeleteEvent} disabled={loading}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 rounded-xl disabled:opacity-50 transition-colors">
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 rounded-xl disabled:opacity-50 transition-colors shadow-sm shadow-red-500/20">
                 {loading && <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
                 Delete
               </button>

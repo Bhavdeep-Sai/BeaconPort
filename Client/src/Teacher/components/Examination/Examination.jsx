@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { baseApi } from '../../../environment';
 import { Plus, Pencil, Trash2, ChevronDown, CheckCircle, XCircle, ClipboardList } from 'lucide-react';
@@ -166,11 +166,11 @@ export default function Examination() {
   const getCreatorName = (exam) => exam.creatorRole==='SCHOOL' ? (typeof exam.createdBy==='object'&&exam.createdBy.schoolName?exam.createdBy.schoolName:'School Admin') : (typeof exam.createdBy==='object'&&exam.createdBy.name?exam.createdBy.name:'Teacher');
 
   return (
-    <div className="text-gray-100 space-y-5">
+    <div className="space-y-6 max-w-7xl mx-auto w-full">
       {/* Toast */}
       {toast && (
         <div className={['fixed bottom-5 right-5 z-50 flex items-center gap-2 px-4 py-3 rounded-xl shadow-lg text-sm font-medium border',
-          toast.type==='success' ? 'bg-green-500/20 border-green-500/40 text-green-300' : 'bg-red-500/20 border-red-500/40 text-red-300'].join(' ')}>
+          toast.type==='success' ? 'bg-green-50 dark:bg-green-500/20 border-green-200 dark:border-green-500/40 text-green-600 dark:text-green-300' : 'bg-red-50 dark:bg-red-500/20 border-red-200 dark:border-red-500/40 text-red-600 dark:text-red-300'].join(' ')}>
           {toast.type==='success' ? <CheckCircle size={16}/> : <XCircle size={16}/>} {toast.msg}
         </div>
       )}
@@ -178,20 +178,20 @@ export default function Examination() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-100 flex items-center gap-2">
-            <ClipboardList size={22} className="text-blue-400" /> Examination Management
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+            <ClipboardList size={22} className="text-blue-500 dark:text-blue-400" /> Examination Management
           </h1>
           {userRole && (
-            <p className="text-xs text-gray-500 mt-0.5">
-              Role: <span className="text-blue-400 font-medium">{userRole}</span>
-              {userRole==='TEACHER' && <span className="ml-3 text-gray-500">Can create: Quiz, Class Test, Weekly Test, Slip Test</span>}
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+              Role: <span className="text-blue-600 dark:text-blue-400 font-medium">{userRole}</span>
+              {userRole==='TEACHER' && <span className="ml-3 text-gray-400 dark:text-gray-500">Can create: Quiz, Class Test, Weekly Test, Slip Test</span>}
             </p>
           )}
         </div>
         {(userRole==='SCHOOL'||userRole==='TEACHER') && (
           <button
             onClick={openCreateModal}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-semibold transition-colors shadow-lg whitespace-nowrap"
+            className="flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-xl text-sm font-semibold transition-colors shadow-md whitespace-nowrap"
           >
             <Plus size={15}/> Create Examination
           </button>
@@ -200,18 +200,18 @@ export default function Examination() {
 
       {/* Class filter */}
       {(userRole==='SCHOOL'||userRole==='TEACHER') && classes.length > 0 && (
-        <div className="bg-gray-800/40 border border-gray-700/60 rounded-xl p-4 flex flex-wrap items-center gap-3">
-          <label className="text-sm text-gray-400 min-w-max">Filter by class:</label>
+        <div className="bg-white dark:bg-gray-800/40 border border-gray-200 dark:border-gray-700/60 rounded-xl p-4 flex flex-wrap items-center gap-3 shadow-sm">
+          <label className="text-sm text-gray-600 dark:text-gray-400 min-w-max">Filter by class:</label>
           <select
             value={selectedClass}
             onChange={e => setSelectedClass(e.target.value)}
-            className="bg-gray-700/60 border border-gray-600/60 text-gray-200 text-sm rounded-lg px-3 py-1.5 focus:outline-none focus:border-blue-500/60"
+            className="bg-gray-50 dark:bg-gray-700/60 border border-gray-300 dark:border-gray-600/60 text-gray-900 dark:text-gray-200 text-sm rounded-lg px-3 py-1.5 focus:outline-none focus:border-blue-500"
           >
             <option value="">All Classes</option>
             {classes.map(c => <option key={c._id} value={c._id}>{c.classText}</option>)}
           </select>
           {selectedClass && (
-            <button onClick={() => setSelectedClass('')} className="text-xs text-gray-400 hover:text-blue-400 transition-colors">Clear</button>
+            <button onClick={() => setSelectedClass('')} className="text-xs text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Clear</button>
           )}
         </div>
       )}
@@ -219,35 +219,35 @@ export default function Examination() {
       {/* Loading */}
       {loading && (
         <div className="flex justify-center py-10">
-          <div className="w-10 h-10 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
+          <div className="w-10 h-10 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
         </div>
       )}
 
       {/* Table */}
       {!loading && examinations.length > 0 && (
-        <div className="bg-gray-800/40 border border-gray-700/60 rounded-xl overflow-hidden">
+        <div className="bg-white dark:bg-gray-800/40 border border-gray-200 dark:border-gray-700/60 rounded-xl overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-blue-500/10 border-b border-gray-700/60">
+                <tr className="bg-blue-50/70 dark:bg-blue-500/10 border-b border-gray-200 dark:border-gray-700/60">
                   {['Exam Date','Subject','Class','Type','Time','Duration','Created By','Actions'].map(h => (
-                    <th key={h} className="text-center px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider whitespace-nowrap">{h}</th>
+                    <th key={h} className="text-center px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-700/50">
+              <tbody className="divide-y divide-gray-200 dark:divide-gray-700/50">
                 {examinations.map(exam => (
-                  <tr key={exam._id} className="hover:bg-gray-700/20 transition-colors">
-                    <td className="px-4 py-3 text-center text-gray-300 whitespace-nowrap">{formatDate(exam.examDate)}</td>
-                    <td className="px-4 py-3 text-center text-blue-400 font-medium">{getSubjectName(exam.subject)}</td>
-                    <td className="px-4 py-3 text-center text-gray-300">{getClassName(exam.class)}</td>
+                  <tr key={exam._id} className="hover:bg-gray-50 dark:hover:bg-gray-700/20 transition-colors">
+                    <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300 whitespace-nowrap">{formatDate(exam.examDate)}</td>
+                    <td className="px-4 py-3 text-center text-blue-600 dark:text-blue-400 font-medium">{getSubjectName(exam.subject)}</td>
+                    <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300">{getClassName(exam.class)}</td>
                     <td className="px-4 py-3 text-center">
                       <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${getTypeBadge(exam.examType)}`}>{exam.examType}</span>
                     </td>
-                    <td className="px-4 py-3 text-center text-gray-300 whitespace-nowrap text-xs">{formatTime(exam.startTime)} – {formatTime(exam.endTime)}</td>
-                    <td className="px-4 py-3 text-center text-amber-400 font-medium">{formatDuration(exam.duration)}</td>
+                    <td className="px-4 py-3 text-center text-gray-700 dark:text-gray-300 whitespace-nowrap text-xs">{formatTime(exam.startTime)} – {formatTime(exam.endTime)}</td>
+                    <td className="px-4 py-3 text-center text-amber-600 dark:text-amber-400 font-medium">{formatDuration(exam.duration)}</td>
                     <td className="px-4 py-3 text-center">
-                      <p className={exam.creatorRole==='SCHOOL' ? 'text-red-400 text-xs font-medium' : 'text-blue-400 text-xs font-medium'}>
+                      <p className={exam.creatorRole==='SCHOOL' ? 'text-red-500 dark:text-red-400 text-xs font-medium' : 'text-blue-600 dark:text-blue-400 text-xs font-medium'}>
                         {exam.creatorRole==='SCHOOL'?'School Admin':'Teacher'}
                       </p>
                       <p className="text-xs text-gray-500 mt-0.5">{getCreatorName(exam)}</p>
@@ -255,15 +255,15 @@ export default function Examination() {
                     <td className="px-4 py-3 text-center">
                       {canEditExam(exam) ? (
                         <div className="flex justify-center gap-1.5">
-                          <button onClick={() => openUpdateModal(exam)} title="Edit" className="p-1.5 rounded-lg bg-amber-500/15 border border-amber-500/25 text-amber-400 hover:bg-amber-500/25 transition-colors">
+                          <button onClick={() => openUpdateModal(exam)} title="Edit" className="p-1.5 rounded-lg bg-amber-50 dark:bg-amber-500/15 border border-amber-200 dark:border-amber-500/25 text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-500/25 transition-colors">
                             <Pencil size={13}/>
                           </button>
-                          <button onClick={() => handleDelete(exam._id)} title="Delete" className="p-1.5 rounded-lg bg-red-500/15 border border-red-500/25 text-red-400 hover:bg-red-500/25 transition-colors">
+                          <button onClick={() => handleDelete(exam._id)} title="Delete" className="p-1.5 rounded-lg bg-red-50 dark:bg-red-500/15 border border-red-200 dark:border-red-500/25 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-500/25 transition-colors">
                             <Trash2 size={13}/>
                           </button>
                         </div>
                       ) : (
-                        <span className="text-xs text-gray-600">View Only</span>
+                        <span className="text-xs text-gray-400 dark:text-gray-600">View Only</span>
                       )}
                     </td>
                   </tr>
@@ -271,7 +271,7 @@ export default function Examination() {
               </tbody>
             </table>
           </div>
-          <div className="px-4 py-2.5 border-t border-gray-700/60 text-xs text-gray-500 text-right">
+          <div className="px-4 py-2.5 border-t border-gray-200 dark:border-gray-700/60 text-xs text-gray-500 text-right">
             {examinations.length} examination{examinations.length!==1?'s':''}{selectedClass?' for selected class':''}
           </div>
         </div>
@@ -279,11 +279,11 @@ export default function Examination() {
 
       {/* Empty state */}
       {!loading && examinations.length === 0 && (
-        <div className="bg-gray-800/40 border border-gray-700/60 rounded-xl p-10 text-center">
-          <ClipboardList size={40} className="mx-auto text-gray-600 mb-3"/>
-          <p className="text-gray-400 font-medium">{selectedClass ? 'No examinations for the selected class.' : 'No examinations found.'}</p>
+        <div className="bg-white dark:bg-gray-800/40 border border-gray-200 dark:border-gray-700/60 rounded-xl p-10 text-center shadow-sm">
+          <ClipboardList size={40} className="mx-auto text-gray-400 dark:text-gray-600 mb-3"/>
+          <p className="text-gray-700 dark:text-gray-400 font-medium">{selectedClass ? 'No examinations for the selected class.' : 'No examinations found.'}</p>
           {(userRole==='SCHOOL'||userRole==='TEACHER') && (
-            <button onClick={openCreateModal} className="mt-4 px-4 py-2 bg-blue-500/20 border border-blue-500/30 text-blue-400 rounded-lg hover:bg-blue-500/30 transition-colors text-sm font-medium">
+            <button onClick={openCreateModal} className="mt-4 px-4 py-2 bg-blue-500/15 border border-blue-500/30 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-500/25 transition-colors text-sm font-medium">
               Create First Examination
             </button>
           )}
@@ -292,27 +292,27 @@ export default function Examination() {
 
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-900 border border-gray-700/60 rounded-xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700/60 rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             {/* Modal header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-700/60 bg-blue-500/10">
-              <h2 className="text-base font-bold text-gray-100">{modalType==='create'?'Create New Examination':'Update Examination'}</h2>
-              <button onClick={closeModal} className="text-gray-400 hover:text-gray-200 transition-colors text-lg leading-none">&times;</button>
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 dark:border-gray-700/60 bg-blue-50/50 dark:bg-blue-500/10">
+              <h2 className="text-base font-bold text-gray-900 dark:text-gray-100">{modalType==='create'?'Create New Examination':'Update Examination'}</h2>
+              <button onClick={closeModal} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors text-lg leading-none">&times;</button>
             </div>
 
             <form onSubmit={handleSubmit} className="p-5 space-y-4">
               {/* Date */}
               <div>
-                <label className="block text-xs font-medium text-gray-400 mb-1">Exam Date <span className="text-red-400">*</span></label>
+                <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">Exam Date <span className="text-red-500 dark:text-red-400">*</span></label>
                 <input type="date" name="date" value={formData.date} onChange={handleChange} min={todayInput()} required
-                  className="w-full bg-gray-800/60 border border-gray-700/60 text-gray-200 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500/60" />
+                  className="w-full bg-gray-50 dark:bg-gray-800/60 border border-gray-300 dark:border-gray-700/60 text-gray-900 dark:text-gray-200 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500 [color-scheme:light] dark:[color-scheme:dark]" />
               </div>
 
               {/* Subject */}
               <div>
-                <label className="block text-xs font-medium text-gray-400 mb-1">Subject <span className="text-red-400">*</span></label>
+                <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">Subject <span className="text-red-500 dark:text-red-400">*</span></label>
                 <select name="subjectId" value={formData.subjectId} onChange={handleChange} required
-                  className="w-full bg-gray-800/60 border border-gray-700/60 text-gray-200 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500/60">
+                  className="w-full bg-gray-50 dark:bg-gray-800/60 border border-gray-300 dark:border-gray-700/60 text-gray-900 dark:text-gray-200 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
                   <option value="">Select Subject</option>
                   {subjects.map(s => <option key={s._id} value={s._id}>{s.subjectName}</option>)}
                 </select>
@@ -321,9 +321,9 @@ export default function Examination() {
               {/* Class (create only) */}
               {modalType==='create' && (
                 <div>
-                  <label className="block text-xs font-medium text-gray-400 mb-1">Class <span className="text-red-400">*</span></label>
+                  <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">Class <span className="text-red-500 dark:text-red-400">*</span></label>
                   <select name="classId" value={formData.classId} onChange={handleChange} required
-                    className="w-full bg-gray-800/60 border border-gray-700/60 text-gray-200 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500/60">
+                    className="w-full bg-gray-50 dark:bg-gray-800/60 border border-gray-300 dark:border-gray-700/60 text-gray-900 dark:text-gray-200 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
                     <option value="">Select Class</option>
                     {classes.map(c => <option key={c._id} value={c._id}>{c.classText}</option>)}
                   </select>
@@ -332,9 +332,9 @@ export default function Examination() {
 
               {/* Exam type */}
               <div>
-                <label className="block text-xs font-medium text-gray-400 mb-1">Exam Type <span className="text-red-400">*</span></label>
+                <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">Exam Type <span className="text-red-500 dark:text-red-400">*</span></label>
                 <select name="examType" value={formData.examType} onChange={handleChange} required
-                  className="w-full bg-gray-800/60 border border-gray-700/60 text-gray-200 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500/60">
+                  className="w-full bg-gray-50 dark:bg-gray-800/60 border border-gray-300 dark:border-gray-700/60 text-gray-900 dark:text-gray-200 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
                   <option value="">Select Type</option>
                   {availableExamTypes.map(t => <option key={t} value={t}>{t}</option>)}
                 </select>
@@ -343,29 +343,29 @@ export default function Examination() {
               {/* Times */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-gray-400 mb-1">Start Time <span className="text-red-400">*</span></label>
+                  <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">Start Time <span className="text-red-500 dark:text-red-400">*</span></label>
                   <input type="time" name="startTime" value={formData.startTime} onChange={handleChange} required
-                    className="w-full bg-gray-800/60 border border-gray-700/60 text-gray-200 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500/60" />
+                    className="w-full bg-gray-50 dark:bg-gray-800/60 border border-gray-300 dark:border-gray-700/60 text-gray-900 dark:text-gray-200 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500 [color-scheme:light] dark:[color-scheme:dark]" />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-400 mb-1">End Time <span className="text-red-400">*</span></label>
+                  <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">End Time <span className="text-red-500 dark:text-red-400">*</span></label>
                   <input type="time" name="endTime" value={formData.endTime} onChange={handleChange} required
-                    className="w-full bg-gray-800/60 border border-gray-700/60 text-gray-200 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500/60" />
+                    className="w-full bg-gray-50 dark:bg-gray-800/60 border border-gray-300 dark:border-gray-700/60 text-gray-900 dark:text-gray-200 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500 [color-scheme:light] dark:[color-scheme:dark]" />
                 </div>
               </div>
 
               {/* Duration display */}
               <div>
-                <label className="block text-xs font-medium text-gray-400 mb-1">Duration</label>
-                <div className="bg-gray-800/60 border border-gray-700/60 rounded-lg px-3 py-2 text-sm">
+                <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">Duration</label>
+                <div className="bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/60 rounded-lg px-3 py-2 text-sm">
                   {calculatingDuration ? (
                     <span className="flex items-center gap-1.5 text-gray-400">
-                      <div className="w-3 h-3 border border-blue-400 border-t-transparent rounded-full animate-spin"/> Calculating...
+                      <div className="w-3 h-3 border border-blue-500 border-t-transparent rounded-full animate-spin"/> Calculating...
                     </span>
                   ) : formData.duration ? (
-                    <span className="text-blue-400 font-medium">{formatDuration(formData.duration)}</span>
+                    <span className="text-blue-600 dark:text-blue-400 font-medium">{formatDuration(formData.duration)}</span>
                   ) : (
-                    <span className="text-gray-500">{formData.startTime && formData.endTime ? 'Invalid time range' : 'Select start & end time'}</span>
+                    <span className="text-gray-400 dark:text-gray-500">{formData.startTime && formData.endTime ? 'Invalid time range' : 'Select start & end time'}</span>
                   )}
                 </div>
               </div>
@@ -373,11 +373,11 @@ export default function Examination() {
               {/* Actions */}
               <div className="flex justify-end gap-2 pt-1">
                 <button type="button" onClick={closeModal}
-                  className="px-4 py-2 bg-gray-700/60 border border-gray-600/60 text-gray-300 rounded-lg hover:bg-gray-600/60 transition-colors text-sm">
+                  className="px-4 py-2 bg-gray-100 dark:bg-gray-700/60 border border-gray-300 dark:border-gray-600/60 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600/60 transition-colors text-sm">
                   Cancel
                 </button>
                 <button type="submit" disabled={loading||calculatingDuration}
-                  className="flex items-center gap-1.5 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed">
+                  className="flex items-center gap-1.5 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed shadow-md">
                   {loading ? <><div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"/>{modalType==='create'?'Creating...':'Updating...'}</> : modalType==='create'?'Create Examination':'Update Examination'}
                 </button>
               </div>
