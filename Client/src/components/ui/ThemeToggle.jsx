@@ -26,7 +26,7 @@ export function ThemeToggle({ className = '', size = 'md', showLabel = false }) 
       className={[
         'inline-flex items-center justify-center transition-all duration-200 cursor-pointer select-none active:scale-95',
         'bg-gray-100 hover:bg-gray-200 border border-gray-300 text-gray-700 shadow-sm',
-        'dark:bg-gray-800 dark:hover:bg-gray-750 dark:border-gray-700 dark:text-gray-200 dark:hover:text-white',
+        'dark:bg-gray-800 dark:hover:bg-gray-700 dark:border-gray-700 dark:text-gray-200 dark:hover:text-white',
         sizeClasses[size] || sizeClasses.md,
         className,
       ].join(' ')}

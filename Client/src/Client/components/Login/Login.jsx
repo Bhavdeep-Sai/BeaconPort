@@ -286,7 +286,7 @@ export default function Login() {
                 <button
                   type="button"
                   onClick={() => setDemoTooltipOpen((prev) => !prev)}
-                  className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-750 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white text-xs sm:text-sm font-medium transition-all shadow-sm backdrop-blur-sm cursor-pointer active:scale-95 ${demoTooltipOpen ? 'ring-2 ring-orange-500/40 border-orange-500/50' : ''}`}
+                  className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white text-xs sm:text-sm font-medium transition-all shadow-sm backdrop-blur-sm cursor-pointer active:scale-95 ${demoTooltipOpen ? 'ring-2 ring-orange-500/40 border-orange-500/50' : ''}`}
                   title="Click to view Demo Credentials"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="text-orange-500" viewBox="0 0 16 16">
