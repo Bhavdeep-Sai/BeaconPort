@@ -5,6 +5,11 @@ const cookieParser = require("cookie-parser");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 
+const loggingMiddleware = require("./middleware/loggingMiddleware");
+const errorHandler = require("./middleware/errorHandler");
+const { attachTenantContext } = require("./utils/tenant");
+
+const healthRouter = require("./routes/healthRouter");
 const schoolRouter = require("./routes/schoolRouter");
 const classRouter = require("./routes/classRouter");
 const subjectRouter = require("./routes/subjectRouter");
@@ -20,6 +25,12 @@ const salaryRouter = require("./routes/salaryRouter");
 
 const app = express();
 
+// 4.3 Structured Logging with Pino-HTTP & Request Tracing
+app.use(loggingMiddleware);
+
+// 4.3 Health & Readiness Probes (/health and /ready)
+app.use(healthRouter);
+
 // 2.6 Abuse protection: Helmet security headers
 app.use(helmet());
 
@@ -27,6 +38,9 @@ app.use(helmet());
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 app.use(cookieParser());
+
+// 4.2 Attach Tenant Scoping Context
+app.use(attachTenantContext);
 
 // 2.6 Abuse protection: Strict CORS
 const allowedOrigins = [
@@ -75,11 +89,11 @@ const aiLimiter = rateLimit({
 });
 
 // Apply rate limiting to sensitive auth and AI endpoints
-app.use("/api/school/login", authLimiter);
-app.use("/api/school/register", authLimiter);
-app.use("/api/school/forgot-password", authLimiter);
-app.use("/api/teacher/login", authLimiter);
-app.use("/api/student/login", authLimiter);
+app.post("/api/school/login", authLimiter);
+app.post("/api/school/register", authLimiter);
+app.post("/api/school/forgot-password", authLimiter);
+app.post("/api/teacher/login", authLimiter);
+app.post("/api/student/login", authLimiter);
 app.use("/api/ai-tutor/chat", aiLimiter);
 
 // Routes
@@ -96,26 +110,7 @@ app.use("/api/notice", noticeRouter);
 app.use("/api/fee", feeRouter);
 app.use("/api/salary", salaryRouter);
 
-// Central error handling middleware
-app.use((err, req, res, next) => {
-  if (err.type === "entity.too.large") {
-    return res.status(413).json({
-      success: false,
-      message: "Payload too large. Max body size is 10kb.",
-    });
-  }
-  if (err.message && err.message.includes("CORS")) {
-    return res.status(403).json({
-      success: false,
-      message: err.message,
-    });
-  }
-  console.error("Unhandled Application Error:", err);
-  return res.status(500).json({
-    success: false,
-    message: "Internal Server Error",
-  });
-});
+// 4.3 Central error handling middleware
+app.use(errorHandler);
 
 module.exports = app;
-
