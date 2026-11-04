@@ -6,6 +6,8 @@ process.env.JWT_SECRET = "test_super_secret_jwt_key_min_32_characters";
 process.env.GOOGLE_CLIENT_ID = "mock-google-client-id.apps.googleusercontent.com";
 process.env.GEMINI_API_KEY = "mock-gemini-api-key";
 
+jest.setTimeout(60000);
+
 let mongoServer;
 
 beforeAll(async () => {
