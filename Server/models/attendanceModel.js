@@ -20,6 +20,11 @@ const attendanceSchema = new mongoose.Schema({
         type: Date, 
         required: true
     },
+    dateKey: {
+        type: String,
+        required: true,
+        match: /^\d{4}-\d{2}-\d{2}$/, // YYYY-MM-DD
+    },
     status: {
         type: String, 
         enum: ['Present', 'Absent'], 
@@ -39,20 +44,20 @@ const attendanceSchema = new mongoose.Schema({
     }
 });
 
-// Create compound index to ensure unique attendance per student per day per class
+// Compound unique index ensuring one attendance record per student per class per calendar dateKey
 attendanceSchema.index({ 
+    school: 1,
     student: 1, 
     class: 1, 
-    date: 1 
+    dateKey: 1 
 }, { 
     unique: true,
-    name: 'unique_student_class_date_attendance'
+    name: 'unique_school_student_class_dateKey_attendance'
 });
 
-// Create additional indexes for better query performance
-attendanceSchema.index({ class: 1, date: 1 });
-attendanceSchema.index({ school: 1, date: 1 });
-attendanceSchema.index({ student: 1, date: -1 });
+// Performance indexes
+attendanceSchema.index({ school: 1, class: 1, dateKey: 1 });
+attendanceSchema.index({ school: 1, student: 1, dateKey: -1 });
 
 // Middleware to update the updatedAt field on save
 attendanceSchema.pre('save', function(next) {
@@ -60,49 +65,46 @@ attendanceSchema.pre('save', function(next) {
     next();
 });
 
-// Static method to check if attendance exists for a class on a specific date
-attendanceSchema.statics.checkAttendanceExists = async function(classId, date) {
-    const startOfDay = new Date(date);
-    startOfDay.setHours(0, 0, 0, 0);
-    
-    const endOfDay = new Date(date);
-    endOfDay.setHours(23, 59, 59, 999);
-    
+// Static method to check if attendance exists for a class on a specific dateKey
+attendanceSchema.statics.checkAttendanceExists = async function(schoolId, classId, dateKey) {
     const attendance = await this.findOne({
+        school: schoolId,
         class: classId,
-        date: {
-            $gte: startOfDay,
-            $lte: endOfDay
-        }
+        dateKey: dateKey
     });
-    
     return !!attendance;
 };
 
-// Static method to get attendance summary for a class on a specific date
-attendanceSchema.statics.getAttendanceSummary = async function(classId, date) {
-    const startOfDay = new Date(date);
-    startOfDay.setHours(0, 0, 0, 0);
-    
-    const endOfDay = new Date(date);
-    endOfDay.setHours(23, 59, 59, 999);
-    
-    const attendanceRecords = await this.find({
-        class: classId,
-        date: {
-            $gte: startOfDay,
-            $lte: endOfDay
+// Static method to get attendance summary using MongoDB $group aggregation pipeline
+attendanceSchema.statics.getAttendanceSummary = async function(schoolId, classId, dateKey) {
+    const summaryRecords = await this.aggregate([
+        {
+            $match: {
+                school: new mongoose.Types.ObjectId(schoolId),
+                class: new mongoose.Types.ObjectId(classId),
+                dateKey: dateKey
+            }
+        },
+        {
+            $group: {
+                _id: "$status",
+                count: { $sum: 1 }
+            }
         }
-    }).populate('student', 'name');
-    
-    const summary = {
-        totalStudents: attendanceRecords.length,
-        present: attendanceRecords.filter(record => record.status === 'Present').length,
-        absent: attendanceRecords.filter(record => record.status === 'Absent').length,
-        attendanceRecords
+    ]);
+
+    let present = 0;
+    let absent = 0;
+    for (const record of summaryRecords) {
+        if (record._id === 'Present') present = record.count;
+        if (record._id === 'Absent') absent = record.count;
+    }
+
+    return {
+        totalStudents: present + absent,
+        present,
+        absent
     };
-    
-    return summary;
 };
 
 module.exports = mongoose.model("Attendance", attendanceSchema);

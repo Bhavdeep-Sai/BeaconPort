@@ -69,13 +69,12 @@ module.exports = {
         });
       }
 
-      // Check if attendance already exists for this specific student on this date
+      const dateKey = formattedDate.format("YYYY-MM-DD");
+
+      // Check if attendance already exists for this specific student on this dateKey
       const existingAttendance = await Attendance.findOne({
         student: studentId,
-        date: {
-          $gte: formattedDate.startOf('day').toDate(),
-          $lt: formattedDate.clone().endOf('day').toDate()
-        },
+        dateKey: dateKey,
         class: classId,
         school: schoolId
       });
@@ -92,6 +91,7 @@ module.exports = {
       const newAttendance = new Attendance({
         student: studentId,
         date: formattedDate.toDate(),
+        dateKey,
         status,
         notes: notes || '',
         class: classId,
@@ -167,14 +167,13 @@ module.exports = {
         });
       }
 
-      // Check if attendance has already been taken for this class today
+      const dateKey = formattedDate.format("YYYY-MM-DD");
+
+      // Check if attendance has already been taken for this class today using dateKey
       const existingAttendance = await Attendance.findOne({
         class: classId,
         school: schoolId,
-        date: {
-          $gte: formattedDate.startOf('day').toDate(),
-          $lt: formattedDate.clone().endOf('day').toDate()
-        }
+        dateKey: dateKey
       });
 
       if (existingAttendance) {
@@ -185,7 +184,7 @@ module.exports = {
       }
 
       // Validate all student IDs and attendance data
-      const validAttendanceData = [];
+      const bulkOps = [];
       for (const record of attendanceData) {
         if (!record.studentId || !mongoose.Types.ObjectId.isValid(record.studentId)) {
           return res.status(400).json({
@@ -201,24 +200,40 @@ module.exports = {
           });
         }
 
-        validAttendanceData.push({
-          student: record.studentId,
-          date: formattedDate.toDate(),
-          status: record.status,
-          notes: record.notes || '',
-          class: classId,
-          school: schoolId
+        bulkOps.push({
+          insertOne: {
+            document: {
+              student: record.studentId,
+              date: formattedDate.toDate(),
+              dateKey: dateKey,
+              status: record.status,
+              notes: record.notes || '',
+              class: classId,
+              school: schoolId
+            }
+          }
         });
       }
 
-      // Insert all attendance records
-      const savedAttendance = await Attendance.insertMany(validAttendanceData);
+      // Insert all attendance records atomically via bulkWrite
+      try {
+        const bulkResult = await Attendance.bulkWrite(bulkOps, { ordered: false });
 
-      res.status(201).json({
-        success: true,
-        message: `Attendance marked successfully for ${savedAttendance.length} students`,
-        data: savedAttendance
-      });
+        res.status(201).json({
+          success: true,
+          message: `Attendance marked successfully for ${bulkResult.insertedCount} students`,
+          insertedCount: bulkResult.insertedCount,
+          dateKey: dateKey
+        });
+      } catch (bulkErr) {
+        if (bulkErr.code === 11000 || bulkErr.name === "MongoBulkWriteError") {
+          return res.status(409).json({
+            success: false,
+            message: "Attendance has already been taken for one or more students today"
+          });
+        }
+        throw bulkErr;
+      }
 
     } catch (error) {
       console.error("Error marking bulk attendance:", error);
@@ -397,19 +412,20 @@ module.exports = {
         });
       }
 
-      const today = moment().startOf("day");
+      const dateKey = req.query.date && moment(req.query.date, "YYYY-MM-DD", true).isValid()
+        ? moment(req.query.date, "YYYY-MM-DD").format("YYYY-MM-DD")
+        : moment().format("YYYY-MM-DD");
+
       const attendanceForToday = await Attendance.findOne({
         class: classId,
         school: schoolId,
-        date: {
-          $gte: today.toDate(),
-          $lt: today.clone().endOf("day").toDate(),
-        },
+        dateKey: dateKey,
       });
 
       return res.status(200).json({ 
-        success: true,
+        success: true, 
         attendanceTaken: Boolean(attendanceForToday),
+        dateKey: dateKey,
         message: attendanceForToday 
           ? "Attendance has already been taken for today" 
           : "Attendance has not been taken yet for today",
