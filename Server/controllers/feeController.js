@@ -1,4 +1,4 @@
-﻿const Fee = require('../models/feeModel');
+const Fee = require('../models/feeModel');
 const Student = require('../models/studentModel');
 const School = require('../models/schoolModel');
 const Subject = require('../models/subjectModel');
@@ -136,44 +136,89 @@ module.exports = {
 
       const students = await Student.find(studentFilter)
         .populate({ path: 'studentClass', select: 'classFee includedSubjects' })
-        .populate('enrolledSubjects', 'subjectFee');
+        .populate('enrolledSubjects', 'subjectFee')
+        .lean();
 
+      if (!students || students.length === 0) {
+        return res.json({
+          success: true,
+          message: 'No students found matching criteria',
+          created: 0,
+          updated: 0,
+          skipped: 0,
+        });
+      }
+
+      // Single query to fetch existing fee records for all matching students in this term & year
+      const existingFees = await Fee.find({
+        school: schoolId,
+        student: { $in: students.map(s => s._id) },
+        term,
+        year: Number(year),
+      }).lean();
+
+      const existingFeeMap = new Map();
+      existingFees.forEach(f => {
+        existingFeeMap.set(f.student.toString(), f);
+      });
+
+      const bulkOps = [];
       let created = 0, skipped = 0, updated = 0;
-      const createdFees = [];
-      
-      await Promise.all(students.map(async (student) => {
+
+      for (const student of students) {
         const currentFee = calcTotalFee(student);
-        const existing = await Fee.findOne({ school: schoolId, student: student._id, term, year: Number(year) });
+        const existing = existingFeeMap.get(student._id.toString());
+
         if (existing) {
           // Sync amount if class fee changed and record hasn't been paid yet
           if (['pending', 'overdue'].includes(existing.status) && existing.amount !== currentFee) {
-            await Fee.updateOne({ _id: existing._id }, { $set: { amount: currentFee } });
+            bulkOps.push({
+              updateOne: {
+                filter: { _id: existing._id, school: schoolId },
+                update: { $set: { amount: currentFee } },
+              }
+            });
             updated++;
           } else {
             skipped++;
           }
-          return;
+        } else {
+          // Atomic upsert via bulkWrite guarantees idempotency and prevents concurrent duplicates
+          bulkOps.push({
+            updateOne: {
+              filter: {
+                school: schoolId,
+                student: student._id,
+                term,
+                year: Number(year),
+              },
+              update: {
+                $setOnInsert: {
+                  class: student.studentClass ? student.studentClass._id : null,
+                  amount: currentFee,
+                  frequency,
+                  dueDate: new Date(dueDate),
+                  status: 'pending',
+                  paidAmount: null,
+                  paymentMethod: null,
+                  notes: '',
+                }
+              },
+              upsert: true,
+            }
+          });
+          created++;
         }
-        const newFee = await Fee.create({
-          school:    schoolId,
-          student:   student._id,
-          class:     student.studentClass ? student.studentClass._id : null,
-          amount:    currentFee,
-          term,
-          year:      Number(year),
-          frequency,
-          dueDate:   new Date(dueDate),
-          status:    'pending',
-        });
-        createdFees.push({
-          id: newFee._id,
-          student: student.name,
-          term,
-          year,
-          frequency,
-        });
-        created++;
-      }));
+      }
+
+      // Execute bulkWrite operations in batches of 500
+      if (bulkOps.length > 0) {
+        const BATCH_SIZE = 500;
+        for (let i = 0; i < bulkOps.length; i += BATCH_SIZE) {
+          const batch = bulkOps.slice(i, i + BATCH_SIZE);
+          await Fee.bulkWrite(batch, { ordered: false });
+        }
+      }
 
       return res.json({
         success: true,
