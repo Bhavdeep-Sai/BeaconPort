@@ -165,12 +165,36 @@ module.exports = {
         filterQuery.studentClass = req.query.studentClass;
       }
 
+      const total = await Student.countDocuments(filterQuery);
+
+      const page = Math.max(1, parseInt(req.query.page) || 1);
+      const limit = req.query.limit !== undefined 
+        ? Math.max(1, parseInt(req.query.limit) || 10) 
+        : 50;
+      const skip = (page - 1) * limit;
+
       const students = await Student.find(filterQuery)
         .select("-password")
         .populate('studentClass')
-        .populate('enrolledSubjects', 'subjectName subjectFee subjectCode');
+        .populate('enrolledSubjects', 'subjectName subjectFee subjectCode')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean();
 
-      res.status(200).json({ success: true, message: students.length > 0 ? "Data Found" : "No Student data found", students: students || [] });
+      res.status(200).json({ 
+        success: true, 
+        message: students.length > 0 ? "Data Found" : "No Student data found", 
+        students: students || [],
+        pagination: {
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit) || 1,
+          hasNextPage: skip + students.length < total,
+          hasPrevPage: page > 1,
+        }
+      });
     } catch (error) {
       console.error("Get all Students error:", error);
       res

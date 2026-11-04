@@ -214,15 +214,35 @@ module.exports = {
         filterQuery.subjects = req.query.subject;
       }
 
+      const total = await Teacher.countDocuments(filterQuery);
+
+      const page = Math.max(1, parseInt(req.query.page) || 1);
+      const limit = req.query.limit !== undefined 
+        ? Math.max(1, parseInt(req.query.limit) || 10) 
+        : 50;
+      const skip = (page - 1) * limit;
+
       const teachers = await Teacher.find(filterQuery)
         .populate("teacherClasses")
         .populate("subjects")
-        .select("-password");
+        .select("-password")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean();
 
       res.status(200).json({
         success: true,
         message: teachers.length > 0 ? "Data Found" : "No Teachers Found",
         teachers,
+        pagination: {
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit) || 1,
+          hasNextPage: skip + teachers.length < total,
+          hasPrevPage: page > 1,
+        }
       });
     } catch (error) {
       console.error("Get all Teachers error:", error);
