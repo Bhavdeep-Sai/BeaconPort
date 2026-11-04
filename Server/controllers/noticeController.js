@@ -1,6 +1,7 @@
 const Notice = require("../models/noticeModel");
 const School = require("../models/schoolModel");
 const Teacher = require("../models/teacherModel");
+const { escapeRegex } = require("../utils/escapeRegex");
 
 module.exports = {
   createNotice: async (req, res) => {
@@ -164,26 +165,29 @@ module.exports = {
         }
       }
 
-      // Apply search filter if provided
+      // Apply search filter if provided (with ReDoS protection)
       if (req.query.search) {
-        const searchFilter = {
-          $or: [
-            { title: { $regex: req.query.search, $options: "i" } },
-            { message: { $regex: req.query.search, $options: "i" } },
-          ]
-        };
-        
-        // Combine with existing filter
-        if (filter.$or) {
-          filter = {
-            $and: [
-              { school: schoolId },
-              { $or: filter.$or },
-              searchFilter
+        const safeSearch = escapeRegex(req.query.search, 50);
+        if (safeSearch) {
+          const searchFilter = {
+            $or: [
+              { title: { $regex: safeSearch, $options: "i" } },
+              { message: { $regex: safeSearch, $options: "i" } },
             ]
           };
-        } else {
-          Object.assign(filter, searchFilter);
+          
+          // Combine with existing filter
+          if (filter.$or) {
+            filter = {
+              $and: [
+                { school: schoolId },
+                { $or: filter.$or },
+                searchFilter
+              ]
+            };
+          } else {
+            Object.assign(filter, searchFilter);
+          }
         }
       }
 
