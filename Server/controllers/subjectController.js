@@ -64,9 +64,32 @@ module.exports = {
     try {
       const id = req.params.id;
       const schoolId = req.user.schoolId;
-      await Subject.findOneAndUpdate({ _id: id, school: schoolId }, { $set: { ...req.body } });
-      const SubjectAfterUpdate = await Subject.findOne({ _id: id });
-      res.status(200).json({ success: true, message: "Subject updated.", data: SubjectAfterUpdate });
+
+      // Whitelist update fields to prevent mass assignment
+      const { subjectName, subjectCode, subjectFee } = req.body;
+      const updateData = {};
+      if (subjectName !== undefined) updateData.subjectName = subjectName;
+      if (subjectCode !== undefined) updateData.subjectCode = subjectCode;
+      if (subjectFee !== undefined) updateData.subjectFee = subjectFee;
+
+      const subjectAfterUpdate = await Subject.findOneAndUpdate(
+        { _id: id, school: schoolId },
+        { $set: updateData },
+        { new: true, runValidators: true }
+      );
+
+      if (!subjectAfterUpdate) {
+        return res.status(404).json({
+          success: false,
+          message: "Subject not found or access denied"
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        message: "Subject updated.",
+        data: subjectAfterUpdate
+      });
     } catch (err) {
       console.error('updateSubjectwithId:', err);
       res.status(500).json({ success: false, message: "Server Error in Subject Updating" });

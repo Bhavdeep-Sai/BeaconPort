@@ -1,5 +1,6 @@
 const Attendance = require("../models/attendanceModel");
 const Student = require("../models/studentModel");
+const Class = require("../models/classModel");
 const moment = require("moment");
 const mongoose = require("mongoose");
 
@@ -30,6 +31,24 @@ module.exports = {
         return res.status(400).json({
           success: false,
           message: "Invalid class ID format"
+        });
+      }
+
+      // Ensure class belongs to this school
+      const targetClass = await Class.findOne({ _id: classId, school: schoolId });
+      if (!targetClass) {
+        return res.status(404).json({
+          success: false,
+          message: "Class not found in this school"
+        });
+      }
+
+      // Ensure student belongs to this school
+      const targetStudent = await Student.findOne({ _id: studentId, school: schoolId });
+      if (!targetStudent) {
+        return res.status(404).json({
+          success: false,
+          message: "Student not found in this school"
         });
       }
 
@@ -117,6 +136,28 @@ module.exports = {
         });
       }
 
+      // Ensure class belongs to this school
+      const targetClass = await Class.findOne({ _id: classId, school: schoolId });
+      if (!targetClass) {
+        return res.status(404).json({
+          success: false,
+          message: "Class not found in this school"
+        });
+      }
+
+      // Ensure all students belong to this school
+      const inputStudentIds = attendanceData.map(r => r.studentId).filter(id => mongoose.Types.ObjectId.isValid(id));
+      const studentCount = await Student.countDocuments({
+        _id: { $in: inputStudentIds },
+        school: schoolId
+      });
+      if (studentCount !== attendanceData.length) {
+        return res.status(400).json({
+          success: false,
+          message: "One or more students do not belong to this school"
+        });
+      }
+
       // Ensure date is properly formatted
       const formattedDate = moment(date, "YYYY-MM-DD", true);
       if (!formattedDate.isValid()) {
@@ -191,6 +232,7 @@ module.exports = {
   getAttendance: async (req, res) => {
     try {
       const studentId = req.params.id;
+      const schoolId = req.user.schoolId;
 
       // Validate studentId
       if (!studentId || !mongoose.Types.ObjectId.isValid(studentId)) {
@@ -200,10 +242,16 @@ module.exports = {
         });
       }
 
-      console.log(`Fetching attendance for student ID: ${studentId}`);
+      // Check role isolation: Students may only view their own attendance
+      if (req.user.role === 'STUDENT' && req.user.id !== studentId) {
+        return res.status(403).json({
+          success: false,
+          message: "Access Denied: You cannot view another student's attendance"
+        });
+      }
 
-      // Get student info
-      const student = await Student.findById(studentId)
+      // Get student info scoped to tenant school
+      const student = await Student.findOne({ _id: studentId, school: schoolId })
         .populate('studentClass');
 
       if (!student) {
@@ -213,8 +261,8 @@ module.exports = {
         });
       }
 
-      // Get attendance records
-      const attendance = await Attendance.find({ student: studentId })
+      // Get attendance records scoped to tenant school
+      const attendance = await Attendance.find({ student: studentId, school: schoolId })
         .populate({
           path: 'class',
           select: 'classText section'
@@ -280,9 +328,23 @@ module.exports = {
         };
       }
 
-      // Get attendance for all students
+      // Validate students belong to this school
+      const schoolId = req.user.schoolId;
+      const studentCount = await Student.countDocuments({
+        _id: { $in: studentIds },
+        school: schoolId
+      });
+      if (studentCount !== studentIds.length) {
+        return res.status(400).json({
+          success: false,
+          message: "One or more students do not belong to this school"
+        });
+      }
+
+      // Get attendance for all students scoped to tenant school
       const attendanceRecords = await Attendance.find({
         student: { $in: studentIds },
+        school: schoolId,
         ...dateFilter
       })
       .populate('student', 'name studentClass')
@@ -318,6 +380,7 @@ module.exports = {
   checkAttendance: async (req, res) => {
     try {
       const classId = req.params.classId;
+      const schoolId = req.user.schoolId;
 
       if (!classId || !mongoose.Types.ObjectId.isValid(classId)) {
         return res.status(400).json({ 
@@ -326,9 +389,18 @@ module.exports = {
         });
       }
 
+      const targetClass = await Class.findOne({ _id: classId, school: schoolId });
+      if (!targetClass) {
+        return res.status(404).json({
+          success: false,
+          message: "Class not found in this school"
+        });
+      }
+
       const today = moment().startOf("day");
       const attendanceForToday = await Attendance.findOne({
         class: classId,
+        school: schoolId,
         date: {
           $gte: today.toDate(),
           $lt: today.clone().endOf("day").toDate(),

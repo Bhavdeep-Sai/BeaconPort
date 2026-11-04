@@ -339,6 +339,18 @@ module.exports = {
         });
       }
 
+      // Validate subject belongs to this school if provided
+      if (subjectId) {
+        const Subject = require("../models/subjectModel");
+        const subjectDoc = await Subject.findOne({ _id: subjectId, school: schoolId });
+        if (!subjectDoc) {
+          return res.status(404).json({
+            success: false,
+            message: "Subject not found in this school"
+          });
+        }
+      }
+
       // Check permissions - Fixed the permission logic
       if (role === 'TEACHER') {
         // Teachers can only edit exams they created
@@ -454,8 +466,8 @@ module.exports = {
       
       updateData.updatedAt = new Date();
 
-      const updatedExam = await Examination.findByIdAndUpdate(
-        examId, 
+      const updatedExam = await Examination.findOneAndUpdate(
+        { _id: examId, school: schoolId }, 
         { $set: updateData },
         { new: true }
       ).populate('subject', 'subjectName')
@@ -521,7 +533,7 @@ module.exports = {
         }
       }
 
-      await Examination.findByIdAndDelete(examId);
+      await Examination.findOneAndDelete({ _id: examId, school: schoolId });
       
       res.status(200).json({
         success: true, 

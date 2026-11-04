@@ -4,16 +4,23 @@ const Student = require("../models/studentModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const cloudinary = require("../config/cloudinary"); // Import Cloudinary config
+const escapeRegex = require("../utils/escapeRegex");
 
 module.exports = {
   registerStudent: async (req, res) => {
     try {
-      const form = new formidable.IncomingForm();
+      const form = new formidable.IncomingForm({
+        maxFileSize: 5 * 1024 * 1024,
+        filter: ({ originalFilename, mimetype }) => {
+          if (!originalFilename) return true;
+          return mimetype && mimetype.startsWith("image/");
+        },
+      });
       form.parse(req, async (err, fields, files) => {
         if (err) {
           return res
             .status(400)
-            .json({ success: false, message: "Form parsing error" });
+            .json({ success: false, message: "Form parsing error: " + err.message });
         }
 
         if (!files.image || !files.image[0]) {
@@ -54,6 +61,8 @@ module.exports = {
           });
         }
 
+        const hashedPassword = await bcrypt.hash(fields.password[0], 10);
+
         const newStudent = new Student({
           school: req.user.schoolId,
           email: fields.email[0],
@@ -65,14 +74,17 @@ module.exports = {
           parentNum: fields.parentNum[0],
           studentImg: cloudinaryResult.secure_url, // Store Cloudinary URL
           cloudinaryPublicId: cloudinaryResult.public_id, // Store public_id for deletion
-          password: fields.password[0], // stored as plain-text as per your instruction
+          password: hashedPassword,
           enrolledSubjects: fields.enrolledSubjects ? JSON.parse(fields.enrolledSubjects[0]) : [],
         });
 
         const savedStudent = await newStudent.save();
+        const studentResponse = savedStudent.toObject();
+        delete studentResponse.password;
+
         res.status(200).json({
           success: true,
-          data: savedStudent,
+          data: studentResponse,
           message: "Student is registered Successfully",
         });
       });
@@ -84,44 +96,51 @@ module.exports = {
 
   loginStudent: async (req, res) => {
     try {
-      const student = await Student.findOne({ email: req.body.email });
+      const { email, password } = req.body;
+      if (!email || !password) {
+        return res.status(401).json({ success: false, message: "Invalid email or password" });
+      }
 
-      if (student) {
-        if (req.body.password === student.password) {
-          const jwtSecret = process.env.JWT_SECRET;
-          const token = jwt.sign(
-            {
-              id: student._id,
-              schoolId: student.school,
-              name: student.name,
-              studentImg: student.studentImg,
-              role: "STUDENT",
-            },
-            jwtSecret
-          );
-          res.header("Authorization", token);
+      const student = await Student.findOne({ email }).select("+password");
 
-          return res.status(200).json({
-            success: true,
-            message: "Success Login.",
-            user: {
-              id: student._id,
-              schoolId: student.school,
-              name: student.name,
-              studentImg: student.studentImg,
-              role: "STUDENT",
-            },
-            token: token,
-          });
-        } else {
-          return res
-            .status(401)
-            .json({ success: false, message: "Password is Incorrect" });
-        }
+      if (!student) {
+        return res
+          .status(401)
+          .json({ success: false, message: "Invalid email or password" });
+      }
+
+      const isMatch = await bcrypt.compare(password, student.password);
+
+      if (isMatch) {
+        const jwtSecret = process.env.JWT_SECRET;
+        const token = jwt.sign(
+          {
+            id: student._id,
+            schoolId: student.school,
+            name: student.name,
+            studentImg: student.studentImg,
+            role: "STUDENT",
+          },
+          jwtSecret
+        );
+        res.header("Authorization", token);
+
+        return res.status(200).json({
+          success: true,
+          message: "Success Login.",
+          user: {
+            id: student._id,
+            schoolId: student.school,
+            name: student.name,
+            studentImg: student.studentImg,
+            role: "STUDENT",
+          },
+          token: token,
+        });
       } else {
         return res
-          .status(404)
-          .json({ success: false, message: "Email not found" });
+          .status(401)
+          .json({ success: false, message: "Invalid email or password" });
       }
     } catch (error) {
       console.error("Login Student error:", error);
@@ -139,14 +158,17 @@ module.exports = {
       const filterQuery = { school: req.user.schoolId };
 
       if (req.query.search) {
-        filterQuery.name = { $regex: req.query.search, $options: "i" };
+        filterQuery.name = { $regex: escapeRegex(req.query.search, 50), $options: "i" };
       }
 
       if (req.query.studentClass) {
         filterQuery.studentClass = req.query.studentClass;
       }
 
-      const students = await Student.find(filterQuery).populate('studentClass').populate('enrolledSubjects', 'subjectName subjectFee subjectCode');
+      const students = await Student.find(filterQuery)
+        .select("-password")
+        .populate('studentClass')
+        .populate('enrolledSubjects', 'subjectName subjectFee subjectCode');
 
       res.status(200).json({ success: true, message: students.length > 0 ? "Data Found" : "No Student data found", students: students || [] });
     } catch (error) {
@@ -164,7 +186,9 @@ module.exports = {
       const student = await Student.findOne({
         _id: id,
         school: schoolId,
-      }).populate('studentClass');
+      })
+        .select("-password")
+        .populate('studentClass');
 
       if (!student) {
         return res
@@ -185,7 +209,7 @@ module.exports = {
     try {
       const id = req.params.id;
       const schoolId = req.user.schoolId;
-      const student = await Student.findOne({ _id: id, school: schoolId });
+      const student = await Student.findOne({ _id: id, school: schoolId }).select("-password");
 
       if (!student) {
         return res
@@ -206,13 +230,19 @@ module.exports = {
     try {
       const id = req.params.id;
       const schoolId = req.user.schoolId;
-      const form = new formidable.IncomingForm();
+      const form = new formidable.IncomingForm({
+        maxFileSize: 5 * 1024 * 1024,
+        filter: ({ originalFilename, mimetype }) => {
+          if (!originalFilename) return true;
+          return mimetype && mimetype.startsWith("image/");
+        },
+      });
 
       form.parse(req, async (err, fields, files) => {
         if (err) {
           return res
             .status(400)
-            .json({ success: false, message: "Form parsing error" });
+            .json({ success: false, message: "Form parsing error: " + err.message });
         }
 
         const student = await Student.findOne({ _id: id, school: schoolId });
@@ -226,12 +256,14 @@ module.exports = {
         // Store old cloudinary public_id for cleanup
         const oldCloudinaryPublicId = student.cloudinaryPublicId;
 
-        // Update fields from form data (take first element if array)
-        Object.keys(fields).forEach((field) => {
-          if (field === 'enrolledSubjects') return; // handled separately
-          student[field] = Array.isArray(fields[field])
-            ? fields[field][0]
-            : fields[field];
+        // Whitelist scalar fields to prevent mass assignment
+        const allowedFields = ["name", "email", "age", "gender", "parent", "parentNum", "studentClass"];
+        allowedFields.forEach((field) => {
+          if (fields[field] !== undefined) {
+            student[field] = Array.isArray(fields[field])
+              ? fields[field][0]
+              : fields[field];
+          }
         });
 
         // Parse enrolledSubjects JSON string

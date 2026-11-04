@@ -158,10 +158,19 @@ module.exports = {
         });
       }
 
-      // If updating attendee, verify the teacher exists
-      if (req.body.attendee) {
+      // Whitelist fields to prevent mass assignment
+      const allowedFields = ['classText', 'classNum', 'classFee', 'includedSubjects', 'attendee'];
+      const updateData = {};
+      for (const field of allowedFields) {
+        if (req.body[field] !== undefined) {
+          updateData[field] = req.body[field];
+        }
+      }
+
+      // If updating attendee, verify the teacher exists in this school
+      if (updateData.attendee) {
         const teacherExists = await Teacher.exists({ 
-          _id: req.body.attendee, 
+          _id: updateData.attendee, 
           school: schoolId 
         });
         
@@ -172,11 +181,26 @@ module.exports = {
           });
         }
       }
+
+      // Verify that all includedSubjects belong to this school
+      if (updateData.includedSubjects && Array.isArray(updateData.includedSubjects)) {
+        const Subject = require("../models/subjectModel");
+        const count = await Subject.countDocuments({
+          _id: { $in: updateData.includedSubjects },
+          school: schoolId,
+        });
+        if (count !== updateData.includedSubjects.length) {
+          return res.status(400).json({
+            success: false,
+            message: "One or more included subjects do not belong to this school",
+          });
+        }
+      }
       
       // Update the class
       await Class.findOneAndUpdate(
         { _id: id, school: schoolId }, 
-        { $set: req.body },
+        { $set: updateData },
         { new: false, runValidators: true }
       );
       

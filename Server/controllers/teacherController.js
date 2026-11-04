@@ -1,5 +1,7 @@
 const formidable = require("formidable");
+const bcrypt = require("bcrypt");
 const Teacher = require("../models/teacherModel");
+const escapeRegex = require("../utils/escapeRegex");
 const path = require("path");
 const fs = require("fs");
 const jwt = require("jsonwebtoken");
@@ -8,12 +10,18 @@ const cloudinary = require("../config/cloudinary"); // Import your cloudinary co
 module.exports = {
   registerTeacher: async (req, res) => {
     try {
-      const form = new formidable.IncomingForm();
+      const form = new formidable.IncomingForm({
+        maxFileSize: 5 * 1024 * 1024, // 5MB limit
+        filter: ({ originalFilename, mimetype }) => {
+          if (!originalFilename) return true;
+          return mimetype && mimetype.startsWith("image/");
+        },
+      });
       form.parse(req, async (err, fields, files) => {
         if (err) {
           return res
             .status(400)
-            .json({ success: false, message: "Form parsing error" });
+            .json({ success: false, message: "Form parsing error: " + err.message });
         }
 
         if (!files.image || !files.image[0]) {
@@ -97,6 +105,8 @@ module.exports = {
           }
         }
 
+        const hashedPassword = await bcrypt.hash(fields.password[0], 10);
+
         const newTeacher = new Teacher({
           school: req.user.schoolId,
           email: fields.email[0],
@@ -108,14 +118,17 @@ module.exports = {
           gender: fields.gender[0],
           teacherImg: cloudinaryResult.secure_url, // Store Cloudinary URL
           teacherImgPublicId: cloudinaryResult.public_id, // Store public_id for deletion
-          password: fields.password[0], // Store password as plain text (as requested)
+          password: hashedPassword,
           salary: fields.salary && fields.salary[0] ? parseFloat(fields.salary[0]) : 0,
         });
 
         const savedTeacher = await newTeacher.save();
+        const teacherResponse = savedTeacher.toObject();
+        delete teacherResponse.password;
+
         res.status(200).json({
           success: true,
-          data: savedTeacher,
+          data: teacherResponse,
           message: "Teacher is registered Successfully",
         });
       });
@@ -129,15 +142,22 @@ module.exports = {
 
   loginTeacher: async (req, res) => {
     try {
-      const teacher = await Teacher.findOne({ email: req.body.email });
+      const { email, password } = req.body;
+      if (!email || !password) {
+        return res.status(401).json({ success: false, message: "Invalid email or password" });
+      }
+
+      const teacher = await Teacher.findOne({ email }).select("+password");
 
       if (!teacher) {
         return res
-          .status(404)
-          .json({ success: false, message: "Email not found" });
+          .status(401)
+          .json({ success: false, message: "Invalid email or password" });
       }
 
-      if (req.body.password === teacher.password) {
+      const isMatch = await bcrypt.compare(password, teacher.password);
+
+      if (isMatch) {
         const jwtSecret = process.env.JWT_SECRET;
         const token = jwt.sign(
           {
@@ -167,7 +187,7 @@ module.exports = {
       } else {
         return res
           .status(401)
-          .json({ success: false, message: "Password is Incorrect" });
+          .json({ success: false, message: "Invalid email or password" });
       }
     } catch (error) {
       console.error("Login Teacher error:", error);
@@ -183,7 +203,7 @@ module.exports = {
       const filterQuery = { school: req.user.schoolId };
 
       if (req.query.search) {
-        filterQuery.name = { $regex: req.query.search, $options: "i" };
+        filterQuery.name = { $regex: escapeRegex(req.query.search, 50), $options: "i" };
       }
 
       if (req.query.teacherClass) {
@@ -218,7 +238,8 @@ module.exports = {
       const schoolId = req.user.schoolId;
       const teacher = await Teacher.findOne({ _id: id, school: schoolId })
         .populate("teacherClasses")
-        .populate("subjects");
+        .populate("subjects")
+        .select("-password");
 
       if (!teacher) {
         return res
@@ -241,7 +262,8 @@ module.exports = {
       const schoolId = req.user.schoolId;
       const teacher = await Teacher.findOne({ _id: id, school: schoolId })
         .populate("teacherClasses")
-        .populate("subjects");
+        .populate("subjects")
+        .select("-password");
 
       if (!teacher) {
         return res
@@ -262,13 +284,19 @@ module.exports = {
     try {
       const id = req.params.id;
       const schoolId = req.user.schoolId;
-      const form = new formidable.IncomingForm();
+      const form = new formidable.IncomingForm({
+        maxFileSize: 5 * 1024 * 1024,
+        filter: ({ originalFilename, mimetype }) => {
+          if (!originalFilename) return true;
+          return mimetype && mimetype.startsWith("image/");
+        },
+      });
 
       form.parse(req, async (err, fields, files) => {
         if (err) {
           return res
             .status(400)
-            .json({ success: false, message: "Form parsing error" });
+            .json({ success: false, message: "Form parsing error: " + err.message });
         }
 
         const teacher = await Teacher.findOne({ _id: id, school: schoolId });
@@ -279,22 +307,15 @@ module.exports = {
             .json({ success: false, message: "Teacher not found" });
         }
 
-        // Update fields from form data (take first element if array)
-        Object.keys(fields).forEach((field) => {
-          // Handle special cases and skip password updates here
-          if (
-            field !== "teacherClasses" &&
-            field !== "subjects" &&
-            field !== "password" // Handle password separately
-          ) {
-            // Coerce salary to number explicitly
-            if (field === 'salary') {
-              const val = Array.isArray(fields[field]) ? fields[field][0] : fields[field];
+        // Whitelist allowed fields to prevent mass assignment
+        const allowedFields = ["name", "email", "qualification", "age", "gender", "salary"];
+        allowedFields.forEach((field) => {
+          if (fields[field] !== undefined) {
+            const val = Array.isArray(fields[field]) ? fields[field][0] : fields[field];
+            if (field === "salary") {
               teacher.salary = val ? parseFloat(val) : 0;
             } else {
-              teacher[field] = Array.isArray(fields[field])
-                ? fields[field][0]
-                : fields[field];
+              teacher[field] = val;
             }
           }
         });
@@ -322,11 +343,6 @@ module.exports = {
           } catch (e) {
             teacher.subjects = [fields.subject[0]];
           }
-        }
-
-        // Handle password updates separately (store as plain text)
-        if (fields.password && fields.password[0]) {
-          teacher.password = fields.password[0];
         }
 
         // Handle image update if provided
