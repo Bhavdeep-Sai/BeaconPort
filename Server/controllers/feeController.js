@@ -49,12 +49,8 @@ module.exports = {
       const { schoolId } = req.user;
       const { term, year, classId, status } = req.query;
 
-      if (term && year) {
-        await Fee.updateMany(
-          { school: schoolId, term, year: Number(year), status: 'pending', dueDate: { $lt: new Date() } },
-          { $set: { status: 'overdue' } }
-        );
-      }
+      // Note: Write-on-read overdue marking removed in Phase 4. Overdue marking is
+      // now executed asynchronously via background job (Server/jobs/feeOverdue.js).
 
       const studentFilter = { school: schoolId };
       if (classId) studentFilter.studentClass = classId;
