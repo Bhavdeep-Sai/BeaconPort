@@ -21,4 +21,8 @@ const salarySchema = new mongoose.Schema({
   description: { type: String, default: '' },
 }, { timestamps: true });
 
+// Prevent duplicate salary slips for the same teacher in the same month and year within a school
+salarySchema.index({ school: 1, teacher: 1, month: 1, year: 1 }, { unique: true });
+salarySchema.index({ school: 1, status: 1 });
+
 module.exports = mongoose.model('Salary', salarySchema);

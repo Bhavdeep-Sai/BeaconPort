@@ -24,9 +24,7 @@ const schoolSchema = new mongoose.Schema({
         enum: ['monthly', 'quarterly', 'half-yearly', 'annual'],
         default: 'half-yearly',
     },
-
-    createdAt: { type: Date, default: new Date() }
-});
+}, { timestamps: true });
 
 schoolSchema.index({ email: 1, oauthProvider: 1 });
 schoolSchema.index({ resetPasswordToken: 1 });
