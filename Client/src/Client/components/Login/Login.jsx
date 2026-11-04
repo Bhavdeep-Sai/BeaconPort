@@ -148,12 +148,13 @@ export default function Login() {
         const response = await axios.post(urls[role], { email: values.email, password: values.password });
         if (rememberMe) {
           localStorage.setItem(`rememberedEmail_${role}`, values.email);
-          localStorage.setItem(`rememberedPassword_${role}`, values.password);
           localStorage.setItem(`rememberMe_${role}`, 'true');
         } else {
-          ['Email', 'Password', 'Me'].forEach(k => localStorage.removeItem(`remembered${k}_${role}`));
+          localStorage.removeItem(`rememberedEmail_${role}`);
           localStorage.removeItem(`rememberMe_${role}`);
         }
+        // Security: Never store plaintext passwords in localStorage
+        localStorage.removeItem(`rememberedPassword_${role}`);
         if (response.data.token) {
           localStorage.setItem('token', response.data.token);
           if (response.data.user) {
@@ -172,12 +173,12 @@ export default function Login() {
   React.useEffect(() => { if (!role || !roleConfig[role]) navigate('/select-role'); }, [role, navigate]);
 
   React.useEffect(() => {
+    // Purge any legacy stored passwords for security
+    ['school', 'teacher', 'student'].forEach((r) => localStorage.removeItem(`rememberedPassword_${r}`));
     if (role && roleConfig[role]) {
       const email = localStorage.getItem(`rememberedEmail_${role}`);
-      const pwd = localStorage.getItem(`rememberedPassword_${role}`);
       if (localStorage.getItem(`rememberMe_${role}`) === 'true' && email) {
         formik.setFieldValue('email', email);
-        if (pwd) formik.setFieldValue('password', pwd);
         setRememberMe(true);
       }
     }
@@ -209,8 +210,7 @@ export default function Login() {
         callback: async (response) => {
           try {
             if (!response.access_token) return;
-            const userInfo = await axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${response.access_token}`);
-            const loginRes = await axios.post(`${baseApi}/school/login/oauth`, { email: userInfo.data.email, provider: 'google' });
+            const loginRes = await axios.post(`${baseApi}/school/login/oauth`, { token: response.access_token, provider: 'google' });
             if (loginRes.data.token) {
               localStorage.setItem('token', loginRes.data.token);
               localStorage.setItem('user', JSON.stringify(loginRes.data.user));
@@ -222,7 +222,7 @@ export default function Login() {
             if (err.response?.status === 404) {
               setError('No account found with this Google email. Please register first.');
             } else {
-              setError('Google login failed. Please try again.');
+              setError(err.response?.data?.message || 'Google login failed. Please try again.');
             }
           } finally { setOauthLoading(false); }
         },

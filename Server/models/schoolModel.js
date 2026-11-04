@@ -6,7 +6,7 @@ const schoolSchema = new mongoose.Schema({
     ownerName: { type: String, required: true },
     schoolImg: { type: String, required: true }, 
     schoolImgPublicId: { type: String }, 
-    password: { type: String, required: true },
+    password: { type: String, required: true, select: false },
         
     isOAuthUser: { type: Boolean, default: false },
     oauthProvider: { 

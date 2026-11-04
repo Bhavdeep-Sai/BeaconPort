@@ -303,17 +303,36 @@ module.exports = {
 
           // Verify Google token
           const googleResponse = await axios.get(
-            `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${token[0]}`,
+            `https://oauth2.googleapis.com/tokeninfo?access_token=${token[0]}`,
             { timeout: 10000 }
           );
 
-          const { email, id: googleId, name } = googleResponse.data;
+          const { email, id: googleId, sub, aud, azp, email_verified } = googleResponse.data;
+          const oauthId = googleId || sub;
 
-          if (!email || !googleId) {
+          if (!email || !oauthId) {
             cleanupTempFile(tempFilePath);
             return res.status(400).json({
               success: false,
               message: "Invalid Google token - missing user data",
+            });
+          }
+
+          const expectedAud = process.env.GOOGLE_CLIENT_ID;
+          const tokenAud = aud || azp;
+          if (expectedAud && tokenAud !== expectedAud) {
+            cleanupTempFile(tempFilePath);
+            return res.status(403).json({
+              success: false,
+              message: "Google token audience mismatch",
+            });
+          }
+
+          if (email_verified !== "true" && email_verified !== true) {
+            cleanupTempFile(tempFilePath);
+            return res.status(403).json({
+              success: false,
+              message: "Google email is not verified",
             });
           }
 
@@ -448,12 +467,12 @@ module.exports = {
 
       const school = await School.findOne({
         email: email.toLowerCase().trim(),
-      });
+      }).select("+password");
 
       if (!school) {
-        return res.status(404).json({
+        return res.status(401).json({
           success: false,
-          message: "Email not found",
+          message: "Invalid email or password",
         });
       }
 
@@ -470,7 +489,7 @@ module.exports = {
       if (!isAuth) {
         return res.status(401).json({
           success: false,
-          message: "Password is incorrect",
+          message: "Invalid email or password",
         });
       }
 
@@ -518,18 +537,56 @@ module.exports = {
 
   loginSchoolGoogle: async (req, res) => {
     try {
-      const { email } = req.body;
+      const { token } = req.body;
 
+      if (!token) {
+        return res.status(400).json({
+          success: false,
+          message: "Google token is required for OAuth login",
+        });
+      }
+
+      let googleData;
+      try {
+        const googleRes = await axios.get(
+          `https://oauth2.googleapis.com/tokeninfo?access_token=${token}`,
+          { timeout: 10000 }
+        );
+        googleData = googleRes.data;
+      } catch (err) {
+        return res.status(401).json({
+          success: false,
+          message: "Invalid or expired Google token",
+        });
+      }
+
+      const expectedAud = process.env.GOOGLE_CLIENT_ID;
+      const tokenAud = googleData.aud || googleData.azp;
+      if (expectedAud && tokenAud !== expectedAud) {
+        return res.status(403).json({
+          success: false,
+          message: "Google token audience mismatch",
+        });
+      }
+
+      if (googleData.email_verified !== "true" && googleData.email_verified !== true) {
+        return res.status(403).json({
+          success: false,
+          message: "Google email is not verified",
+        });
+      }
+
+      const email = googleData.email ? googleData.email.toLowerCase().trim() : null;
       if (!email) {
         return res.status(400).json({
           success: false,
-          message: "Email is required for OAuth login",
+          message: "Missing email from Google account",
         });
       }
 
       // Find school with Google OAuth
       const school = await School.findOne({
-        email: email.toLowerCase().trim(),
+        email: email,
         oauthProvider: "google",
         isOAuthUser: true,
       });
@@ -546,7 +603,7 @@ module.exports = {
         throw new Error("JWT_SECRET not configured");
       }
 
-      const token = jwt.sign(
+      const jwtToken = jwt.sign(
         {
           id: school._id,
           schoolId: school._id,
@@ -559,7 +616,7 @@ module.exports = {
         { expiresIn: "7d" }
       );
 
-      res.header("Authorization", token);
+      res.header("Authorization", jwtToken);
 
       return res.status(200).json({
         success: true,
@@ -572,7 +629,7 @@ module.exports = {
           email: school.email,
           role: "SCHOOL",
         },
-        token: token,
+        token: jwtToken,
       });
     } catch (error) {
       console.error("Google OAuth login error:", error);
@@ -614,16 +671,17 @@ module.exports = {
         });
       }
 
-      // Generate reset token
+      // Generate reset token and store SHA-256 hash in database
       const resetToken = crypto.randomBytes(32).toString("hex");
+      const hashedToken = crypto.createHash("sha256").update(resetToken).digest("hex");
       const resetTokenExpiry = new Date(Date.now() + 3600000); // 1 hour from now
 
-      // Save reset token to database
-      school.resetPasswordToken = resetToken;
+      // Save hashed reset token to database
+      school.resetPasswordToken = hashedToken;
       school.resetPasswordExpires = resetTokenExpiry;
       await school.save();
 
-      // Create password reset URL
+      // Create password reset URL (contains the unhashed raw token)
       const frontedURL = process.env.FRONTEND_URL;
       const resetURL = `${frontedURL}/reset-password/${resetToken}`;
 
@@ -694,9 +752,10 @@ module.exports = {
         });
       }
 
-      // Find school with valid reset token
+      // Find school with valid SHA-256 hashed reset token
+      const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
       const school = await School.findOne({
-        resetPasswordToken: token,
+        resetPasswordToken: hashedToken,
         resetPasswordExpires: { $gt: new Date() },
       });
 
@@ -707,9 +766,8 @@ module.exports = {
         });
       }
 
-      // Hash new password
-      const salt = bcrypt.genSaltSync(10);
-      const hashPassword = bcrypt.hashSync(newPassword, salt);
+      // Hash new password using async bcrypt
+      const hashPassword = await bcrypt.hash(newPassword, 10);
 
       // Update password and clear reset token
       school.password = hashPassword;
@@ -741,8 +799,9 @@ module.exports = {
         });
       }
 
+      const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
       const school = await School.findOne({
-        resetPasswordToken: token,
+        resetPasswordToken: hashedToken,
         resetPasswordExpires: { $gt: new Date() },
       });
 
@@ -774,7 +833,7 @@ module.exports = {
       const skip = (page - 1) * limit;
 
       const schools = await School.find()
-        .select("-password -__v -resetPasswordToken -resetPasswordExpires")
+        .select("_id schoolName schoolImg")
         .skip(skip)
         .limit(limit)
         .sort({ createdAt: -1 });

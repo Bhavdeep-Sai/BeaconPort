@@ -11,7 +11,7 @@ const studentSchema = new mongoose.Schema({
     parent: {type: String, required: true},
     parentNum: {type: String, required: true},
     studentImg: {type: String, required: true},
-    password: {type: String, required: true},
+    password: {type: String, required: true, select: false},
     createdAt:{ type: Date, default: new Date()}
 })
 
