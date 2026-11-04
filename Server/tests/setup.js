@@ -12,6 +12,25 @@ beforeAll(async () => {
   mongoServer = await MongoMemoryServer.create();
   const uri = mongoServer.getUri();
   await mongoose.connect(uri);
+
+  // Ensure all compound unique indexes are built for tests
+  const Student = require("../models/studentModel");
+  const Teacher = require("../models/teacherModel");
+  const Salary = require("../models/salaryModel");
+  const Attendance = require("../models/attendanceModel");
+  const Fee = require("../models/feeModel");
+  const Class = require("../models/classModel");
+  const Subject = require("../models/subjectModel");
+
+  await Promise.all([
+    Student.syncIndexes(),
+    Teacher.syncIndexes(),
+    Salary.syncIndexes(),
+    Attendance.syncIndexes(),
+    Fee.syncIndexes(),
+    Class.syncIndexes(),
+    Subject.syncIndexes(),
+  ]);
 });
 
 afterEach(async () => {
