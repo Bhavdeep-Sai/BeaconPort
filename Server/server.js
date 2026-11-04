@@ -1,42 +1,8 @@
 require("dotenv").config();
-const express = require("express");
-const cors = require("cors");
 const mongoose = require("mongoose");
-const cookieParser = require("cookie-parser");
 const cron = require("node-cron");
-const path = require("path");
+const app = require("./app");
 const Schedule = require("./models/scheduleModel");
-
-const schoolRouter = require("./routes/schoolRouter");
-const classRouter = require("./routes/classRouter");
-const subjectRouter = require("./routes/subjectRouter");
-const studentRouter = require("./routes/studentRouter");
-const teacherRouter = require("./routes/teacherRouter");
-const scheduleRouter = require("./routes/scheduleRouter");
-const attendanceRouter = require("./routes/attendanceRouter");
-const examinationRouter = require("./routes/examinationRouter");
-const noticeRouter = require("./routes/noticeRouter");
-const aiTutorRoutes = require("./routes/aiTutorRoutes");
-const feeRouter = require("./routes/feeRouter");
-const salaryRouter = require("./routes/salaryRouter");
-
-const app = express();
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(
-  cors({
-    origin: [
-      process.env.FRONTEND_URL,
-      "http://localhost:5173",
-      "http://localhost:5174",
-      "http://localhost:3000",
-    ].filter(Boolean),
-    credentials: true,
-  })
-);
-
-app.use(cookieParser());
-
 
 // MongoDB connection
 mongoose
@@ -93,20 +59,6 @@ function setupScheduleCleanupJob() {
     }
   );
 }
-
-// Routes
-app.use("/api/school", schoolRouter);
-app.use("/api/class", classRouter);
-app.use("/api/subject", subjectRouter);
-app.use("/api/student", studentRouter);
-app.use("/api/ai-tutor", aiTutorRoutes);
-app.use("/api/teacher", teacherRouter);
-app.use("/api/schedule", scheduleRouter);
-app.use("/api/attendance", attendanceRouter);
-app.use("/api/examination", examinationRouter);
-app.use("/api/notice", noticeRouter);
-app.use("/api/fee", feeRouter);
-app.use("/api/salary", salaryRouter);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
