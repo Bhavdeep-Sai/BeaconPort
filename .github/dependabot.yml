@@ -1,6 +1,6 @@
 version: 2
 updates:
-  # Maintain Server npm dependencies
+  # Maintain Server npm dependencies (grouped into a single PR)
   - package-ecosystem: "npm"
     directory: "/Server"
     schedule:
@@ -8,11 +8,15 @@ updates:
       day: "monday"
       time: "06:00"
       timezone: "Etc/UTC"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 3
+    groups:
+      server-dependencies:
+        patterns:
+          - "*"
     commit-message:
       prefix: "chore(deps-server)"
 
-  # Maintain Client npm dependencies
+  # Maintain Client npm dependencies (grouped into a single PR)
   - package-ecosystem: "npm"
     directory: "/Client"
     schedule:
@@ -20,11 +24,15 @@ updates:
       day: "monday"
       time: "06:00"
       timezone: "Etc/UTC"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 3
+    groups:
+      client-dependencies:
+        patterns:
+          - "*"
     commit-message:
       prefix: "chore(deps-client)"
 
-  # Maintain GitHub Actions dependencies
+  # Maintain GitHub Actions dependencies (grouped into a single PR)
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
@@ -32,6 +40,10 @@ updates:
       day: "monday"
       time: "06:00"
       timezone: "Etc/UTC"
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 3
+    groups:
+      action-dependencies:
+        patterns:
+          - "*"
     commit-message:
       prefix: "chore(deps-actions)"
