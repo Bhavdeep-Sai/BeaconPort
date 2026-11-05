@@ -5,6 +5,11 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const cloudinary = require("../config/cloudinary"); // Import Cloudinary config
 const escapeRegex = require("../utils/escapeRegex");
+const {
+  encryptCredential,
+  decryptCredential,
+  generateStudentPassword,
+} = require("../utils/credentialCrypto");
 
 module.exports = {
   registerStudent: async (req, res) => {
@@ -61,7 +66,13 @@ module.exports = {
           });
         }
 
-        const hashedPassword = await bcrypt.hash(fields.password[0], 10);
+        const rawPassword =
+          (fields.password &&
+            fields.password[0] &&
+            fields.password[0].trim()) ||
+          generateStudentPassword();
+        const hashedPassword = await bcrypt.hash(rawPassword, 10);
+        const encryptedPassword = encryptCredential(rawPassword);
 
         const newStudent = new Student({
           school: req.user.schoolId,
@@ -75,12 +86,15 @@ module.exports = {
           studentImg: cloudinaryResult.secure_url, // Store Cloudinary URL
           cloudinaryPublicId: cloudinaryResult.public_id, // Store public_id for deletion
           password: hashedPassword,
+          encryptedPassword: encryptedPassword,
           enrolledSubjects: fields.enrolledSubjects ? JSON.parse(fields.enrolledSubjects[0]) : [],
         });
 
         const savedStudent = await newStudent.save();
         const studentResponse = savedStudent.toObject();
         delete studentResponse.password;
+        delete studentResponse.encryptedPassword;
+        studentResponse.assignedPassword = rawPassword;
 
         res.status(200).json({
           success: true,
@@ -211,7 +225,7 @@ module.exports = {
         _id: id,
         school: schoolId,
       })
-        .select("-password")
+        .select("-password +encryptedPassword")
         .populate('studentClass');
 
       if (!student) {
@@ -220,7 +234,13 @@ module.exports = {
           .json({ success: false, message: "Student Not Found" });
       }
 
-      res.status(200).json({ success: true, student });
+      const studentObj = student.toObject();
+      if (student.encryptedPassword) {
+        studentObj.password = decryptCredential(student.encryptedPassword);
+      }
+      delete studentObj.encryptedPassword;
+
+      res.status(200).json({ success: true, student: studentObj });
     } catch (error) {
       console.error("Get Student own data error:", error);
       res
@@ -233,7 +253,7 @@ module.exports = {
     try {
       const id = req.params.id;
       const schoolId = req.user.schoolId;
-      const student = await Student.findOne({ _id: id, school: schoolId }).select("-password");
+      const student = await Student.findOne({ _id: id, school: schoolId }).select("-password +encryptedPassword");
 
       if (!student) {
         return res
@@ -241,7 +261,13 @@ module.exports = {
           .json({ success: false, message: "Student Not Found" });
       }
 
-      res.status(200).json({ success: true, student });
+      const studentObj = student.toObject();
+      if (student.encryptedPassword) {
+        studentObj.password = decryptCredential(student.encryptedPassword);
+      }
+      delete studentObj.encryptedPassword;
+
+      res.status(200).json({ success: true, student: studentObj });
     } catch (error) {
       console.error("Get Student by id error:", error);
       res
@@ -435,6 +461,44 @@ module.exports = {
       });
     } catch (error) {
       console.error("Delete Student error:", error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal Server Error" });
+    }
+  },
+
+  resetStudentPassword: async (req, res) => {
+    try {
+      const id = req.params.id;
+      const schoolId = req.user.schoolId;
+      const { password } = req.body;
+
+      if (!password || typeof password !== "string" || password.trim().length < 6) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Password must be at least 6 characters" });
+      }
+
+      const cleanPassword = password.trim();
+      const student = await Student.findOne({ _id: id, school: schoolId });
+
+      if (!student) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Student Not Found" });
+      }
+
+      student.password = await bcrypt.hash(cleanPassword, 10);
+      student.encryptedPassword = encryptCredential(cleanPassword);
+      await student.save();
+
+      res.status(200).json({
+        success: true,
+        message: "Student password reset successfully",
+        password: cleanPassword,
+      });
+    } catch (error) {
+      console.error("Reset Student password error:", error);
       res
         .status(500)
         .json({ success: false, message: "Internal Server Error" });

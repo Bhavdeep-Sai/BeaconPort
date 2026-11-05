@@ -11,6 +11,7 @@ const teacherSchema = new mongoose.Schema({
     gender: { type: String, required: true },
     teacherImg: { type: String, required: true },
     password: { type: String, required: true, select: false },
+    encryptedPassword: { type: String, select: false },
     salary: { type: Number, default: 0 },
 }, { timestamps: true });
 

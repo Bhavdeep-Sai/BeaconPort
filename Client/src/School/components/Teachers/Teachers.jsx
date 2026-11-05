@@ -96,10 +96,23 @@ export default function Teachers() {
     });
   }, [search, filterClass, filterSubject]);
 
+  const generateBptPassword = () => `BPT-${Math.floor(1000 + Math.random() * 9000)}`;
+
   /* form actions */
   const openAdd = () => {
     setEditing(null);
-    setForm({ name: '', email: '', qualification: '', age: '', gender: '', subjects: [], teacherClasses: [], attendeeClasses: [], password: '', salary: '' });
+    setForm({
+      name: '',
+      email: '',
+      qualification: '',
+      age: '',
+      gender: '',
+      subjects: [],
+      teacherClasses: [],
+      attendeeClasses: [],
+      password: generateBptPassword(),
+      salary: '',
+    });
     setImageFile(null);
     setShowForm(true);
   };
@@ -147,7 +160,7 @@ export default function Teachers() {
       fd.append('age', form.age || '');
       fd.append('gender', form.gender || '');
       fd.append('salary', form.salary || '0');
-      if (!editing) fd.append('password', form.password || '');
+      if (form.password && form.password.trim()) fd.append('password', form.password.trim());
       if (form.subjects?.length) fd.append('subjects', JSON.stringify(form.subjects));
       if (form.teacherClasses?.length) fd.append('teacherClasses', JSON.stringify(form.teacherClasses));
 
@@ -157,6 +170,9 @@ export default function Teachers() {
       let savedTeacherId = editing;
       if (editing) {
         await axios.put(`${baseApi}/teacher/update/${editing}`, fd, { headers });
+        if (form.password && form.password.trim()) {
+          await axios.put(`${baseApi}/teacher/reset-password/${editing}`, { password: form.password.trim() }, { headers: authHeaders });
+        }
       } else {
         const res = await axios.post(`${baseApi}/teacher/register`, fd, { headers });
         savedTeacherId = res.data.teacher?._id || res.data._id;
@@ -764,15 +780,24 @@ export default function Teachers() {
                 <p className="text-[11px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-3">Account</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-medium text-gray-700 dark:text-slate-400">{editing ? 'New Password' : 'Password *'}</label>
-                    <input
-                      required={!editing}
-                      type="password"
-                      placeholder={editing ? 'Leave blank to keep current' : 'Set a secure password'}
-                      value={form.password}
-                      onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
-                      className="bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 focus:border-orange-500 rounded-lg px-4 py-2.5 text-sm text-gray-900 dark:text-slate-100 outline-none transition-colors placeholder-gray-400 dark:placeholder-slate-600"
-                    />
+                    <label className="text-xs font-medium text-gray-700 dark:text-slate-400">{editing ? 'Reset Password' : 'Password (default BPT-XXXX)'}</label>
+                    <div className="relative flex items-center">
+                      <input
+                        required={!editing}
+                        type="text"
+                        placeholder={editing ? 'Leave blank to keep current' : 'Set a secure password'}
+                        value={form.password}
+                        onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
+                        className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 focus:border-orange-500 rounded-lg px-4 py-2.5 text-sm text-gray-900 dark:text-slate-100 outline-none transition-colors placeholder-gray-400 dark:placeholder-slate-600 font-mono pr-28"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setForm(f => ({ ...f, password: generateBptPassword() }))}
+                        className="absolute right-2 px-2.5 py-1 text-xs font-semibold rounded-lg bg-orange-500/10 text-orange-600 dark:text-orange-400 hover:bg-orange-500/20 transition-colors"
+                      >
+                        Auto BPT
+                      </button>
+                    </div>
                   </div>
                   <div className="flex flex-col gap-1.5">
                     <label className="text-xs font-medium text-gray-700 dark:text-slate-400">Profile Photo</label>

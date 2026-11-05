@@ -76,11 +76,37 @@ export default function Students() {
   useEffect(() => { fetchClasses(); fetchSubjects(); }, []);
   useEffect(() => { fetchStudents({ search: search || undefined, studentClass: filterClass || undefined }); }, [search, filterClass]);
 
+  const generateBpsPassword = () => `BPS-${Math.floor(1000 + Math.random() * 9000)}`;
+
   // Form handling
-  const openAdd = () => { setEditing(null); setForm({ name: '', email: '', studentClass: '', age: '', gender: '', parent: '', parentNum: '', password: '' }); setImageFile(null); setShowForm(true); };
+  const openAdd = () => {
+    setEditing(null);
+    setForm({
+      name: '',
+      email: '',
+      studentClass: '',
+      age: '',
+      gender: '',
+      parent: '',
+      parentNum: '',
+      password: generateBpsPassword(),
+    });
+    setImageFile(null);
+    setShowForm(true);
+  };
+
   const openEdit = (s) => {
     setEditing(s._id);
-    setForm({ name: s.name || '', email: s.email || '', studentClass: s.studentClass?._id || '', age: s.age || '', gender: s.gender || '', parent: s.parent || '', parentNum: s.parentNum || '', password: '' });
+    setForm({
+      name: s.name || '',
+      email: s.email || '',
+      studentClass: s.studentClass?._id || '',
+      age: s.age || '',
+      gender: s.gender || '',
+      parent: s.parent || '',
+      parentNum: s.parentNum || '',
+      password: '',
+    });
     setImageFile(null);
     setShowForm(true);
   };
@@ -97,11 +123,14 @@ export default function Students() {
       fd.append('studentClass', form.studentClass); fd.append('age', form.age);
       fd.append('gender', form.gender); fd.append('parent', form.parent);
       fd.append('parentNum', form.parentNum);
-      if (!editing) fd.append('password', form.password || '');
+      if (form.password && form.password.trim()) fd.append('password', form.password.trim());
 
       const token = localStorage.getItem('token');
       if (editing) {
         await axios.put(`${baseApi}/student/update/${editing}`, fd, { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' } });
+        if (form.password && form.password.trim()) {
+          await axios.put(`${baseApi}/student/reset-password/${editing}`, { password: form.password.trim() }, { headers: { Authorization: `Bearer ${token}` } });
+        }
       } else {
         await axios.post(`${baseApi}/student/register`, fd, { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' } });
       }
@@ -252,6 +281,11 @@ export default function Students() {
                   <div className="text-gray-500 dark:text-slate-500 text-xs mt-0.5">{s.parent}{s.parentNum ? ` · ${s.parentNum}` : ''}</div>
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
+                  {passwordVisibility[s._id] && (
+                    <span className="font-mono text-xs bg-orange-50 dark:bg-orange-950/40 border border-orange-200 dark:border-orange-800 text-orange-700 dark:text-orange-300 px-2 py-0.5 rounded font-semibold">
+                      {s.password || 'N/A'}
+                    </span>
+                  )}
                   <button onClick={() => togglePasswordVisibility(s._id)} className="text-gray-400 hover:text-gray-600 dark:hover:text-slate-300 p-1 cursor-pointer">
                     {passwordVisibility[s._id] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -321,7 +355,22 @@ export default function Students() {
                 </select>
                 <input placeholder="Parent / Guardian" value={form.parent} onChange={e => setForm(f => ({ ...f, parent: e.target.value }))} className="bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2.5 text-gray-900 dark:text-slate-100" />
                 <input placeholder="Parent phone" value={form.parentNum} onChange={e => setForm(f => ({ ...f, parentNum: e.target.value }))} className="bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2.5 text-gray-900 dark:text-slate-100" />
-                {!editing && <input placeholder="Password" type="password" value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))} className="bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2.5 text-gray-900 dark:text-slate-100" />}
+                <div className="relative flex items-center md:col-span-2">
+                  <input
+                    placeholder={editing ? "Reset password (leave blank to keep current)" : "Password (default BPS-XXXX)"}
+                    type="text"
+                    value={form.password}
+                    onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
+                    className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2.5 text-gray-900 dark:text-slate-100 pr-28 text-sm font-mono"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setForm(f => ({ ...f, password: generateBpsPassword() }))}
+                    className="absolute right-2 px-2.5 py-1 text-xs font-semibold rounded-lg bg-orange-500/10 text-orange-600 dark:text-orange-400 hover:bg-orange-500/20 transition-colors"
+                  >
+                    Auto BPS
+                  </button>
+                </div>
               </div>
 
               <div className="mt-4 flex items-center gap-3">

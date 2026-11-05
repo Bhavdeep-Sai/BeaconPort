@@ -60,7 +60,7 @@ const demoAccounts = {
   teacher: {
     title: 'Demo Teacher (Mathematics)',
     email: 'teacher.math@beaconport.com',
-    password: 'demo1234',
+    password: 'BPT-1001',
     badge: 'Demo Teacher Ready',
     hint: 'Sarah Jenkins • Class 8A, 9A, 10A • Schedule & attendance management',
     theme: 'border-blue-500/30 bg-blue-500/10 text-blue-400 btn:bg-blue-500 hover:bg-blue-600',
@@ -68,7 +68,7 @@ const demoAccounts = {
   student: {
     title: 'Demo Student (Class 8A)',
     email: 'student1@beaconport.com',
-    password: 'demo1234',
+    password: 'BPS-1001',
     badge: 'Demo Student Ready',
     hint: 'Aarav Sharma • Timetable, exams, fee status & AI Tutor',
     theme: 'border-green-500/30 bg-green-500/10 text-green-400 btn:bg-green-500 hover:bg-green-600',

@@ -9,6 +9,7 @@
     "seed": "node scripts/seedDemoSchool.js",
     "test": "jest --runInBand --detectOpenHandles --forceExit",
     "migrate:indexes": "node scripts/migrations/addIndexes.js",
+    "migrate:credentials": "node scripts/migrations/backfillCredentials.js",
     "perf:explain": "node scripts/perf/explainReport.js",
     "job:schedule-cleanup": "node jobs/run.js scheduleCleanup",
     "job:fee-overdue": "node jobs/run.js feeOverdue",
