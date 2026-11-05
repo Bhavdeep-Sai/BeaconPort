@@ -25,6 +25,9 @@ const salaryRouter = require("./routes/salaryRouter");
 
 const app = express();
 
+// Trust first proxy (Nginx) for client IP detection via X-Forwarded-For
+app.set("trust proxy", 1);
+
 // 4.3 Structured Logging with Pino-HTTP & Request Tracing
 app.use(loggingMiddleware);
 
@@ -67,7 +70,7 @@ app.use(
 const isTest = process.env.NODE_ENV === "test";
 
 const authLimiter = rateLimit({
-  windowMs: isTest ? 1000 : 15 * 60 * 1000,
+  windowMs: isTest ? 60 * 1000 : 15 * 60 * 1000,
   max: isTest ? 5 : 20, // 5 attempts in tests to trigger 429 easily
   standardHeaders: true,
   legacyHeaders: false,
