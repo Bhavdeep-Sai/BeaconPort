@@ -12,6 +12,7 @@ const studentSchema = new mongoose.Schema({
     parentNum: { type: String, required: true },
     studentImg: { type: String, required: true },
     password: { type: String, required: true, select: false },
+    encryptedPassword: { type: String, select: false },
 }, { timestamps: true });
 
 // Multi-tenant indexes

@@ -1,5 +1,5 @@
 const express = require('express');
-const { registerStudent, loginStudent, getStudentsWithQuery, getStudentOwnData, updateStudent, deleteStudentWithId, fetchStudentWithId} = require('../controllers/studentController');
+const { registerStudent, loginStudent, getStudentsWithQuery, getStudentOwnData, updateStudent, deleteStudentWithId, fetchStudentWithId, resetStudentPassword } = require('../controllers/studentController');
 const authMiddleware = require('../auth/auth');
 const router = express.Router();
 
@@ -9,6 +9,7 @@ router.get('/fetch-with-query', authMiddleware(['SCHOOL', 'TEACHER']), getStuden
 router.get('/fetch-single', authMiddleware(['STUDENT']), getStudentOwnData);
 router.get('/fetch/:id', authMiddleware(['SCHOOL']), fetchStudentWithId);
 router.put('/update/:id', authMiddleware(['SCHOOL']), updateStudent);
+router.put('/reset-password/:id', authMiddleware(['SCHOOL']), resetStudentPassword);
 router.delete('/delete/:id', authMiddleware(['SCHOOL']), deleteStudentWithId);
 
 module.exports = router;

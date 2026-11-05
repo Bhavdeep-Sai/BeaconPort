@@ -1,6 +1,7 @@
 require("dotenv").config({ path: require("path").join(__dirname, "../.env") });
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
+const { encryptCredential } = require("../utils/credentialCrypto");
 
 const School = require("../models/schoolModel");
 const Teacher = require("../models/teacherModel");
@@ -140,7 +141,8 @@ async function seed() {
       age: 34,
       gender: "Female",
       teacherImg: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=500&auto=format&fit=crop&q=80",
-      password: "demo1234",
+      password: await bcrypt.hash("BPT-1001", 10),
+      encryptedPassword: encryptCredential("BPT-1001"),
       salary: 45000,
     },
     {
@@ -153,7 +155,8 @@ async function seed() {
       age: 42,
       gender: "Male",
       teacherImg: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80",
-      password: "demo1234",
+      password: await bcrypt.hash("BPT-1002", 10),
+      encryptedPassword: encryptCredential("BPT-1002"),
       salary: 52000,
     },
     {
@@ -166,7 +169,8 @@ async function seed() {
       age: 29,
       gender: "Female",
       teacherImg: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=500&auto=format&fit=crop&q=80",
-      password: "demo1234",
+      password: await bcrypt.hash("BPT-1003", 10),
+      encryptedPassword: encryptCredential("BPT-1003"),
       salary: 40000,
     },
     {
@@ -179,7 +183,8 @@ async function seed() {
       age: 36,
       gender: "Male",
       teacherImg: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&auto=format&fit=crop&q=80",
-      password: "demo1234",
+      password: await bcrypt.hash("BPT-1004", 10),
+      encryptedPassword: encryptCredential("BPT-1004"),
       salary: 55000,
     },
     {
@@ -192,7 +197,8 @@ async function seed() {
       age: 45,
       gender: "Male",
       teacherImg: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500&auto=format&fit=crop&q=80",
-      password: "demo1234",
+      password: await bcrypt.hash("BPT-1005", 10),
+      encryptedPassword: encryptCredential("BPT-1005"),
       salary: 48000,
     },
   ];
@@ -211,6 +217,7 @@ async function seed() {
     const s = studentNames[i];
     const assignedClass = i < 12 ? class8A : i < 24 ? class9A : class10A;
     const studentAge = i < 12 ? 13 + (i % 2) : i < 24 ? 14 + (i % 2) : 15 + (i % 2);
+    const studentPass = `BPS-${1000 + i + 1}`;
 
     studentsToInsert.push({
       school: schoolId,
@@ -223,7 +230,8 @@ async function seed() {
       parent: s.parent,
       parentNum: s.parentNum,
       studentImg: s.img,
-      password: "demo1234",
+      password: await bcrypt.hash(studentPass, 10),
+      encryptedPassword: encryptCredential(studentPass),
     });
   }
   const createdStudents = await Student.insertMany(studentsToInsert);

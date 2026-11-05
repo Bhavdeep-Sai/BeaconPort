@@ -6,6 +6,11 @@ const path = require("path");
 const fs = require("fs");
 const jwt = require("jsonwebtoken");
 const cloudinary = require("../config/cloudinary"); // Import your cloudinary config
+const {
+  encryptCredential,
+  decryptCredential,
+  generateTeacherPassword,
+} = require("../utils/credentialCrypto");
 
 module.exports = {
   registerTeacher: async (req, res) => {
@@ -105,7 +110,13 @@ module.exports = {
           }
         }
 
-        const hashedPassword = await bcrypt.hash(fields.password[0], 10);
+        const rawPassword =
+          (fields.password &&
+            fields.password[0] &&
+            fields.password[0].trim()) ||
+          generateTeacherPassword();
+        const hashedPassword = await bcrypt.hash(rawPassword, 10);
+        const encryptedPassword = encryptCredential(rawPassword);
 
         const newTeacher = new Teacher({
           school: req.user.schoolId,
@@ -119,12 +130,15 @@ module.exports = {
           teacherImg: cloudinaryResult.secure_url, // Store Cloudinary URL
           teacherImgPublicId: cloudinaryResult.public_id, // Store public_id for deletion
           password: hashedPassword,
+          encryptedPassword: encryptedPassword,
           salary: fields.salary && fields.salary[0] ? parseFloat(fields.salary[0]) : 0,
         });
 
         const savedTeacher = await newTeacher.save();
         const teacherResponse = savedTeacher.toObject();
         delete teacherResponse.password;
+        delete teacherResponse.encryptedPassword;
+        teacherResponse.assignedPassword = rawPassword;
 
         res.status(200).json({
           success: true,
@@ -259,7 +273,7 @@ module.exports = {
       const teacher = await Teacher.findOne({ _id: id, school: schoolId })
         .populate("teacherClasses")
         .populate("subjects")
-        .select("-password");
+        .select("-password +encryptedPassword");
 
       if (!teacher) {
         return res
@@ -267,7 +281,13 @@ module.exports = {
           .json({ success: false, message: "Teacher Not Found" });
       }
 
-      res.status(200).json({ success: true, teacher });
+      const teacherObj = teacher.toObject();
+      if (teacher.encryptedPassword) {
+        teacherObj.password = decryptCredential(teacher.encryptedPassword);
+      }
+      delete teacherObj.encryptedPassword;
+
+      res.status(200).json({ success: true, teacher: teacherObj });
     } catch (error) {
       console.error("Get Teacher own data error:", error);
       res
@@ -283,7 +303,7 @@ module.exports = {
       const teacher = await Teacher.findOne({ _id: id, school: schoolId })
         .populate("teacherClasses")
         .populate("subjects")
-        .select("-password");
+        .select("-password +encryptedPassword");
 
       if (!teacher) {
         return res
@@ -291,7 +311,13 @@ module.exports = {
           .json({ success: false, message: "Teacher Not Found" });
       }
 
-      res.status(200).json({ success: true, teacher });
+      const teacherObj = teacher.toObject();
+      if (teacher.encryptedPassword) {
+        teacherObj.password = decryptCredential(teacher.encryptedPassword);
+      }
+      delete teacherObj.encryptedPassword;
+
+      res.status(200).json({ success: true, teacher: teacherObj });
     } catch (error) {
       console.error("Get Teacher by id error:", error);
       res
@@ -533,5 +559,43 @@ module.exports = {
         message: "Error cleaning up orphaned images"
       });
     }
-  }
+  },
+
+  resetTeacherPassword: async (req, res) => {
+    try {
+      const id = req.params.id;
+      const schoolId = req.user.schoolId;
+      const { password } = req.body;
+
+      if (!password || typeof password !== "string" || password.trim().length < 6) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Password must be at least 6 characters" });
+      }
+
+      const cleanPassword = password.trim();
+      const teacher = await Teacher.findOne({ _id: id, school: schoolId });
+
+      if (!teacher) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Teacher Not Found" });
+      }
+
+      teacher.password = await bcrypt.hash(cleanPassword, 10);
+      teacher.encryptedPassword = encryptCredential(cleanPassword);
+      await teacher.save();
+
+      res.status(200).json({
+        success: true,
+        message: "Teacher password reset successfully",
+        password: cleanPassword,
+      });
+    } catch (error) {
+      console.error("Reset Teacher password error:", error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal Server Error" });
+    }
+  },
 };
