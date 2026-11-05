@@ -2,6 +2,12 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { baseApi } from '../../../../environment';
 
+const getSchoolImgSrc = (img) => {
+  if (!img) return '/bell.svg';
+  if (img.startsWith('http://') || img.startsWith('https://') || img.startsWith('/')) return img;
+  return `./images/uploaded/school/${img}`;
+};
+
 export default function Gallery() {
   const [schools, setSchools] = useState([]);
   const [selected, setSelected] = useState(null);
@@ -19,7 +25,7 @@ export default function Gallery() {
         {schools.map((school) => (
           <div key={school._id} onClick={() => setSelected(school)}
             className="cursor-pointer rounded-xl overflow-hidden border border-gray-700 bg-gray-800 hover:border-orange-500/50 transition-all group">
-            <img src={`./images/uploaded/school/${school.schoolImg}`} alt={school.schoolName}
+            <img src={getSchoolImgSrc(school.schoolImg)} alt={school.schoolName}
               loading="lazy" className="w-full h-36 object-cover group-hover:scale-105 transition-transform duration-300" />
             <div className="px-3 py-2">
               <p className="text-sm font-medium text-gray-200 truncate">{school.schoolName}</p>
@@ -32,7 +38,7 @@ export default function Gallery() {
         <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4" onClick={() => setSelected(null)}>
           <div className="bg-gray-900 rounded-2xl overflow-hidden max-w-lg w-full border border-gray-700 shadow-2xl" onClick={e => e.stopPropagation()}>
             <h3 className="text-center font-bold text-xl text-orange-400 py-3 border-b border-gray-700">{selected.schoolName}</h3>
-            <img src={`./images/uploaded/school/${selected.schoolImg}`} alt={selected.schoolName} className="w-full max-h-[70vh] object-contain" />
+            <img src={getSchoolImgSrc(selected.schoolImg)} alt={selected.schoolName} className="w-full max-h-[70vh] object-contain" />
             <div className="p-3 text-center">
               <button onClick={() => setSelected(null)} className="text-sm text-gray-400 hover:text-white transition-colors">Close</button>
             </div>

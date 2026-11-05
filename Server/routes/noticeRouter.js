@@ -1,19 +1,25 @@
 const express = require("express");
 const authMiddleware = require("../auth/auth");
+const validateRequest = require("../middleware/validateRequest");
+const {
+  createNoticeSchema,
+  updateNoticeSchema,
+  batchDeleteNoticeSchema,
+} = require("../schemas/noticeSchemas");
+
 const router = express.Router();
 
 const {
-    createNotice,
-    getAllNotices,
-    getNoticeById,
-    getNoticesByAudience,
-    updateNoticeWithId,
-    deleteNoticeWithId,
-    batchDeleteNotices,
-    getImportantNotices,
-    getActiveNotices,
+  createNotice,
+  getAllNotices,
+  getNoticeById,
+  getNoticesByAudience,
+  updateNoticeWithId,
+  deleteNoticeWithId,
+  batchDeleteNotices,
+  getImportantNotices,
+  getActiveNotices,
 } = require("../controllers/noticeController");
-
 
 router.get("/all", authMiddleware(["SCHOOL", "TEACHER", "STUDENT"]), getAllNotices);
 router.get("/important", authMiddleware(["SCHOOL", "TEACHER", "STUDENT"]), getImportantNotices);
@@ -21,9 +27,27 @@ router.get("/active", authMiddleware(["SCHOOL", "TEACHER", "STUDENT"]), getActiv
 router.get("/audience/:audience", authMiddleware(["SCHOOL", "TEACHER", "STUDENT"]), getNoticesByAudience);
 router.get("/:id", authMiddleware(["SCHOOL", "TEACHER", "STUDENT"]), getNoticeById);
 
-router.post("/create", authMiddleware(["SCHOOL", "TEACHER"]), createNotice);
-router.put("/:id", authMiddleware(["SCHOOL", "TEACHER"]), updateNoticeWithId);
+router.post(
+  "/create",
+  authMiddleware(["SCHOOL", "TEACHER"]),
+  validateRequest({ body: createNoticeSchema }),
+  createNotice
+);
+
+router.put(
+  "/:id",
+  authMiddleware(["SCHOOL", "TEACHER"]),
+  validateRequest({ body: updateNoticeSchema }),
+  updateNoticeWithId
+);
+
 router.delete("/:id", authMiddleware(["SCHOOL", "TEACHER"]), deleteNoticeWithId);
-router.post("/batch-delete", authMiddleware(["SCHOOL", "TEACHER"]), batchDeleteNotices);
+
+router.post(
+  "/batch-delete",
+  authMiddleware(["SCHOOL", "TEACHER"]),
+  validateRequest({ body: batchDeleteNoticeSchema }),
+  batchDeleteNotices
+);
 
 module.exports = router;

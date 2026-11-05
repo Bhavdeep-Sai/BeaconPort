@@ -177,11 +177,39 @@ module.exports = {
         });
       }
       
-      let updateData = { ...otherData };
+      // Whitelist fields to prevent mass assignment
+      const updateData = {};
       
       // Update status if provided
       if (status && ['active', 'cancelled'].includes(status)) {
         updateData.status = status;
+      }
+
+      if (req.body.teacher) {
+        const Teacher = require('../models/teacherModel');
+        const teacherExists = await Teacher.exists({ _id: req.body.teacher, school: schoolId });
+        if (!teacherExists) {
+          return res.status(400).json({ success: false, message: "Teacher not found in this school" });
+        }
+        updateData.teacher = req.body.teacher;
+      }
+
+      if (req.body.subject) {
+        const Subject = require('../models/subjectModel');
+        const subjectExists = await Subject.exists({ _id: req.body.subject, school: schoolId });
+        if (!subjectExists) {
+          return res.status(400).json({ success: false, message: "Subject not found in this school" });
+        }
+        updateData.subject = req.body.subject;
+      }
+
+      if (req.body.class) {
+        const Class = require('../models/classModel');
+        const classExists = await Class.exists({ _id: req.body.class, school: schoolId });
+        if (!classExists) {
+          return res.status(400).json({ success: false, message: "Class not found in this school" });
+        }
+        updateData.class = req.body.class;
       }
       
       // If we have date and time information, update the datetime fields
@@ -226,12 +254,11 @@ module.exports = {
         });
       }
       
-      await Schedule.findOneAndUpdate(
+      const scheduleAfterUpdate = await Schedule.findOneAndUpdate(
         { _id: id, school: schoolId }, 
-        { $set: updateData }
-      );
-      
-      const scheduleAfterUpdate = await Schedule.findOne({ _id: id })
+        { $set: updateData },
+        { new: true }
+      )
         .populate('teacher', 'name')
         .populate('subject', 'subjectName');
         

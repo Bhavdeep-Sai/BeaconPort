@@ -6,7 +6,7 @@ const schoolSchema = new mongoose.Schema({
     ownerName: { type: String, required: true },
     schoolImg: { type: String, required: true }, 
     schoolImgPublicId: { type: String }, 
-    password: { type: String, required: true },
+    password: { type: String, required: true, select: false },
         
     isOAuthUser: { type: Boolean, default: false },
     oauthProvider: { 
@@ -24,9 +24,7 @@ const schoolSchema = new mongoose.Schema({
         enum: ['monthly', 'quarterly', 'half-yearly', 'annual'],
         default: 'half-yearly',
     },
-
-    createdAt: { type: Date, default: new Date() }
-});
+}, { timestamps: true });
 
 schoolSchema.index({ email: 1, oauthProvider: 1 });
 schoolSchema.index({ resetPasswordToken: 1 });

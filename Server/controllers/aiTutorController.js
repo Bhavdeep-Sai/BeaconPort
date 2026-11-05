@@ -2,13 +2,53 @@ require("dotenv").config();
 const Student = require("../models/studentModel");
 const ChatHistory = require("../models/chatHistoryModel");
 const axios = require('axios');
+const { escapeRegex } = require("../utils/escapeRegex");
+
+const studentDailyUsage = new Map();
+
+function checkAndIncrementQuota(studentId) {
+  const today = new Date().toISOString().slice(0, 10);
+  const key = `${studentId}:${today}`;
+  const currentCount = studentDailyUsage.get(key) || 0;
+  if (currentCount >= 50) {
+    return false;
+  }
+  studentDailyUsage.set(key, currentCount + 1);
+  return true;
+}
 
 module.exports = {
+  // Exported for testing reset capability
+  _resetDailyUsage: () => studentDailyUsage.clear(),
+
   getAITutorResponse: async (req, res) => {
     try {
       const { message, context, previous_messages, sessionId } = req.body;
       const studentId = req.user.id;
       const schoolId = req.user.schoolId;
+
+      // Validate message input to prevent denial of service and cost runaway
+      if (!message || typeof message !== 'string' || message.trim().length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: "A non-empty message string is required"
+        });
+      }
+
+      if (message.length > 1000) {
+        return res.status(400).json({
+          success: false,
+          message: "Message exceeds maximum allowed length of 1000 characters"
+        });
+      }
+
+      // Check per-student daily quota (50 requests/day)
+      if (!checkAndIncrementQuota(studentId)) {
+        return res.status(429).json({
+          success: false,
+          message: "Daily message quota of 50 messages reached for AI Tutor. Please try again tomorrow."
+        });
+      }
       
       // Check if Gemini API key is configured
       if (!process.env.GEMINI_API_KEY) {
@@ -59,15 +99,18 @@ module.exports = {
       // Build conversation history for Gemini
       let conversationHistory = systemPrompt + "\n\n";
       
-      // Add previous messages if available
-      if (previous_messages && previous_messages.length > 0) {
-        const recentMessages = previous_messages.slice(-10); // Last 10 messages
+      // Add previous messages if available (keep at most last 10 turns, capped at 1000 chars each)
+      if (Array.isArray(previous_messages) && previous_messages.length > 0) {
+        const recentMessages = previous_messages.slice(-10);
         conversationHistory += "Previous conversation:\n";
         recentMessages.forEach(msg => {
-          if (msg.role === 'user') {
-            conversationHistory += `Student: ${msg.content}\n`;
-          } else if (msg.role === 'assistant') {
-            conversationHistory += `Tutor: ${msg.content}\n`;
+          if (msg && typeof msg.content === 'string' && ['user', 'assistant'].includes(msg.role)) {
+            const safeContent = msg.content.slice(0, 1000);
+            if (msg.role === 'user') {
+              conversationHistory += `Student: ${safeContent}\n`;
+            } else if (msg.role === 'assistant') {
+              conversationHistory += `Tutor: ${safeContent}\n`;
+            }
           }
         });
       }
@@ -78,9 +121,10 @@ module.exports = {
 
       try {
         console.log('Calling Gemini API...');
+        const geminiModel = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
         
         const geminiResponse = await axios.post(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${process.env.GEMINI_API_KEY}`,
+          `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent`,
           {
             contents: [
               {
@@ -118,7 +162,8 @@ module.exports = {
           },
           {
             headers: {
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
+              'x-goog-api-key': process.env.GEMINI_API_KEY,
             },
             timeout: 30000 // 30 second timeout
           }
@@ -290,12 +335,15 @@ module.exports = {
 
       let query = { student: studentId, isActive: false }; // Only show completed sessions
       
-      // Add search functionality
+      // Add search functionality with ReDoS protection
       if (search) {
-        query.$or = [
-          { title: { $regex: search, $options: 'i' } },
-          { context: { $regex: search, $options: 'i' } }
-        ];
+        const safeSearch = escapeRegex(search, 50);
+        if (safeSearch) {
+          query.$or = [
+            { title: { $regex: safeSearch, $options: 'i' } },
+            { context: { $regex: safeSearch, $options: 'i' } }
+          ];
+        }
       }
 
       const chatSessions = await ChatHistory.find(query)
