@@ -1,0 +1,23 @@
+# Root Docker Build Context Exclusions
+node_modules
+*/node_modules
+npm-debug.log*
+
+# Environment and Secret files
+.env
+.env.*
+!.env.example
+*.local.md
+
+# Build outputs
+Client/dist/
+Client/node_modules/
+Server/node_modules/
+Server/coverage/
+Server/tests/
+
+# Git & Documentation
+.git/
+.github/
+docs/
+brunoTesting/
