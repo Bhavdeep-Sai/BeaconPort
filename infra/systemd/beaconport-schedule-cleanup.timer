@@ -1,0 +1,15 @@
+[Unit]
+Description=BeaconPort Scheduled Job Timer: Daily Midnight Cleanup of Expired Schedules & Notices
+Requires=beaconport-schedule-cleanup.service
+
+[Timer]
+# Trigger daily at 00:00:00 UTC
+OnCalendar=*-*-* 00:00:00 UTC
+# Run immediately upon boot if a scheduled event was missed during downtime
+Persistent=true
+# Apply minor randomized delay (up to 5 minutes) to avoid resource spikes
+RandomizedDelaySec=300
+
+[Install]
+WantedBy=timers.target
+

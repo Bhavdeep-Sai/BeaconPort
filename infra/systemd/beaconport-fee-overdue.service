@@ -1,0 +1,16 @@
+[Unit]
+Description=BeaconPort Scheduled Job: Mark past-due student fee records as OVERDUE
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+User=root
+# Execute overdue fee marking inside the production container using local environment configuration
+ExecStart=/usr/bin/docker run --rm --network host --env-file /etc/beaconport/.env beaconport-api:latest node jobs/run.js feeOverdue
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+
