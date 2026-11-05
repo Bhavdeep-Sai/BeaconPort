@@ -191,6 +191,22 @@
             "created": "2025-06-23T09:20:58.485112Z",
             "modified": "2025-06-23T09:20:58.485113Z"
           }
+        },
+        {
+          "type": "http-request",
+          "name": "GET /api/attendance/summary",
+          "method": "GET",
+          "url": "{{baseUrl}}/api/attendance/summary?classId={{classId}}&startDate=2026-11-01&endDate=2026-11-30",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "body": {
+            "type": "none"
+          }
         }
       ]
     },
@@ -2263,6 +2279,272 @@
             ],
             "created": "2025-06-23T09:20:58.485578Z",
             "modified": "2025-06-23T09:20:58.485579Z"
+          }
+        }
+      ]
+    },
+    {
+      "type": "http-folder",
+      "name": "Health",
+      "children": [
+        {
+          "type": "http-request",
+          "name": "GET /health",
+          "method": "GET",
+          "url": "{{baseUrl}}/health",
+          "headers": [],
+          "body": {
+            "type": "none"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "GET /ready",
+          "method": "GET",
+          "url": "{{baseUrl}}/ready",
+          "headers": [],
+          "body": {
+            "type": "none"
+          }
+        }
+      ]
+    },
+    {
+      "type": "http-folder",
+      "name": "Fee",
+      "children": [
+        {
+          "type": "http-request",
+          "name": "POST /api/fee/bulk-generate",
+          "method": "POST",
+          "url": "{{baseUrl}}/api/fee/bulk-generate",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "body": {
+            "type": "json",
+            "json": {
+              "classId": "{{classId}}",
+              "month": "November",
+              "year": 2026,
+              "amount": 500,
+              "dueDate": "2026-11-20"
+            }
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "POST /api/fee/create",
+          "method": "POST",
+          "url": "{{baseUrl}}/api/fee/create",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "body": {
+            "type": "json",
+            "json": {
+              "studentId": "{{studentId}}",
+              "month": "November",
+              "year": 2026,
+              "amount": 500,
+              "dueDate": "2026-11-20"
+            }
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "GET /api/fee/student/:studentId",
+          "method": "GET",
+          "url": "{{baseUrl}}/api/fee/student/{{studentId}}",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "body": {
+            "type": "none"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "PUT /api/fee/update/:id",
+          "method": "PUT",
+          "url": "{{baseUrl}}/api/fee/update/{{feeId}}",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "body": {
+            "type": "json",
+            "json": {
+              "status": "PAID"
+            }
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "GET /api/fee/overview",
+          "method": "GET",
+          "url": "{{baseUrl}}/api/fee/overview",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "body": {
+            "type": "none"
+          }
+        }
+      ]
+    },
+    {
+      "type": "http-folder",
+      "name": "Salary",
+      "children": [
+        {
+          "type": "http-request",
+          "name": "POST /api/salary/generate",
+          "method": "POST",
+          "url": "{{baseUrl}}/api/salary/generate",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "body": {
+            "type": "json",
+            "json": {
+              "teacherId": "{{teacherId}}",
+              "month": "November",
+              "year": 2026,
+              "amount": 3000,
+              "paymentDate": "2026-11-01"
+            }
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "GET /api/salary/all",
+          "method": "GET",
+          "url": "{{baseUrl}}/api/salary/all",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "body": {
+            "type": "none"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "GET /api/salary/teacher/:teacherId",
+          "method": "GET",
+          "url": "{{baseUrl}}/api/salary/teacher/{{teacherId}}",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "body": {
+            "type": "none"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "PUT /api/salary/update/:id",
+          "method": "PUT",
+          "url": "{{baseUrl}}/api/salary/update/{{salaryId}}",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "body": {
+            "type": "json",
+            "json": {
+              "status": "PAID"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "http-folder",
+      "name": "AI Tutor",
+      "children": [
+        {
+          "type": "http-request",
+          "name": "POST /api/ai-tutor/chat",
+          "method": "POST",
+          "url": "{{baseUrl}}/api/ai-tutor/chat",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "body": {
+            "type": "json",
+            "json": {
+              "message": "Can you summarize the law of conservation of energy?"
+            }
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "GET /api/ai-tutor/history",
+          "method": "GET",
+          "url": "{{baseUrl}}/api/ai-tutor/history",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "body": {
+            "type": "none"
+          }
+        },
+        {
+          "type": "http-request",
+          "name": "DELETE /api/ai-tutor/clear",
+          "method": "DELETE",
+          "url": "{{baseUrl}}/api/ai-tutor/clear",
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}",
+              "enabled": true
+            }
+          ],
+          "body": {
+            "type": "none"
           }
         }
       ]
