@@ -1,0 +1,521 @@
+openapi: 3.0.3
+info:
+  title: BeaconPort School Management API
+  description: >
+    Production-grade multi-tenant RESTful API for school administration, academic tracking,
+    fee management, examination coordination, and AI-assisted tutoring.
+  version: 1.0.0
+  contact:
+    name: BeaconPort Engineering
+    url: https://github.com/Bhavdeep-Sai/BeaconPort
+
+servers:
+  - url: http://localhost:5000
+    description: Local development environment
+  - url: https://api.beaconport.example.com
+    description: Production environment (CloudFront / HTTPS origin)
+
+tags:
+  - name: Health & Probes
+    description: Container liveness and database readiness probes
+  - name: School & Auth
+    description: School tenant management and administrator authentication
+  - name: Teacher
+    description: Faculty directory, onboarding, and profile management
+  - name: Student
+    description: Student roster, enrollment, and academic profile
+  - name: Class
+    description: Classroom management and grade-level organization
+  - name: Subject
+    description: Curriculum and subject management
+  - name: Attendance
+    description: Daily student attendance tracking and aggregated analytics
+  - name: Fee
+    description: Tuition invoicing, overdue tracking, and batched generation
+  - name: Salary
+    description: Faculty payroll records and compensation tracking
+  - name: Examination
+    description: Exam timetables, grading schemas, and academic assessments
+  - name: Notice
+    description: Role-scoped campus announcements and notices
+  - name: Schedule
+    description: Timetable management and recurring event scheduling
+  - name: AI Tutor
+    description: Gemini-powered study assistant with per-student abuse limits
+
+paths:
+  # ----------------------------------------------------------------------------
+  # Health Probes
+  # ----------------------------------------------------------------------------
+  /health:
+    get:
+      tags:
+        - Health & Probes
+      summary: Liveness Probe
+      description: Verifies that the Node.js application process is running and responding.
+      responses:
+        '200':
+          description: Process healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  uptime:
+                    type: number
+                    example: 124.5
+
+  /ready:
+    get:
+      tags:
+        - Health & Probes
+      summary: Readiness Probe
+      description: Verifies database connectivity (Mongoose connection state === 1).
+      responses:
+        '200':
+          description: Application ready to receive traffic
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ready
+                  database:
+                    type: string
+                    example: connected
+        '503':
+          description: Database disconnected or unavailable
+
+  # ----------------------------------------------------------------------------
+  # School & Admin Authentication
+  # ----------------------------------------------------------------------------
+  /api/school/register:
+    post:
+      tags:
+        - School & Auth
+      summary: Register a new school tenant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - schoolName
+                - email
+                - password
+              properties:
+                schoolName:
+                  type: string
+                  example: "Springfield Academy"
+                email:
+                  type: string
+                  format: email
+                  example: "admin@springfield.edu"
+                password:
+                  type: string
+                  format: password
+                  minLength: 8
+                  example: "SuperSecurePass123!"
+      responses:
+        '201':
+          description: School registered successfully
+        '400':
+          description: Validation error or duplicate email
+
+  /api/school/login:
+    post:
+      tags:
+        - School & Auth
+      summary: Authenticate school administrator
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: "admin@springfield.edu"
+                password:
+                  type: string
+                  format: password
+                  example: "SuperSecurePass123!"
+      responses:
+        '200':
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                  user:
+                    type: object
+        '401':
+          description: Invalid email or password
+
+  /api/school/login/oauth:
+    post:
+      tags:
+        - School & Auth
+      summary: Authenticate via Google OAuth
+      description: Validates client token against Google tokeninfo endpoint.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - token
+              properties:
+                token:
+                  type: string
+                  description: Google ID token or access token
+      responses:
+        '200':
+          description: Authentication successful, returns JWT
+        '400':
+          description: Missing or invalid Google token
+        '401':
+          description: Token audience mismatch or email not verified
+
+  /api/school/all:
+    get:
+      tags:
+        - School & Auth
+      summary: List all registered schools (sanitized public gallery)
+      responses:
+        '200':
+          description: Public list with sensitive fields stripped
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                    schoolName:
+                      type: string
+                    schoolImg:
+                      type: string
+
+  # ----------------------------------------------------------------------------
+  # Students
+  # ----------------------------------------------------------------------------
+  /api/student/all:
+    get:
+      tags:
+        - Student
+      summary: List students with pagination and lean projection
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+        - in: query
+          name: search
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Paginated list of tenant students
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  students:
+                    type: array
+                    items:
+                      type: object
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  totalPages:
+                    type: integer
+
+  /api/student/register:
+    post:
+      tags:
+        - Student
+      summary: Register a new student within current school tenant
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - email
+                - password
+                - rollNum
+                - studentClass
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+                rollNum:
+                  type: string
+                studentClass:
+                  type: string
+      responses:
+        '201':
+          description: Student created successfully
+        '409':
+          description: Duplicate roll number or email within school
+
+  # ----------------------------------------------------------------------------
+  # Attendance
+  # ----------------------------------------------------------------------------
+  /api/attendance/mark:
+    post:
+      tags:
+        - Attendance
+      summary: Mark attendance for a single student
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - studentId
+                - status
+                - dateKey
+              properties:
+                studentId:
+                  type: string
+                status:
+                  type: string
+                  enum: [Present, Absent, Late]
+                dateKey:
+                  type: string
+                  example: "2026-11-05"
+      responses:
+        '200':
+          description: Attendance marked
+
+  /api/attendance/mark-bulk:
+    post:
+      tags:
+        - Attendance
+      summary: Bulk mark attendance atomically
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - attendanceData
+                - dateKey
+              properties:
+                dateKey:
+                  type: string
+                  example: "2026-11-05"
+                attendanceData:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      studentId:
+                        type: string
+                      status:
+                        type: string
+                        enum: [Present, Absent, Late]
+      responses:
+        '200':
+          description: Bulk attendance recorded
+        '409':
+          description: Attendance already recorded for dateKey
+
+  /api/attendance/summary:
+    get:
+      tags:
+        - Attendance
+      summary: Get aggregated attendance summary via MongoDB pipeline
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: classId
+          schema:
+            type: string
+        - in: query
+          name: startDate
+          schema:
+            type: string
+        - in: query
+          name: endDate
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Aggregation totals grouped by status
+
+  # ----------------------------------------------------------------------------
+  # Fee Management
+  # ----------------------------------------------------------------------------
+  /api/fee/bulk-generate:
+    post:
+      tags:
+        - Fee
+      summary: Idempotently generate batch fee invoices for a class
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - classId
+                - month
+                - year
+                - amount
+                - dueDate
+              properties:
+                classId:
+                  type: string
+                month:
+                  type: string
+                year:
+                  type: integer
+                amount:
+                  type: number
+                dueDate:
+                  type: string
+                  format: date
+      responses:
+        '200':
+          description: Batched upsert completed successfully
+
+  /api/fee/overview:
+    get:
+      tags:
+        - Fee
+      summary: Get pure read-only fee statistics overview
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Total revenue, pending, and overdue summary
+
+  # ----------------------------------------------------------------------------
+  # Notices
+  # ----------------------------------------------------------------------------
+  /api/notice/create:
+    post:
+      tags:
+        - Notice
+      summary: Publish school announcement
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+                - details
+                - audience
+              properties:
+                title:
+                  type: string
+                details:
+                  type: string
+                audience:
+                  type: string
+                  enum: [ALL, TEACHERS, STUDENTS]
+      responses:
+        '201':
+          description: Notice created
+
+  # ----------------------------------------------------------------------------
+  # AI Tutor
+  # ----------------------------------------------------------------------------
+  /api/ai-tutor/chat:
+    post:
+      tags:
+        - AI Tutor
+      summary: Send query to Gemini AI Study Tutor
+      description: Enforces 1000 character length cap and 50 messages/day quota per student.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - message
+              properties:
+                message:
+                  type: string
+                  maxLength: 1000
+                  example: "Can you explain Newton's second law of motion with a real-world example?"
+      responses:
+        '200':
+          description: AI response generated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  response:
+                    type: string
+                  remainingDailyQuota:
+                    type: integer
+        '400':
+          description: Message empty or exceeds 1000 characters
+        '429':
+          description: Daily quota (50 queries) exceeded
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
