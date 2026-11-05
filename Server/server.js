@@ -37,15 +37,6 @@ app.use(
 
 app.use(cookieParser());
 
-// Note: Since we're using Cloudinary, we no longer need local uploads directory
-// However, keeping this for backward compatibility or other file types
-const fs = require("fs");
-const uploadsDir = path.join(__dirname, "uploads");
-
-// Create uploads directory for any temporary files if needed
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
 
 // MongoDB connection
 mongoose

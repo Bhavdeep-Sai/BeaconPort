@@ -104,38 +104,20 @@ Managing large-scale student data, classes, and communication within schools is 
 
 ## 🚀 Installation Guide  
 
-### 1️⃣ Clone the repository  
-
 ```bash
-git clone https://github.com/kalviumcommunity/S86_Bhavdeep_Capstone_BeaconPort.git
+# 1. Clone the repository
+git clone https://github.com/Bhavdeep-Sai/BeaconPort.git
+cd BeaconPort
+
+# 2. Backend setup (Terminal 1)
+cd Server && npm install && npm start
+
+# 3. Frontend setup (Terminal 2)
+cd Client && npm install && npm run dev
 ```
 
-### 2️⃣ Install dependencies  
-
-```bash
-# Frontend setup
-cd client
-npm install
-
-# Backend setup
-cd ../server
-npm install
-```
-
-### 3️⃣ Set up environment variables  
-Create a `.env` file in both the **client** and **server** directories using `.env.example` as a reference.
-
-### 4️⃣ Run the application locally  
-
-```bash
-# Backend server
-cd server
-node server.js
-
-# Frontend server
-cd ../client
-npm run dev
-```
+### Environment Variables
+Create a `.env` file in both `Server` and `Client` using `.env.example` in each directory as a reference.
 
 ---
 
