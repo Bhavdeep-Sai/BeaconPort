@@ -1,0 +1,16 @@
+[Unit]
+Description=BeaconPort Scheduled Job: Clean up expired notices and stale schedules
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+User=root
+# Execute cleanup job inside the production container using local environment configuration
+ExecStart=/usr/bin/docker run --rm --network host --env-file /etc/beaconport/.env beaconport-api:latest node jobs/run.js scheduleCleanup
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+
