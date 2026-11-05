@@ -1,0 +1,110 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - phase-*
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend-test:
+    name: Backend Test & Security Audit
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Server
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22 LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: npm
+          cache-dependency-path: Server/package-lock.json
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Test Suite with Coverage
+        run: npm test -- --coverage
+        env:
+          NODE_ENV: test
+          JWT_SECRET: test_jwt_secret_key_at_least_32_characters
+          GOOGLE_CLIENT_ID: mock-google-client-id.apps.googleusercontent.com
+          GEMINI_API_KEY: mock-gemini-api-key
+
+      - name: Upload Test Coverage Artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-coverage-report
+          path: Server/coverage/
+          retention-days: 14
+
+      - name: Production Dependency Vulnerability Audit
+        run: npm audit --omit=dev --audit-level=high
+
+  frontend-build:
+    name: Frontend Client Build Verification
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Client
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22 LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: npm
+          cache-dependency-path: Client/package-lock.json
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Production Build
+        run: npm run build
+
+  secret-scan:
+    name: Gitleaks Secret Scanning
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code with Full History
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Gitleaks Secret Detector
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  docker-build:
+    name: Multi-Stage Docker Build Verification
+    needs: [backend-test, secret-scan]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Container Image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./Server
+          file: ./Server/Dockerfile
+          push: false
+          tags: beaconport-api:ci-check
