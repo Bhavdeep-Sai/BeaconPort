@@ -164,16 +164,18 @@ describe("2.1 & 2.6: Authentication & Abuse Protection", () => {
 
   describe("Rate Limiting", () => {
     it("should return 429 when authentication rate limit is exceeded", async () => {
-      // In test mode, authLimiter max is 5
+      const testIp = "203.0.113.199";
       for (let i = 0; i < 5; i++) {
         await request(app)
           .post("/api/school/login")
+          .set("X-Forwarded-For", testIp)
           .send({ email: "test@limit.com", password: "pwd" });
       }
 
       // 6th attempt should be blocked with 429
       const blockedRes = await request(app)
         .post("/api/school/login")
+        .set("X-Forwarded-For", testIp)
         .send({ email: "test@limit.com", password: "pwd" });
 
       expect(blockedRes.status).toBe(429);
