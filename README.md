@@ -90,7 +90,7 @@ Every entity within BeaconPort is strictly partitioned by the school identifier 
 erDiagram
     SCHOOL ||--o{ TEACHER : employs
     SCHOOL ||--o{ STUDENT : enrolls
-    SCHOOL ||--o{ CLASS : organizes
+    SCHOOL ||--o{ CLASSROOM : organizes
     SCHOOL ||--o{ SUBJECT : offers
     SCHOOL ||--o{ ATTENDANCE : records
     SCHOOL ||--o{ FEE : invoices
@@ -99,8 +99,8 @@ erDiagram
     SCHOOL ||--o{ NOTICE : broadcasts
     SCHOOL ||--o{ SCHEDULE : timetables
     STUDENT ||--o{ CHATHISTORY : prompts
-    CLASS ||--o{ STUDENT : contains
-    CLASS ||--o{ SUBJECT : includes
+    CLASSROOM ||--o{ STUDENT : contains
+    CLASSROOM ||--o{ SUBJECT : includes
     TEACHER ||--o{ SUBJECT : instructs
 
     SCHOOL {
@@ -137,7 +137,7 @@ erDiagram
         datetime createdAt
     }
 
-    CLASS {
+    CLASSROOM {
         ObjectId _id PK
         ObjectId school FK "Indexed {school}"
         string className
